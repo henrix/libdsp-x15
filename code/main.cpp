@@ -17,10 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
+#define	PAD	0
+
+#define __CL_ENABLE_EXCEPTIONS
+#include <CL/cl.hpp>
+
+#include "AudioAPI.hpp"
 #include <math.h>
 #include <iostream>
-#include "AudioAPI.hpp"
-
+#include <fstream>
 
 void callback(cl_event, cl_int type, void *user_data)
 {
@@ -29,19 +34,47 @@ void callback(cl_event, cl_int type, void *user_data)
 
 int main(int argc, const char* argv[])
 {
-	float *x = new float[48000]();
-	float *y = new float[48000]();
+	int sampling_rate = 48000;
+	int N = 16384;
+	int bufsize = 2*N;
+	float *x = (float*) __malloc_ddr(sizeof(float)*2*N);
+	float *y = (float*) __malloc_ddr(sizeof(float)*2*N);
 	AudioAPI *api = new AudioAPI();
 
-	for (int i=0; i < 48000; i++){
-		x[i] = sin(2*M_PI*1000*i / (double) 48000);
+	std::ofstream sinout("../test/data/1kHz_sin.txt");
+	if (sinout.is_open()){
+		for (int i=0; i < N; i++){
+			x[PAD + 2*i] = sin(2*M_PI*1000*i / (double) N);
+			x[PAD + 2*i + 1] = 0;
+			sinout << x[PAD + 2*i] << std::endl;
+		}
+		sinout.close();
+	}
+	else{
+		std::cout << "Couldn't write sin test output" << std::endl;
 	}
 
-	api->ocl_DSPF_sp_fftSPxSP(24000, x, y, 4, 16384);
+	api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384);
+
+	std::ofstream fftout("../test/data/fft_1kHz_sin.txt");
+	if (fftout.is_open()){
+		float max = 0;
+		int max_i = 0;
+		for (int i=0; i < bufsize; i++){
+			if (max < y[i]){
+				max = y[i];
+				max_i = i;
+			}
+			fftout << y[i] << std::endl;
+		}
+		std::cout << "Maximum:\t" << max << std::endl << "Index:\t\t" << max_i << std::endl;
+		fftout.close();
+	}
+	else{
+		std::cout << "Couldn't write fft test output" << std::endl;
+	}
 
 	delete api;
-	delete[] x;
-	delete[] y;
+	__free_ddr(x);
+	__free_ddr(y);
 }
-
-
