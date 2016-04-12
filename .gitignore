@@ -3,6 +3,6 @@
 *.o
 *.obj
 
-audio_dsp_lib
+X15_lib_audio
 
 .settings
