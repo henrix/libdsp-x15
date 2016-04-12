@@ -21,6 +21,12 @@
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
 
+#include <cstdlib>
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include "ocl_util.h"
+
 class AudioAPI
 {
 	unsigned int _sampling_rate, _bufsize_fft, _bufsize_ifft;
