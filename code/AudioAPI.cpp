@@ -63,7 +63,8 @@ AudioAPI::AudioAPI() : _N_fft(0), _N_ifft(0) {
         _program = new cl::Program(*_context, source);
         _program->build(devices, "./dsplib.ae66");
 
-        _Q = new cl::CommandQueue(*_context, devices[0], CL_QUEUE_PROFILING_ENABLE);
+        _Qfft = new cl::CommandQueue(*_context, devices[0], CL_QUEUE_PROFILING_ENABLE);
+        _Qifft = new cl::CommandQueue(*_context, devices[0], CL_QUEUE_PROFILING_ENABLE);
     }
     catch(cl::Error &err) {
         std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
@@ -71,11 +72,11 @@ AudioAPI::AudioAPI() : _N_fft(0), _N_ifft(0) {
 }
 
 AudioAPI::~AudioAPI() {
-	delete _bufX;
-	delete _bufY;
-	delete _bufW;
+	delete _bufFFTX;
+	delete _bufFFTY;
+	delete _bufFFTW;
 	delete _program;
-	__free_ddr(_w);
+	__free_ddr(_wFFT);
 }
 
 int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
@@ -85,28 +86,28 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
         if (N != _N_fft) {
             _N_fft = N;
             delete _fftKernel;
-            delete _bufX;
-            delete _bufY;
-            delete _bufW;
-            if (_w)
-                __free_ddr(_w);
+            delete _bufFFTX;
+            delete _bufFFTY;
+            delete _bufFFTW;
+            if (_wFFT)
+                __free_ddr(_wFFT);
 
             _bufsize_fft = sizeof(float) * (2*_N_fft + PAD + PAD);
-            _w = (float*) __malloc_ddr(sizeof(float)*2*_N_fft);
+            _wFFT = (float*) __malloc_ddr(sizeof(float)*2*_N_fft);
 
             //memset (y, 0xA5, sizeof (y));
-            _twGen(_w, _N_fft);
+            _twGen(_wFFT, _N_fft);
             
 
-            _bufX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_fft, x);
-            _bufY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_fft, y);
-            _bufW = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_fft, _w);
+            _bufFFTX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_fft, x);
+            _bufFFTY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_fft, y);
+            _bufFFTW = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_fft, _wFFT);
 
             _fftKernel = new cl::Kernel(*_program, "ocl_DSPF_sp_fftSPxSP");
             _fftKernel->setArg(0, _N_fft);
-            _fftKernel->setArg(1, *_bufX);
-            _fftKernel->setArg(2, *_bufW);
-            _fftKernel->setArg(3, *_bufY);
+            _fftKernel->setArg(1, *_bufFFTX);
+            _fftKernel->setArg(2, *_bufFFTW);
+            _fftKernel->setArg(3, *_bufFFTY);
             int rad = 4;
             _fftKernel->setArg(4, rad); //n_min
             _fftKernel->setArg(5, _N_fft); //n_max
@@ -115,16 +116,18 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
         cl::Event ev1, ev2;
         //ev2.setCallback(CL_COMPLETE, completeFFTEvt, NULL);
         std::vector<cl::Event> evs(2);
-        _Q->enqueueWriteBuffer(*_bufX, CL_FALSE, 0, _bufsize_fft, x, 0, &evs[0]);
-        _Q->enqueueWriteBuffer(*_bufW, CL_FALSE, 0, _bufsize_fft, _w, 0, &evs[1]);
-        _Q->enqueueTask(*_fftKernel, &evs, &ev1);
+        _Qfft->enqueueWriteBuffer(*_bufFFTX, CL_FALSE, 0, _bufsize_fft, x, 0, &evs[0]);
+        _Qfft->enqueueWriteBuffer(*_bufFFTW, CL_FALSE, 0, _bufsize_fft, _wFFT, 0, &evs[1]);
+        _Qfft->enqueueTask(*_fftKernel, &evs, &ev1);
         //ev1.wait();
-        _Q->enqueueReadBuffer(*_bufY, CL_TRUE, 0, _bufsize_fft, y, 0, &ev2);
+        _Qfft->enqueueReadBuffer(*_bufFFTY, CL_TRUE, 0, _bufsize_fft, y, 0, &ev2);
         //ev2.wait();
         ocl_event_times(evs[0], "Write X");
         ocl_event_times(evs[1], "Twiddle");
         ocl_event_times(ev1, "FFT");
         ocl_event_times(ev2, "Read Y");
+
+        //TODO: Generate and return ID for referencing task in callback
     }
     catch (cl::Error &err)
     { std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; }	
@@ -133,6 +136,55 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
 int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x, 
 	float *y, int n_min, int n_max) {
 
+	try{
+	        if (N != _N_ifft) {
+	            _N_ifft = N;
+	            delete _ifftKernel;
+	            delete _bufIFFTX;
+	            delete _bufIFFTY;
+	            delete _bufIFFTW;
+	            if (_wIFFT)
+	                __free_ddr(_wIFFT);
+
+	            _bufsize_ifft = sizeof(float) * (2*_N_ifft + PAD + PAD);
+	            _wIFFT = (float*) __malloc_ddr(sizeof(float)*2*_N_ifft);
+
+	            //memset (y, 0xA5, sizeof (y));
+	            _twGen(_wIFFT, _N_ifft);
+
+
+	            _bufIFFTX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_ifft, x);
+	            _bufIFFTY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_ifft, y);
+	            _bufIFFTW = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_ifft, _wIFFT);
+
+	            _ifftKernel = new cl::Kernel(*_program, "ocl_DSPF_sp_ifftSPxSP");
+	            _ifftKernel->setArg(0, _N_ifft);
+	            _ifftKernel->setArg(1, *_bufIFFTX);
+	            _ifftKernel->setArg(2, *_bufIFFTW);
+	            _ifftKernel->setArg(3, *_bufIFFTY);
+	            int rad = 4;
+	            _ifftKernel->setArg(4, rad); //n_min
+	            _ifftKernel->setArg(5, _N_ifft); //n_max
+	        }
+
+	        cl::Event ev1, ev2;
+	        //ev2.setCallback(CL_COMPLETE, completeFFTEvt, NULL);
+	        std::vector<cl::Event> evs(2);
+	        _Qifft->enqueueWriteBuffer(*_bufIFFTX, CL_FALSE, 0, _bufsize_ifft, x, 0, &evs[0]);
+	        _Qifft->enqueueWriteBuffer(*_bufIFFTW, CL_FALSE, 0, _bufsize_ifft, _wIFFT, 0, &evs[1]);
+	        _Qifft->enqueueTask(*_ifftKernel, &evs, &ev1);
+	        //ev1.wait();
+	        _Qifft->enqueueReadBuffer(*_bufIFFTY, CL_TRUE, 0, _bufsize_ifft, y, 0, &ev2);
+	        //ev2.wait();
+	        ocl_event_times(evs[0], "Write X");
+	        ocl_event_times(evs[1], "Twiddle");
+	        ocl_event_times(ev1, "IFFT");
+	        ocl_event_times(ev2, "Read Y");
+
+	        //TODO: Generate and return ID for referencing task in callback
+	    }
+	    catch (cl::Error &err)
+	    { std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; }
 }
 
 void AudioAPI::data_callback(int id, int size, float *buf) {

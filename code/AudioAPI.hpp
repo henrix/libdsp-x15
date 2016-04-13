@@ -25,17 +25,20 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include "ocl_util.h"
 
 class AudioAPI
 {
 	unsigned int _sampling_rate, _bufsize_fft, _bufsize_ifft;
 	int _N_fft, _N_ifft;
-	float *_w;
+	float *_wFFT, *_wIFFT;
+	//std::map<int, >
 	cl::Kernel *_fftKernel, *_ifftKernel;
-	cl::Buffer *_bufX, *_bufY, *_bufW;
+	cl::Buffer *_bufFFTX, *_bufFFTY, *_bufFFTW;
+	cl::Buffer *_bufIFFTX, *_bufIFFTY, *_bufIFFTW;
 	cl::Program *_program;
-	cl::CommandQueue *_Q;
+	cl::CommandQueue *_Qfft, *_Qifft;
 	cl::Context *_context;
 
 	static void _twGen(float *w, int n);
