@@ -13,10 +13,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#include "AudioAPI.hpp"
+#ifndef AUDIO_API_H_
+#define AUDIO_API_H_
 
-int main(int argc, const char* argv[]) {
+#define __CL_ENABLE_EXCEPTIONS
+#include <CL/cl.hpp>
 
-}
+class AudioAPI
+{
+	unsigned int _sampling_rate, _N; //0.5 Hz resolution
+	//float _x[], _y[], _z[];
+	//std::Buffer _bufX, _bufY, _bufW;
+	//cl::Kernel _audioKernel;
 
+	void _tw_gen(float *w, int n);
 
+public:
+	AudioAPI(unsigned int sampling_rate = 48000);
+	~AudioAPI();
+	void ocl_DSPF_sp_fftSPxSP_r2c(int N, float *x, float *w, 
+		float *y, int n_min, int n_max);
+	void ocl_DSPF_sp_ifftSPxSP_c2r(int N, float *x, float *w, 
+		float *y, int n_min, int n_max);
+};
+
+#endif
