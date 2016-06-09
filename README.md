@@ -7,8 +7,9 @@ The C66x DSP library is developed in this repository. The Linux Kernel developme
 2. Boot SD-Card
 3. Install sshfs: ```sudo apt-get install sshfs```
 4. Mount root file system of SBC via sshfs (e.g. ```sshfs root@<IP-Adress of BeagleBoard-X15>:/ ~/mnt```)
-5. Switch to code directory in this repo
-6. Compile project and demo: ```make```
+5. Set enviroment variable to target root dir: ```export $TARGET_ROOTDIR=~/mnt```
+6. Switch to code directory in this repo
+7. Compile project and demo: ```make```
 
 ## Important Sources
 
