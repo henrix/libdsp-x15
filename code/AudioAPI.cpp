@@ -26,13 +26,14 @@
 
 #define	PAD	0
 
+
 AudioAPI::AudioAPI(unsigned int sampling_rate) : _sampling_rate(sampling_rate), 
 	_N(sampling_rate/2)
 
 {
-	//_x = float[N*2];
-	//_y = float[N*2];
-	//_w = float[N*2];
+	_x = new float[_N*2]();
+	_y = new float[_N*2]();
+	_w = new float[_N*2]();
 
 	try {
         cl::Context context(CL_DEVICE_TYPE_ACCELERATOR);
@@ -41,27 +42,32 @@ AudioAPI::AudioAPI(unsigned int sampling_rate) : _sampling_rate(sampling_rate),
         std::ifstream t("./audio_kernel.cl");
         if (!t) { std::cout << "Error Opening Kernel Source file\n"; exit(-1); }
 
-        int bufsize = sizeof(float) * (2*_N + PAD + PAD);
+        unsigned int bufsize = sizeof(float) * (2*_N + PAD + PAD);
 
-        //Buffer _bufX(context, CL_MEM_READ_ONLY,  bufsize);
-     	//Buffer _bufY(context, CL_MEM_WRITE_ONLY, bufsize);
-     	//Buffer _bufW(context, CL_MEM_READ_ONLY,  bufsize);
+        _bufX = new cl::Buffer(context, CL_MEM_READ_ONLY,  bufsize);
+     	_bufY = new cl::Buffer(context, CL_MEM_WRITE_ONLY, bufsize);
+     	_bufW = new cl::Buffer(context, CL_MEM_READ_ONLY,  bufsize);
 
         std::string kSrc((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
         cl::Program::Sources    source(1, std::make_pair(kSrc.c_str(),kSrc.length()));
         cl::Program             program = cl::Program(context, source);
         program.build(devices, "./dsplib.ae66");
 
+        _audioKernel = new cl::Kernel(program, "ocl_DSPF_sp_fftSPxSP_r2c");
     }
     catch(cl::Error err) {
-
         std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 }
 
 AudioAPI::~AudioAPI()
 {
-
+	delete[] _x;
+	delete[] _y;
+	delete[] _w;
+	delete _bufX;
+	delete _bufY;
+	delete _bufW;
 }
 
 void AudioAPI::ocl_DSPF_sp_fftSPxSP_r2c(int N, float *x, float *w, 

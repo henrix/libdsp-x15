@@ -16,7 +16,7 @@
 #include "AudioAPI.hpp"
 
 int main(int argc, const char* argv[]) {
-
+    AudioAPI audio_api();
 }
 
 

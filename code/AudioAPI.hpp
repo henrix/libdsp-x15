@@ -1,4 +1,6 @@
 /***********************************************************************
+ * Author: Henrik Langer (henni19790@gmail.com)
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,9 +24,9 @@
 class AudioAPI
 {
 	unsigned int _sampling_rate, _N; //0.5 Hz resolution
-	//float _x[], _y[], _z[];
-	//std::Buffer _bufX, _bufY, _bufW;
-	//cl::Kernel _audioKernel;
+	float *_x, *_y, *_w;
+	cl::Buffer *_bufX, *_bufY, *_bufW;
+	cl::Kernel *_audioKernel;
 
 	void _tw_gen(float *w, int n);
 

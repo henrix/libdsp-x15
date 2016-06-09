@@ -1,4 +1,4 @@
-EXE       = audio-dsp-lib
+EXE       = audio_dsp_lib
 CPP_FLAGS = -O3
 
 include ./make.inc
