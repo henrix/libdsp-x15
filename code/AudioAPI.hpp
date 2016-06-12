@@ -23,20 +23,42 @@
 
 class AudioAPI
 {
-	unsigned int _sampling_rate, _N; //0.5 Hz resolution
-	float *_x, *_y, *_w;
+	unsigned int _sampling_rate, _bufsize_fft, _bufsize_ifft;
+	int _N_fft, _N_ifft;
+	float *_w;
+	cl::Kernel *_fftKernel, *_ifftKernel;
 	cl::Buffer *_bufX, *_bufY, *_bufW;
-	cl::Kernel *_audioKernel;
+	cl::Program *_program;
+	cl::CommandQueue *_Q;
+	cl::Context *_context;
 
-	void _tw_gen(float *w, int n);
+	void _twGen(float *w, int n);
+	//void _completeFFTEvt(cl::Event, );
 
 public:
-	AudioAPI(unsigned int sampling_rate = 48000);
+	enum ops {
+		FFT,
+		IFFT,
+		FIR,
+		IIR,
+		CONV
+	};
+	AudioAPI();
 	~AudioAPI();
-	void ocl_DSPF_sp_fftSPxSP_r2c(int N, float *x, float *w, 
+	/**
+	 * Calculate FFT
+	 * @param N
+	 * @param x input buffer
+	 * @param y output buffer
+	 * @param n_min
+	 * @param n_max
+	 * @return ID of task
+	 */
+	int ocl_DSPF_sp_fftSPxSP(int N, float *x, 
 		float *y, int n_min, int n_max);
-	void ocl_DSPF_sp_ifftSPxSP_c2r(int N, float *x, float *w, 
+	int ocl_DSPF_sp_ifftSPxSP(int N, float *x, 
 		float *y, int n_min, int n_max);
+	void data_callback(int id, int size, float *buf);
 };
 
 #endif

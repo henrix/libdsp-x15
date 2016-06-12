@@ -26,34 +26,26 @@
 
 #define	PAD	0
 
-
-AudioAPI::AudioAPI(unsigned int sampling_rate) : _sampling_rate(sampling_rate), 
-	_N(sampling_rate/2)
-
+AudioAPI::AudioAPI() : _N_fft(0), _N_ifft(0)
 {
-	_x = new float[_N*2]();
-	_y = new float[_N*2]();
-	_w = new float[_N*2]();
 
 	try {
-        cl::Context context(CL_DEVICE_TYPE_ACCELERATOR);
-        std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+        _context = new cl::Context(CL_DEVICE_TYPE_ACCELERATOR);
+        std::vector<cl::Device> devices = _context->getInfo<CL_CONTEXT_DEVICES>();
+
+        int num;
+ 		devices[0].getInfo(CL_DEVICE_MAX_COMPUTE_UNITS, &num);
+ 		std::cout << "Found " << num << " DSP compute cores." << std::endl;
 
         std::ifstream t("./audio_kernel.cl");
         if (!t) { std::cout << "Error Opening Kernel Source file\n"; exit(-1); }
 
-        unsigned int bufsize = sizeof(float) * (2*_N + PAD + PAD);
-
-        _bufX = new cl::Buffer(context, CL_MEM_READ_ONLY,  bufsize);
-     	_bufY = new cl::Buffer(context, CL_MEM_WRITE_ONLY, bufsize);
-     	_bufW = new cl::Buffer(context, CL_MEM_READ_ONLY,  bufsize);
-
         std::string kSrc((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
         cl::Program::Sources    source(1, std::make_pair(kSrc.c_str(),kSrc.length()));
-        cl::Program             program = cl::Program(context, source);
-        program.build(devices, "./dsplib.ae66");
+        _program = new cl::Program(*_context, source);
+        _program->build(devices, "./dsplib.ae66");
 
-        _audioKernel = new cl::Kernel(program, "ocl_DSPF_sp_fftSPxSP_r2c");
+        _Q = new cl::CommandQueue(*_context, devices[0]);
     }
     catch(cl::Error err) {
         std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
@@ -62,21 +54,51 @@ AudioAPI::AudioAPI(unsigned int sampling_rate) : _sampling_rate(sampling_rate),
 
 AudioAPI::~AudioAPI()
 {
-	delete[] _x;
-	delete[] _y;
-	delete[] _w;
 	delete _bufX;
 	delete _bufY;
 	delete _bufW;
+	delete _program;
+	delete [] _w;
 }
 
-void AudioAPI::ocl_DSPF_sp_fftSPxSP_r2c(int N, float *x, float *w, 
+int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x, 
 	float *y, int n_min, int n_max)
 {
+	if (N != _N_fft) {
+		_N_fft = N;
+		delete _fftKernel;
+		delete _bufX;
+		delete _bufY;
+		delete _bufW;
+		delete [] _w;
+		_w = new float[_N_fft*2]();
+		_twGen(_w, _N_fft);
+		_bufsize_fft = sizeof(float) * (2*_N_fft + PAD + PAD);
+
+    	_bufX = new cl::Buffer(*_context, CL_MEM_READ_ONLY,  _bufsize_fft);
+    	_bufY = new cl::Buffer(*_context, CL_MEM_WRITE_ONLY, _bufsize_fft);
+    	_bufW = new cl::Buffer(*_context, CL_MEM_READ_ONLY,  _bufsize_fft);
+
+    	_fftKernel = new cl::Kernel(*_program, "ocl_DSPF_sp_fftSPxSP");
+		_fftKernel->setArg(0, _N_fft);
+		_fftKernel->setArg(1, *_bufX);
+		_fftKernel->setArg(2, *_bufW);
+		_fftKernel->setArg(3, *_bufY);
+		int rad = 4;
+		_fftKernel->setArg(4, rad); //n_min
+		_fftKernel->setArg(5, _N_fft); //n_max
+	}
+
+	cl::Event ev1, ev2;
+	std::vector<cl::Event> evs(2);
+	_Q->enqueueWriteBuffer(*_bufX, CL_FALSE, 0, _bufsize_fft, x, 0, &evs[0]);
+    _Q->enqueueWriteBuffer(*_bufW, CL_FALSE, 0, _bufsize_fft, _w, 0, &evs[1]);
+    _Q->enqueueTask(*_fftKernel, &evs, &ev1);
+    _Q->enqueueReadBuffer(*_bufY, CL_TRUE, 0, _bufsize_fft, y, 0, &ev2);
 
 }
 
-void AudioAPI::ocl_DSPF_sp_ifftSPxSP_c2r(int N, float *x, float *w, 
+int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x, 
 	float *y, int n_min, int n_max)
 {
 
@@ -86,7 +108,7 @@ void AudioAPI::ocl_DSPF_sp_ifftSPxSP_c2r(int N, float *x, float *w,
     Function for generating Specialized sequence of twiddle factors 
     (took from TI OpenCL (FFT) example)
 */
-void AudioAPI::_tw_gen(float *w, int n)
+void AudioAPI::_twGen(float *w, int n)
 {
     int i, j, k;
     const double PI = 3.141592654;
@@ -104,4 +126,9 @@ void AudioAPI::_tw_gen(float *w, int n)
             k += 6;
         }
     }
+}
+
+void data_callback(int id, int size, float *buf)
+{
+
 }

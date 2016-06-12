@@ -17,6 +17,13 @@
 
 int main(int argc, const char* argv[]) {
     AudioAPI audio_api();
+
+    //_x = new float[_N_fft*2]();
+    //_y = new float[_N_fft*2]();
+    //delete[] _x;
+    //delete[] _y;
+    //delete[] _w;
+    
 }
 
 

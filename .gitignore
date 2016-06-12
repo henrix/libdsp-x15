@@ -1,0 +1,8 @@
+*.slo
+*.lo
+*.o
+*.obj
+
+audio_dsp_lib
+
+.settings
