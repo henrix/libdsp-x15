@@ -1,21 +1,6 @@
-EXE       = audio_dsp_lib
-CPP_FLAGS = -O3
-
-DSP_INCLUDE += -I$(TARGET_ROOTDIR)/usr/share/ti/cgt-c6x/include
-DSP_INCLUDE += -I$(TARGET_ROOTDIR)/usr/share/ti/opencl
-
-CPP   = g++ 
-CL6X  = cl6x -mv6600 --abi=eabi $(DSP_INCLUDE)
-CLOCL = clocl
-
-LIBS  = -lOpenCL -locl_util
-
-UNAME_M :=$(shell uname -m)
-
-$(EXE): main.o AudioAPI.o
-	@$(CPP) $(CPP_FLAGS) $< $(LD_FLAGS) $(LIBS) -o $@
-
-.DEFAULT_GOAL := all
+EXE = X15_lib_audio
+TARGET_ROOTDIR = /opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/targetNFS/
+BIN = /opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/linux-devkit/sysroots/x86_64-arago-linux/usr/bin/
 
 ifneq ($(MAKECMDGOALS),clean)
     ifeq ($(TARGET_ROOTDIR),)
@@ -23,9 +8,21 @@ ifneq ($(MAKECMDGOALS),clean)
     endif
 endif
 
-all: override CPP = arm-linux-gnueabihf-g++ 
-all: CPP_FLAGS += -I$(TARGET_ROOTDIR)/usr/include -idirafter /usr/include
-all: LD_FLAGS = -L$(TARGET_ROOTDIR)/lib -L$(TARGET_ROOTDIR)/usr/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/usr/lib 
+CPP = $(BIN)/arm-linux-gnueabihf-g++ 
+CPP_FLAGS = -O3 -I$(TARGET_ROOTDIR)/usr/include -idirafter /usr/include
+LD_FLAGS = -L$(TARGET_ROOTDIR)/lib -L$(TARGET_ROOTDIR)/usr/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/usr/lib
+
+DSP_INCLUDE = -I$(TARGET_ROOTDIR)/usr/share/ti/cgt-c6x/include
+DSP_INCLUDE += -I$(TARGET_ROOTDIR)/usr/share/ti/opencl
+
+CL6X  = $(BIN)/cl6x -mv6600 --abi=eabi $(DSP_INCLUDE)
+CLOCL = $(BIN)/clocl
+
+LIBS  = -lOpenCL -locl_util
+
+UNAME_M :=$(shell uname -m)
+
+OBJ = main.o AudioAPI.o 
 
 %.o: %.cpp
 	@echo Compiling $<
@@ -47,9 +44,10 @@ all: LD_FLAGS = -L$(TARGET_ROOTDIR)/lib -L$(TARGET_ROOTDIR)/usr/lib -Wl,-rpath-l
 	@echo Compiling $< 
 	@$(CLOCL) -t $(CLOCL_FLAGS) $^
 
-$(EXE):
+all: $(EXE)
 
-all:     $(EXE)
+$(EXE): $(OBJ)
+	@$(CPP) $(CPP_FLAGS) -o $(EXE) $(OBJ) $(LD_FLAGS) $(LIBS)
 
 clean::
 	@rm -f $(EXE) *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h
@@ -57,4 +55,4 @@ clean::
 test: clean $(EXE)
 	@echo Running   $(EXE)
 	@./$(EXE) >> /dev/null
-	@if [ $$? -ne 0 ] ; then echo "FAILED !!!" ; fi
+	@if [ $$? -ne 0 ] ; then echo "FAILED !!!" ; fi	

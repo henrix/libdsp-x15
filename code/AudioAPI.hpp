@@ -32,8 +32,7 @@ class AudioAPI
 	cl::CommandQueue *_Q;
 	cl::Context *_context;
 
-	void _twGen(float *w, int n);
-	//void _completeFFTEvt(cl::Event, );
+	static void _twGen(float *w, int n);
 
 public:
 	enum ops {
@@ -45,6 +44,7 @@ public:
 	};
 	AudioAPI();
 	~AudioAPI();
+	static void completeFFTEvt(cl_event, cl_int type, void *user_data);
 	/**
 	 * Calculate FFT
 	 * @param N
