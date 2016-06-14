@@ -121,7 +121,7 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
     _Q->enqueueWriteBuffer(*_bufW, CL_FALSE, 0, _bufsize_fft, _w, 0, &evs[1]);
     _Q->enqueueTask(*_fftKernel, &evs, &ev1);
     _Q->enqueueReadBuffer(*_bufY, CL_TRUE, 0, _bufsize_fft, y, 0, &ev2);
-
+    ev2.wait();
 }
 
 int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x, 

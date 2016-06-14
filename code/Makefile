@@ -46,7 +46,7 @@ OBJ = main.o AudioAPI.o
 
 all: $(EXE)
 
-$(EXE): $(OBJ)
+$(EXE): $(OBJ) audiokernel.out
 	@$(CPP) $(CPP_FLAGS) -o $(EXE) $(OBJ) $(LD_FLAGS) $(LIBS)
 
 clean::
