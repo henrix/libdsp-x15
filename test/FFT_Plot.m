@@ -34,10 +34,10 @@ f = 0:0.5:16384 - 0.5;
 figure(1)
 clf();
 subplot(2,1,1)
-plot(t, sinData)
+plot(t(1:50), sinData(1:50))
 grid on
-title('Plot of test signal (1kHz sine)')
-xlabel('Time')
+title('Plot of 1kHz sine with 16384 Hz sampling rate')
+xlabel('Time (s)')
 ylabel('Amplitude')
 subplot(2,1,2)
 plot(f, fftData)
@@ -47,7 +47,7 @@ text(f(minFFT_i),minFFT,strMin,'HorizontalAlignment','left');
 text(f(maxFFT_i),maxFFT,strMax,'HorizontalAlignment','left');
 line()
 grid on
-title('Plot of computed spectrum using FFT on C66x DSP')
+title('Plot of computed spectrum using DSP FFT with N = 16384')
 xlabel('Frequency (Hz)')
 ylabel('Amplitude')
 
