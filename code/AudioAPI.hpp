@@ -33,7 +33,6 @@ class AudioAPI
 	unsigned int _sampling_rate, _bufsize_fft, _bufsize_ifft;
 	int _N_fft, _N_ifft;
 	float *_wFFT, *_wIFFT;
-	//std::map<int, >
 	cl::Kernel *_fftKernel, *_ifftKernel;
 	cl::Buffer *_bufFFTX, *_bufFFTY, *_bufFFTW;
 	cl::Buffer *_bufIFFTX, *_bufIFFTY, *_bufIFFTW;
@@ -49,11 +48,11 @@ public:
 		IFFT,
 		FIR,
 		IIR,
-		CONV
+		CONV,
+		UNDEFINED
 	};
 	AudioAPI();
 	~AudioAPI();
-	static void completeFFTEvt(cl_event, cl_int type, void *user_data);
 	/**
 	 * Calculate FFT
 	 * @param N
@@ -64,10 +63,11 @@ public:
 	 * @return ID of task
 	 */
 	int ocl_DSPF_sp_fftSPxSP(int N, float *x, 
-		float *y, int n_min, int n_max);
+		float *y, int n_min, int n_max,
+		void (*callback)(cl_event ev, cl_int e_status, void *user_data));
 	int ocl_DSPF_sp_ifftSPxSP(int N, float *x, 
-		float *y, int n_min, int n_max);
-	void data_callback(int id, int size, float *buf);
+		float *y, int n_min, int n_max,
+		void (*callback)(cl_event ev, cl_int e_status, void *user_data));
 };
 
 #endif

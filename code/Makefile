@@ -13,6 +13,7 @@ DSP_INCLUDE = -I$(TARGET_ROOTDIR)/usr/share/ti/cgt-c6x/include
 DSP_INCLUDE += -I$(TARGET_ROOTDIR)/usr/share/ti/opencl
 
 CPP = g++ 
+CPP_FLAGS = -mfpu=neon -O3 -g
 CL6X  = cl6x -mv6600 --abi=eabi $(DSP_INCLUDE)
 CLOCL = clocl
 
@@ -52,7 +53,7 @@ else ifneq (,$(findstring 86, $(UNAME_M)))
     all: LD_FLAGS = -L$(TARGET_ROOTDIR)/lib -L$(TARGET_ROOTDIR)/usr/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/usr/lib 
 endif
 
-OBJ = main.o AudioAPI.o 
+OBJ = AudioAPI.o main.o
 
 %.o: %.cpp
 	@echo Compiling $<
