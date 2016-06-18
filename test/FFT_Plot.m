@@ -18,29 +18,34 @@
 #######################################################################
  
 # Sine test
-sinID = fopen('data/1kHz_sin.txt', 'r');
-fftID = fopen('data/fft_1kHz_sin.txt', 'r');
+sinID = fopen('data/sine.txt', 'r');
+fftID = fopen('data/fft_sine.txt', 'r');
+ifftID = fopen('data/ifft_sine_spectrum.txt', 'r');
 formatSpec = '%f';
 sinData = fscanf(sinID, formatSpec);
 fftData = fscanf(fftID, formatSpec);
+ifftData = fscanf(ifftID, formatSpec);
 fclose(sinID);
 fclose(fftID);
+fclose(ifftID);
 
 N = 16384;
 t = 0:1/16384:1 - 1/16384;
-f = -(N/2):0.5:(N/2)-0.5;
+f = -(N/2)-0.5:0.5:(N/2)-1;
 [minFFT, minFFT_i] = min(fftData);
 [maxFFT, maxFFT_i] = max(fftData);
+[minIFFT, minIFFT_i] = min(ifftData);
+[maxIFFT, maxIFFT_i] = max(ifftData);
 
 figure(1)
 clf();
-subplot(2,1,1)
-plot(t(1:50), sinData(1:50))
+subplot(3,1,1)
+stem(t(1:50), sinData(1:50))
 grid on
-title('Plot of 1kHz sine with 16384 Hz sampling rate')
+title('Plot of generated sine')
 xlabel('Time (s)')
 ylabel('Amplitude')
-subplot(2,1,2)
+subplot(3,1,2)
 plot(f, fftData)
 strMin = [num2str(f(minFFT_i)), ' Hz'];
 strMax = [num2str(f(maxFFT_i)), ' Hz'];
@@ -48,75 +53,21 @@ text(f(minFFT_i),minFFT,strMin,'HorizontalAlignment','left');
 text(f(maxFFT_i),maxFFT,strMax,'HorizontalAlignment','left');
 line()
 grid on
-title('Plot of computed sine spectrum using DSP FFT with N = 16384')
+title('Plot of computed sine spectrum')
 xlabel('Frequency (Hz)')
 ylabel('Amplitude')
-
-print fft_test_sine.pdf
-
-# Rect test
-rectID = fopen('data/1kHz_rect.txt', 'r');
-fftID = fopen('data/fft_1kHz_rect.txt', 'r');
-formatSpec = '%f';
-rectData = fscanf(rectID, formatSpec);
-fftData = fscanf(fftID, formatSpec);
-fclose(rectID);
-fclose(fftID);
-
-N = 16384;
-t = 0:1/16384:1 - 1/16384;
-f = 0:0.5:16384 - 0.5;
-[minFFT, minFFT_i] = min(fftData);
-[maxFFT, maxFFT_i] = max(fftData);
-
-figure(2)
-clf();
-subplot(2,1,1)
-plot(t(1:50), rectData(1:50))
-grid on
-title('Plot of 1kHz rect with 16384 Hz sampling rate')
-xlabel('Time (s)')
-ylabel('Amplitude')
-subplot(2,1,2)
-plot(f, fftData)
-strMin = [num2str(minFFT_i/2 - 1), ' Hz'];
-strMax = [num2str(maxFFT_i/2 - 1), ' Hz'];
-text(f(minFFT_i),minFFT,strMin,'HorizontalAlignment','left');
-text(f(maxFFT_i),maxFFT,strMax,'HorizontalAlignment','left');
+subplot(3,1,3)
+stem(t(1:50), ifftData(1:50))
+strMin = [num2str(f(minIFFT_i)), ' Hz'];
+strMax = [num2str(f(maxIFFT_i)), ' Hz'];
+text(f(minIFFT_i),minIFFT,strMin,'HorizontalAlignment','left');
+text(f(maxIFFT_i),maxIFFT,strMax,'HorizontalAlignment','left');
 line()
 grid on
-title('Plot of computed rect spectrum using DSP FFT with N = 16384')
-xlabel('Frequency (Hz)')
-ylabel('Amplitude')
-
-
-# IFFT of rect spectrum test
-ifftID = fopen('data/ifft_1kHz_rect_spectrum.txt', 'r');
-formatSpec = '%f';
-ifftData = fscanf(ifftID, formatSpec);
-fclose(ifftID);
-
-N = 16384;
-t = 0:1/16384:1 - 1/16384;
-f = 0:0.5:16384 - 0.5;
-[minFFT, minFFT_i] = min(ifftData);
-[maxFFT, maxFFT_i] = max(ifftData);
-
-figure(2)
-clf();
-subplot(2,1,1)
-plot(f, fftData)
-grid on
-title('Plot of rect spectrum using DSP FFT with N = 16384')
-xlabel('Frequency (Hz)')
-ylabel('Amplitude')
-subplot(2,1,2)
-plot(t(1:50), ifftData(1:50))
-grid on
-title('Plot of computed IFFT of rect spectrum using DSP IFFT with N = 16384')
+title('Plot of reconstructed sine')
 xlabel('Time (s)')
 ylabel('Amplitude')
 
-#pause(10)
+% pause(10)
 
-print ifft_test_rect.pdf
+print fft_test_sine.pdf
