@@ -23,31 +23,32 @@
 #include <CL/cl.hpp>
 
 #include "AudioAPI.hpp"
+#include "CallbackResponse.hpp"
 #include <math.h>
 #include <iostream>
 #include <fstream>
 
-void callback(cl_event, cl_int type, void *user_data)
-{
-	std::cout << "FFT finished" << std::endl;
-}
+int N = 16384;
+bool fftFinished = false, ifftFinished = false;
+
+void callbackFFT(cl_event ev, cl_int type, void *user_data);
+void callbackIFFT(cl_event ev, cl_int type, void *user_data);
 
 int main(int argc, const char* argv[])
 {
+	AudioAPI *api;
 	int sampling_rate = 48000;
-	int N = 16384;
 	int bufsize = 2*N;
 	float *x = (float*) __malloc_ddr(sizeof(float)*2*N);
 	float *y = (float*) __malloc_ddr(sizeof(float)*2*N);
-	AudioAPI *api = new AudioAPI();
 
 	/**
-	 * FFT Test Sine 1kHz
+	 * Generate sine
 	 */
-	std::ofstream sinout("../test/data/1kHz_sin.txt");
+	std::ofstream sinout("../test/data/sine.txt");
 	if (sinout.is_open()){
 		for (int i=0; i < N; i++){
-			x[PAD + 2*i] = sin(2*M_PI*1000*i / (double) N);
+			x[PAD + 2*i] = sin(2*M_PI*2048*i / (double) N);
 			x[PAD + 2*i + 1] = 0;
 			sinout << x[PAD + 2*i] << std::endl;
 		}
@@ -57,75 +58,64 @@ int main(int argc, const char* argv[])
 		std::cout << "Couldn't write sine test output" << std::endl;
 	}
 
-	api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384);
-
-	std::ofstream fftoutsine("../test/data/fft_1kHz_sin.txt");
-	if (fftoutsine.is_open()){
-		for (int i=0; i < N*2; i++){
-			fftoutsine << y[i] << std::endl;
-		}
-		fftoutsine.close();
-	}
-	else{
-		std::cout << "Couldn't write fft sine test output" << std::endl;
-	}
-
-
-	/**
-	 * FFT Test Rect 1kHz
-	 */
-	std::ofstream rectout("../test/data/1kHz_rect.txt");
-	if (rectout.is_open()){
-		for (int i=0; i < N; i++){
-			if (i % (N/1000) <= (N/1000)/2){
-				x[PAD + 2*i] = 1.0;
-				x[PAD + 2*i + 1] = 0.0;
-			}
-			else{
-				x[PAD + 2*i] = 0.0;
-				x[PAD + 2*i + 1] = 0.0;
-			}
-			rectout << x[PAD + 2*i] << std::endl;
-		}
-		rectout.close();
-	}
-	else{
-		std::cout << "Couldn't write rect test output" << std::endl;
-	}
-
-	api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384);
-
-	std::ofstream fftoutrect("../test/data/fft_1kHz_rect.txt");
-	if (fftoutrect.is_open()){
-		for (int i=0; i < bufsize; i++){
-			fftoutrect << y[i] << std::endl;
-		}
-		fftoutrect.close();
-	}
-	else{
-		std::cout << "Couldn't write fft rect test output" << std::endl;
-	}
-
-
-	/**
-	 * IFFT of rect spectrum
-	 */
-	for (int i=0; i < 2*N; i++){
+	api = new AudioAPI();
+	api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384, callbackFFT);
+	while(!fftFinished){}
+	for (int i=0; i < 2*N; i++)
 		x[i] = y[i];
-	}
-	api->ocl_DSPF_sp_ifftSPxSP(N, x, y, 4, 16384);
-	std::ofstream ifftoutrect("../test/data/ifft_1kHz_rect_spectrum.txt");
-	if (ifftoutrect.is_open()){
-		for (int i=0; i < bufsize; i++){
-			ifftoutrect << y[i] << std::endl;
-		}
-		ifftoutrect.close();
-	}
-	else{
-		std::cout << "Couldn't write ifft rect spectrum test output" << std::endl;
-	}
+
+	api->ocl_DSPF_sp_ifftSPxSP(N, x, y, 4, 16384, callbackIFFT);
+	while(!ifftFinished){}
+	std::cout << "Main finished" << std::endl;
 
 	delete api;
 	__free_ddr(x);
 	__free_ddr(y);
+}
+
+/**
+ * Callbacks
+ */
+void callbackFFT(cl_event ev, cl_int type, void *user_data){
+	std::cout << "Event type callback FFT: " << type << std::endl;
+	CallbackResponse *clbkRes = (CallbackResponse*) user_data;
+	float *y = clbkRes->getDataPtr();
+
+	if (clbkRes->getOp() == AudioAPI::FFT){
+		std::ofstream fftoutsine("../test/data/fft_sine.txt");
+		if (fftoutsine.is_open()){
+			for (int i=0; i < N*2; i++){
+				fftoutsine << y[i] << std::endl;
+			}
+			fftoutsine.close();
+		}
+		else{
+			std::cout << "Couldn't write FFT sine test output" << std::endl;
+		}
+		std::cout << "FFT calculation completed." << std::endl;
+		delete clbkRes;
+		fftFinished = true;
+	}
+}
+
+void callbackIFFT(cl_event ev, cl_int type, void *user_data){
+	std::cout << "Event type callback IFFT: " << type << std::endl;
+	CallbackResponse *clbkRes = (CallbackResponse*) user_data;
+	float *y = clbkRes->getDataPtr();
+
+	if (clbkRes->getOp() == AudioAPI::IFFT){
+		std::ofstream ifftout("../test/data/ifft_sine_spectrum.txt");
+		if (ifftout.is_open()){
+			for (int i=0; i < N*2; i++){
+				ifftout << y[i] << std::endl;
+			}
+			ifftout.close();
+		}
+		else{
+			std::cout << "Couldn't write IFFT sine spectrum test output" << std::endl;
+		}
+		std::cout << "IFFT calculation completed." << std::endl;
+		delete clbkRes;
+		ifftFinished = true;
+	}
 }
