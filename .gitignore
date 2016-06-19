@@ -3,6 +3,7 @@
 *.o
 *.obj
 
-X15_lib_audio
+libaudio-x15.a
+test-libaudio-x15
 
 .settings

@@ -1,4 +1,5 @@
-EXE = X15_lib_audio
+EXE = test-libaudio-x15
+TARGET_LIB = libaudio-x15.a
 TARGET_ROOTDIR = /opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/targetNFS/
 BIN = /opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/linux-devkit/sysroots/x86_64-arago-linux/usr/bin/
 
@@ -13,11 +14,11 @@ DSP_INCLUDE = -I$(TARGET_ROOTDIR)/usr/share/ti/cgt-c6x/include
 DSP_INCLUDE += -I$(TARGET_ROOTDIR)/usr/share/ti/opencl
 
 CPP = g++ 
-CPP_FLAGS = -mfpu=neon -O3 -g
+CPP_FLAGS = -O3 -g #-Wall 
 CL6X  = cl6x -mv6600 --abi=eabi $(DSP_INCLUDE)
 CLOCL = clocl
 
-LIBS  = -lOpenCL -locl_util -ljack 
+LIBS  = libaudio-x15.a -ljack -lOpenCL -locl_util
 
 UNAME_M :=$(shell uname -m)
 
@@ -26,7 +27,7 @@ ifneq ($(TI_OCL_INSTALL),)
     CPP        = g++
     CPP_FLAGS += -I$(TI_OCL_INSTALL)/usr/include
     LD_FLAGS  += -L$(TI_OCL_INSTALL)/usr/lib 
-    LIBS      += -lbfd -
+    LIBAUDIO_LIBS += -lbfd
 
 # Cross compile on x86
 else ifneq (,$(findstring 86, $(UNAME_M)))
@@ -53,8 +54,6 @@ else ifneq (,$(findstring 86, $(UNAME_M)))
     all: LD_FLAGS = -L$(TARGET_ROOTDIR)/lib -L$(TARGET_ROOTDIR)/usr/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/usr/lib 
 endif
 
-OBJ = JACKClient.o AudioAPI.o main.o
-
 %.o: %.cpp
 	@echo Compiling $<
 	@$(CPP) -c $(CPP_FLAGS) $<
@@ -74,14 +73,23 @@ OBJ = JACKClient.o AudioAPI.o main.o
 %.dsp_h: %.cl
 	@echo Compiling $< 
 	@$(CLOCL) -t $(CLOCL_FLAGS) $^
+	
+LIB_OBJ =  AudioAPI.o 
+LIBTEST_OBJ = JACKClient.o main.o
 
-all: $(EXE)
+all: $(TARGET_LIB) $(EXE) 
 
-$(EXE): $(OBJ) #audiokernel.out
-	@$(CPP) $(CPP_FLAGS) -o $(EXE) $(OBJ) $(LD_FLAGS) $(LIBS)
+lib: $(TARGET_LIB)
+	
+$(TARGET_LIB): $(LIB_OBJ) #audiokernel.out
+	# @$(CPP) $(CPP_FLAGS) $(LIB_OBJ) $(LD_FLAGS) -lOpenCL -locl_util
+	ar rcs $@ $^
+
+$(EXE): $(LIBTEST_OBJ) 
+	@$(CPP) $(CPP_FLAGS) -o $(EXE) $(LIBTEST_OBJ) $(LD_FLAGS) $(LIBS)
 
 clean::
-	@rm -f $(EXE) *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h
+	@rm -f $(EXE) *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h *.a
 
 test: clean $(EXE)
 	@echo Running   $(EXE)
