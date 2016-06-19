@@ -1,4 +1,3 @@
-EXE = test-libaudio-x15
 TARGET_LIB = libaudio-x15.a
 TARGET_ROOTDIR = /opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/targetNFS/
 BIN = /opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/linux-devkit/sysroots/x86_64-arago-linux/usr/bin/
@@ -18,7 +17,7 @@ CPP_FLAGS = -O3 -g #-Wall
 CL6X  = cl6x -mv6600 --abi=eabi $(DSP_INCLUDE)
 CLOCL = clocl
 
-LIBS  = libaudio-x15.a -ljack -lOpenCL -locl_util
+# LIBS  = lib/libaudio-x15.a -ljack -lOpenCL -locl_util
 
 UNAME_M :=$(shell uname -m)
 
@@ -74,20 +73,13 @@ endif
 	@echo Compiling $< 
 	@$(CLOCL) -t $(CLOCL_FLAGS) $^
 
-all: $(TARGET_LIB) $(EXE) 
-
-lib: $(TARGET_LIB)
+all: $(TARGET_LIB) 
 	
-$(TARGET_LIB): lib/AudioAPI.o #audiokernel.out
-	# @$(CPP) $(CPP_FLAGS) $(LIB_OBJ) $(LD_FLAGS) -lOpenCL -locl_util
-	mv AudioAPI.o lib/
+$(TARGET_LIB): AudioAPI.o #audiokernel.out
 	ar rcs $@ $^
 
-$(EXE): JACKClient.o main.o 
-	@$(CPP) $(CPP_FLAGS) -o $(EXE) JACKClient.o main.o $(LD_FLAGS) $(LIBS)
-
 clean::
-	@rm -f $(EXE) *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h *.a
+	@rm -f $(EXE) *.o *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h *.a
 
 test: clean $(EXE)
 	@echo Running   $(EXE)

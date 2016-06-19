@@ -1,4 +1,6 @@
 /***********************************************************************
+ * BeagleBoard-X15 audio DSP lib
+ *
  * Author: Henrik Langer (henni19790@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,28 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#ifndef JACKCLIENT_H_
-#define JACKCLIENT_H_
+#ifndef DISPLAY_HPP_
+#define DISPLAY_HPP_
 
-#include <jack/jack.h>
-#include <iostream>
-#include <vector>
+#include <QMainWindow>
 
-class JACKClient {
-	jack_port_t *_input_port, *_output_port;
-	jack_client_t *_jack_client;
-	std::vector<void (*)(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out)> _callbacks;
-	static JACKClient *_self;
-
-	static int _process (jack_nframes_t nframes, void *arg);
-	static void _jackShutdown (void *arg);
+class Display : public QMainWindow
+{
+    Q_OBJECT
 
 public:
-	JACKClient(const char *client_name = "X15-LIB-AUDIO", const char *server_name = NULL);
-	~JACKClient();
-	void stop();
-	void addCallback(void (*callback)(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out));
-	void writeAudio(jack_nframes_t n_frames, jack_default_audio_sample_t *samples);
+    Display(QWidget *parent = 0);
+    ~Display();
 };
 
-#endif //JACKCLIENT_H_
+#endif // DISPLAY_HPP_

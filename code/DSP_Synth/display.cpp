@@ -1,4 +1,6 @@
 /***********************************************************************
+ * BeagleBoard-X15 audio DSP lib
+ *
  * Author: Henrik Langer (henni19790@gmail.com)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,42 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#ifndef CALLBACK_RESPONSE_HPP_
-#define CALLBACK_RESPONSE_HPP_
+#include "display.hpp"
 
-#include "AudioAPI.hpp"
+Display::Display(QWidget *parent)
+    : QMainWindow(parent)
+{
+}
 
-class CallbackResponse{
-	AudioAPI::ops _op;
-	unsigned int _dataSize;
-	float *_dataPtr;
+Display::~Display()
+{
 
-public:
-	CallbackResponse() : _op(AudioAPI::UNDEFINED), _dataSize(0), _dataPtr(0){}
-	CallbackResponse(AudioAPI::ops op, unsigned int dataSize, float *dataPtr){
-		_op = op;
-		_dataSize = dataSize;
-		_dataPtr = dataPtr;
-	}
-	~CallbackResponse(){}
-	AudioAPI::ops getOp() const{
-		return _op;
-	}
-	void setOp(AudioAPI::ops op){
-		_op = op;
-	}
-	unsigned int getDataSize() const{
-		return _dataSize;
-	}
-	void setDataSize(unsigned int size){
-		_dataSize = size;
-	}
-	float* getDataPtr() const{
-		return _dataPtr;
-	}
-	void setDataPtr(float *data){
-		_dataPtr = data;
-	}
-};
-
-#endif //CALLBACK_RESPONSE_HPP_
+}

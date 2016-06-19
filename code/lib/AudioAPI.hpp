@@ -15,18 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#ifndef AUDIO_API_H_
-#define AUDIO_API_H_
+#ifndef AUDIOAPI_HPP_
+#define AUDIOAPI_HPP_
 
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
 
+#include "ocl_util.h"
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "ocl_util.h"
+
 
 class AudioAPI
 {
@@ -70,4 +71,4 @@ public:
 		void (*callback)(cl_event ev, cl_int e_status, void *user_data));
 };
 
-#endif
+#endif //AUDIOAPI_HPP_

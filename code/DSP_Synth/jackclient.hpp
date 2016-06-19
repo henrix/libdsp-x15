@@ -15,42 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#ifndef CALLBACK_RESPONSE_HPP_
-#define CALLBACK_RESPONSE_HPP_
+#ifndef JACKCLIENT_HPP_
+#define JACKCLIENT_HPP_
 
-#include "AudioAPI.hpp"
+#include <jack/jack.h>
+#include <iostream>
+#include <vector>
 
-class CallbackResponse{
-	AudioAPI::ops _op;
-	unsigned int _dataSize;
-	float *_dataPtr;
+class JACKClient {
+    jack_port_t *_input_port, *_output_port;
+    jack_client_t *_jack_client;
+    std::vector<void (*)(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out)> _callbacks;
+    static JACKClient *_self;
+
+    static int _process (jack_nframes_t nframes, void *arg);
+    static void _jackShutdown (void *arg);
 
 public:
-	CallbackResponse() : _op(AudioAPI::UNDEFINED), _dataSize(0), _dataPtr(0){}
-	CallbackResponse(AudioAPI::ops op, unsigned int dataSize, float *dataPtr){
-		_op = op;
-		_dataSize = dataSize;
-		_dataPtr = dataPtr;
-	}
-	~CallbackResponse(){}
-	AudioAPI::ops getOp() const{
-		return _op;
-	}
-	void setOp(AudioAPI::ops op){
-		_op = op;
-	}
-	unsigned int getDataSize() const{
-		return _dataSize;
-	}
-	void setDataSize(unsigned int size){
-		_dataSize = size;
-	}
-	float* getDataPtr() const{
-		return _dataPtr;
-	}
-	void setDataPtr(float *data){
-		_dataPtr = data;
-	}
+    JACKClient(const char *client_name = "X15-LIB-AUDIO", const char *server_name = NULL);
+    ~JACKClient();
+    void stop();
+    void addCallback(void (*callback)(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out));
+    void writeAudio(jack_nframes_t n_frames, jack_default_audio_sample_t *samples);
 };
 
-#endif //CALLBACK_RESPONSE_HPP_
+#endif //JACKCLIENT_HPP_
