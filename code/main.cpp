@@ -24,15 +24,18 @@
 
 #include "AudioAPI.hpp"
 #include "CallbackResponse.hpp"
+#include "JACKClient.hpp"
+#include <jack/jack.h>
 #include <math.h>
 #include <iostream>
 #include <fstream>
 
-int N = 16384;
+int N = 4096;
 bool fftFinished = false, ifftFinished = false;
 
 void callbackFFT(cl_event ev, cl_int type, void *user_data);
 void callbackIFFT(cl_event ev, cl_int type, void *user_data);
+void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out);
 
 int main(int argc, const char* argv[])
 {
@@ -58,6 +61,8 @@ int main(int argc, const char* argv[])
 		std::cout << "Couldn't write sine test output" << std::endl;
 	}
 
+	JACKClient jackClient;
+	jackClient.addCallback(callbackJACK);
 	api = new AudioAPI();
 	api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384, callbackFFT);
 	while(!fftFinished){}
@@ -65,6 +70,7 @@ int main(int argc, const char* argv[])
 		x[i] = y[i];
 
 	api->ocl_DSPF_sp_ifftSPxSP(N, x, y, 4, 16384, callbackIFFT);
+
 	while(!ifftFinished){}
 	std::cout << "Main finished" << std::endl;
 
@@ -118,4 +124,8 @@ void callbackIFFT(cl_event ev, cl_int type, void *user_data){
 		delete clbkRes;
 		ifftFinished = true;
 	}
+}
+
+void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out){
+	std::cout << "_process() callback called with " << n_frames << " called" << std::endl;
 }

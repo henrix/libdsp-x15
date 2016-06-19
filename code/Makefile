@@ -17,7 +17,7 @@ CPP_FLAGS = -mfpu=neon -O3 -g
 CL6X  = cl6x -mv6600 --abi=eabi $(DSP_INCLUDE)
 CLOCL = clocl
 
-LIBS  = -lOpenCL -locl_util
+LIBS  = -lOpenCL -locl_util -ljack 
 
 UNAME_M :=$(shell uname -m)
 
@@ -26,7 +26,7 @@ ifneq ($(TI_OCL_INSTALL),)
     CPP        = g++
     CPP_FLAGS += -I$(TI_OCL_INSTALL)/usr/include
     LD_FLAGS  += -L$(TI_OCL_INSTALL)/usr/lib 
-    LIBS      += -lbfd
+    LIBS      += -lbfd -
 
 # Cross compile on x86
 else ifneq (,$(findstring 86, $(UNAME_M)))
@@ -53,7 +53,7 @@ else ifneq (,$(findstring 86, $(UNAME_M)))
     all: LD_FLAGS = -L$(TARGET_ROOTDIR)/lib -L$(TARGET_ROOTDIR)/usr/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/usr/lib 
 endif
 
-OBJ = AudioAPI.o main.o
+OBJ = JACKClient.o AudioAPI.o main.o
 
 %.o: %.cpp
 	@echo Compiling $<

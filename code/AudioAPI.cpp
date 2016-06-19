@@ -53,7 +53,7 @@ AudioAPI::AudioAPI() : _N_fft(0), _N_ifft(0) {
  		std::cout << "Found " << num << " DSP compute cores." << std::endl;
 
         std::ifstream t("audiokernel.cl");
-        if (!t) { std::cout << "Error Opening Kernel Source file\n"; exit(-1); }
+        if (!t) { std::cerr << "Error Opening Kernel Source file\n"; exit(-1); }
 
         std::string kSrc((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
         cl::Program::Sources source(1, std::make_pair(kSrc.c_str(),kSrc.length()));
