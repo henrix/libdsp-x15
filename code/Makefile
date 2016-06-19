@@ -73,20 +73,18 @@ endif
 %.dsp_h: %.cl
 	@echo Compiling $< 
 	@$(CLOCL) -t $(CLOCL_FLAGS) $^
-	
-LIB_OBJ =  AudioAPI.o 
-LIBTEST_OBJ = JACKClient.o main.o
 
 all: $(TARGET_LIB) $(EXE) 
 
 lib: $(TARGET_LIB)
 	
-$(TARGET_LIB): $(LIB_OBJ) #audiokernel.out
+$(TARGET_LIB): lib/AudioAPI.o #audiokernel.out
 	# @$(CPP) $(CPP_FLAGS) $(LIB_OBJ) $(LD_FLAGS) -lOpenCL -locl_util
+	mv AudioAPI.o lib/
 	ar rcs $@ $^
 
-$(EXE): $(LIBTEST_OBJ) 
-	@$(CPP) $(CPP_FLAGS) -o $(EXE) $(LIBTEST_OBJ) $(LD_FLAGS) $(LIBS)
+$(EXE): JACKClient.o main.o 
+	@$(CPP) $(CPP_FLAGS) -o $(EXE) JACKClient.o main.o $(LD_FLAGS) $(LIBS)
 
 clean::
 	@rm -f $(EXE) *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h *.a

@@ -22,8 +22,8 @@
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
 
-#include "AudioAPI.hpp"
-#include "CallbackResponse.hpp"
+#include "lib/AudioAPI.hpp"
+#include "lib/CallbackResponse.hpp"
 #include "JACKClient.hpp"
 #include <jack/jack.h>
 #include <math.h>
