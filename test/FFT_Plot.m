@@ -46,14 +46,16 @@ title('Plot of generated sine')
 xlabel('Time (s)')
 ylabel('Amplitude')
 subplot(3,1,2)
+length(f)
+length(fftData)
 plot(f, fftData)
-strMin = [num2str(f(minFFT_i)), ' Hz'];
-strMax = [num2str(f(maxFFT_i)), ' Hz'];
-text(f(minFFT_i),minFFT,strMin,'HorizontalAlignment','left');
-text(f(maxFFT_i),maxFFT,strMax,'HorizontalAlignment','left');
+% strMin = [num2str(f(minFFT_i)), ' Hz'];
+% strMax = [num2str(f(maxFFT_i)), ' Hz'];
+% text(f(minFFT_i),minFFT,strMin,'HorizontalAlignment','left');
+% text(f(maxFFT_i),maxFFT,strMax,'HorizontalAlignment','left');
 line()
 grid on
-title('Plot of computed sine spectrum')
+title('Plot of computed sine spectrum (frequency not scaled)')
 xlabel('Frequency (Hz)')
 ylabel('Amplitude')
 subplot(3,1,3)
