@@ -18,13 +18,26 @@
  ***********************************************************************/
 
 #include "display.hpp"
+#include "ui_mainwindow.h"
+#include <QDebug>
+#include <QDesktopWidget>
+#include <QScreen>
+#include <QMessageBox>
+#include <QMetaEnum>
 
 Display::Display(QWidget *parent)
     : QMainWindow(parent)
+      //ui(new Ui::Display)
 {
+    //ui->setupUi(this);
+    setGeometry(400, 250, 542, 390);
 }
 
 Display::~Display()
 {
+
+}
+
+void Display::drawGraph(size_t n, void *data){
 
 }

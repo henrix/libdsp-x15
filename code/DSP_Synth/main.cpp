@@ -20,7 +20,7 @@
 #define	PAD	0
 #define __CL_ENABLE_EXCEPTIONS
 
-#include "display.hpp"
+//#include "display.hpp"
 #include "jackclient.hpp"
 #include "../lib/AudioAPI.hpp"
 #include "../lib/CallbackResponse.hpp"
@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
     float *y = (float*) __malloc_ddr(sizeof(float)*2*N);
 
     QApplication a(argc, argv);
-    Display w;
-    w.show();
+    //Display w;
+    //w.show();
 
     /**
      * Generate sine

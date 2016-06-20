@@ -1,0 +1,8 @@
+*.slo
+*.lo
+*.o
+*.obj
+
+app/
+.settings/
+

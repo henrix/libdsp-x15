@@ -21,6 +21,12 @@
 #define DISPLAY_HPP_
 
 #include <QMainWindow>
+#include <QTimer>
+#include "qcustomplot/qcustomplot.h"
+
+namespace Ui {
+class Display;
+}
 
 class Display : public QMainWindow
 {
@@ -29,6 +35,12 @@ class Display : public QMainWindow
 public:
     Display(QWidget *parent = 0);
     ~Display();
+    void drawGraph(size_t n, void *data);
+
+private slots:
+
+private:
+    Ui::Display *ui;
 };
 
 #endif // DISPLAY_HPP_
