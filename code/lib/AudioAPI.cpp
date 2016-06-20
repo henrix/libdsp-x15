@@ -171,7 +171,7 @@ int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 	    std::vector<cl::Event> evss(1);
 	    _Qifft->enqueueWriteBuffer(*_bufIFFTX, CL_FALSE, 0, _bufsize_ifft, x, 0, &evs[0]);
 	    _Qifft->enqueueWriteBuffer(*_bufIFFTW, CL_FALSE, 0, _bufsize_ifft, _wIFFT, 0, &evs[1]);
-	    _Qifft->enqueueNDRangeKernel(*_ifftKernel, cl::NullRange, cl::NDRange(64), cl::NDRange(1), &evs, &evss[0]);
+	    _Qifft->enqueueNDRangeKernel(*_ifftKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
 	    _Qifft->enqueueReadBuffer(*_bufIFFTY, CL_TRUE, 0, _bufsize_ifft, y, &evss, &ev1);
 
 	    CallbackResponse *clbkRes = new CallbackResponse(IFFT, 2*_N_ifft, y);

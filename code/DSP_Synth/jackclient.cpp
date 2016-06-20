@@ -85,7 +85,7 @@ JACKClient::JACKClient(const char *client_name, const char *server_name) : _inpu
 }
 
 JACKClient::~JACKClient(){
-
+    _self = NULL;
 }
 
 void JACKClient::stop(){

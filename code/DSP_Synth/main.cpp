@@ -25,13 +25,13 @@
 #include "../lib/AudioAPI.hpp"
 #include "../lib/CallbackResponse.hpp"
 #include <CL/cl.hpp>
-#include <QApplication>
+//#include <QApplication>
 #include <jack/jack.h>
 #include <math.h>
 #include <iostream>
 #include <fstream>
 
-int N = 4096;
+int N = 16384;
 bool fftFinished = false, ifftFinished = false;
 
 void callbackFFT(cl_event ev, cl_int type, void *user_data);
@@ -46,14 +46,14 @@ int main(int argc, char* argv[])
     float *x = (float*) __malloc_ddr(sizeof(float)*2*N);
     float *y = (float*) __malloc_ddr(sizeof(float)*2*N);
 
-    QApplication a(argc, argv);
+    //QApplication a(argc, argv);
     //Display w;
     //w.show();
 
     /**
      * Generate sine
      */
-    std::ofstream sinout("../test/data/sine.txt");
+    std::ofstream sinout("../../test/data/sine.txt");
     if (sinout.is_open()){
         for (int i=0; i < N; i++){
             x[PAD + 2*i] = sin(2*M_PI*2048*i / (double) N);
@@ -66,8 +66,8 @@ int main(int argc, char* argv[])
         std::cout << "Couldn't write sine test output" << std::endl;
     }
 
-    JACKClient jackClient;
-    jackClient.addCallback(callbackJACK);
+    //JACKClient jackClient;
+    //jackClient.addCallback(callbackJACK);
     api = new AudioAPI();
     api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384, callbackFFT);
     while(!fftFinished){}
@@ -76,14 +76,14 @@ int main(int argc, char* argv[])
 
     api->ocl_DSPF_sp_ifftSPxSP(N, x, y, 4, 16384, callbackIFFT);
 
-    //while(!ifftFinished){}
+    while(!ifftFinished){}
     std::cout << "Main finished" << std::endl;
 
     delete api;
     __free_ddr(x);
     __free_ddr(y);
 
-    return a.exec(); //TODO: Create JACKClient in new thread (fix QT return a.exec()); Move memory allocation to AudioAPI;
+    //return a.exec(); //TODO: Create JACKClient in new thread (fix QT return a.exec()); Move memory allocation to AudioAPI;
 }
 
 /**
@@ -95,9 +95,9 @@ void callbackFFT(cl_event ev, cl_int type, void *user_data){
     float *y = clbkRes->getDataPtr();
 
     if (clbkRes->getOp() == AudioAPI::FFT){
-        std::ofstream fftoutsine("../test/data/fft_sine.txt");
+        std::ofstream fftoutsine("../../test/data/fft_sine.txt");
         if (fftoutsine.is_open()){
-            for (int i=0; i < N*2; i++){
+            for (int i=0; i < 2*N; i++){
                 fftoutsine << y[i] << std::endl;
             }
             fftoutsine.close();
@@ -117,10 +117,10 @@ void callbackIFFT(cl_event ev, cl_int type, void *user_data){
     float *y = clbkRes->getDataPtr();
 
     if (clbkRes->getOp() == AudioAPI::IFFT){
-        std::ofstream ifftout("../test/data/ifft_sine_spectrum.txt");
+        std::ofstream ifftout("../../test/data/ifft_sine_spectrum.txt");
         if (ifftout.is_open()){
             for (int i=0; i < N*2; i++){
-                ifftout << y[i] << std::endl;
+                ifftout << y[PAD + 2*i] << std::endl;
             }
             ifftout.close();
         }
@@ -134,5 +134,5 @@ void callbackIFFT(cl_event ev, cl_int type, void *user_data){
 }
 
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out){
-    std::cout << "_process() callback called with " << n_frames << " called" << std::endl;
+    //std::cout << "_process() callback called with " << n_frames << " called" << std::endl;
 }
