@@ -29,9 +29,9 @@ fclose(sinID);
 fclose(fftID);
 fclose(ifftID);
 
-N = 16384;
+N = (16*1024);
 t = 0:1/16384:1 - 1/16384;
-f = -(N/2)-0.5:0.5:(N/2)-1;
+f = -(N/2):(N/2)-1;
 [minFFT, minFFT_i] = min(fftData);
 [maxFFT, maxFFT_i] = max(fftData);
 [minIFFT, minIFFT_i] = min(ifftData);

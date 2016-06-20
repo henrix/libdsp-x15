@@ -31,7 +31,7 @@
 #include <iostream>
 #include <fstream>
 
-int N = 16384;
+int N = (16*1024);
 bool fftFinished = false, ifftFinished = false;
 
 void callbackFFT(cl_event ev, cl_int type, void *user_data);
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     std::ofstream sinout("../../test/data/sine.txt");
     if (sinout.is_open()){
         for (int i=0; i < N; i++){
-            x[PAD + 2*i] = sin(2*M_PI*2048*i / (double) N);
+            x[PAD + 2*i] = sin(2*M_PI*2048*i / (double) N/4);
             x[PAD + 2*i + 1] = 0;
             sinout << x[PAD + 2*i] << std::endl;
         }
@@ -71,8 +71,11 @@ int main(int argc, char* argv[])
     api = new AudioAPI();
     api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384, callbackFFT);
     while(!fftFinished){}
-    for (int i=0; i < 2*N; i++)
+    for (int i=0; i < 2*N; i++){
+        //x[PAD + 2*i] = y[PAD + 2*i];
+        //x[PAD + 2*i + 1] = 0;
         x[i] = y[i];
+    }
 
     api->ocl_DSPF_sp_ifftSPxSP(N, x, y, 4, 16384, callbackIFFT);
 
@@ -97,8 +100,8 @@ void callbackFFT(cl_event ev, cl_int type, void *user_data){
     if (clbkRes->getOp() == AudioAPI::FFT){
         std::ofstream fftoutsine("../../test/data/fft_sine.txt");
         if (fftoutsine.is_open()){
-            for (int i=0; i < 2*N; i++){
-                fftoutsine << y[i] << std::endl;
+            for (int i=0; i < N; i++){
+                fftoutsine << y[PAD + 2*i + 1] << std::endl;
             }
             fftoutsine.close();
         }
@@ -119,8 +122,9 @@ void callbackIFFT(cl_event ev, cl_int type, void *user_data){
     if (clbkRes->getOp() == AudioAPI::IFFT){
         std::ofstream ifftout("../../test/data/ifft_sine_spectrum.txt");
         if (ifftout.is_open()){
-            for (int i=0; i < N*2; i++){
+            for (int i=0; i < N; i++){
                 ifftout << y[PAD + 2*i] << std::endl;
+                //ifftout << y[i] << std::endl;
             }
             ifftout.close();
         }
