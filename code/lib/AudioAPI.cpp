@@ -24,7 +24,7 @@
     Function for generating Specialized sequence of twiddle factors
     (took from TI OpenCL (FFT) example)
 */
-void AudioAPI::_twGen(float *w, int n) {
+void AudioAPI::_twGenFFT(float *w, int n) {
     int i, j, k;
     const double PI = 3.141592654;
 
@@ -37,6 +37,25 @@ void AudioAPI::_twGen(float *w, int n) {
             w[k + 2] = (float) sin (4 * PI * i / n);
             w[k + 3] = (float) cos (4 * PI * i / n);
             w[k + 4] = (float) sin (6 * PI * i / n);
+            w[k + 5] = (float) cos (6 * PI * i / n);
+            k += 6;
+        }
+    }
+}
+
+void AudioAPI::_twGenIFFT(float *w, int n) {
+    int i, j, k;
+    const double PI = 3.141592654;
+
+    for (j = 1, k = 0; j <= n >> 2; j = j << 2)
+    {
+        for (i = 0; i < n >> 2; i += j)
+        {
+            w[k]     = (float) (-1)*sin (2 * PI * i / n);
+            w[k + 1] = (float) cos (2 * PI * i / n);
+            w[k + 2] = (float) (-1)*sin (4 * PI * i / n);
+            w[k + 3] = (float) cos (4 * PI * i / n);
+            w[k + 4] = (float) (-1)*sin (6 * PI * i / n);
             w[k + 5] = (float) cos (6 * PI * i / n);
             k += 6;
         }
@@ -94,7 +113,7 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
             _bufsize_fft = sizeof(float) * (2*_N_fft + PAD + PAD);
             _wFFT = (float*) __malloc_ddr(sizeof(float)*2*_N_fft);
 
-            _twGen(_wFFT, _N_fft);
+            _twGenFFT(_wFFT, _N_fft);
             
             _bufFFTX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_fft, x);
             _bufFFTY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_fft, y);
@@ -150,7 +169,7 @@ int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 	        _bufsize_ifft = sizeof(float) * (2*_N_ifft + PAD + PAD);
 	        _wIFFT = (float*) __malloc_ddr(sizeof(float)*2*_N_ifft);
 
-	        _twGen(_wIFFT, _N_ifft);
+	        _twGenIFFT(_wIFFT, _N_ifft);
 
 	        _bufIFFTX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_ifft, x);
 	        _bufIFFTY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_ifft, y);

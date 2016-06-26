@@ -20,12 +20,12 @@
 #define	PAD	0
 #define __CL_ENABLE_EXCEPTIONS
 
-//#include "display.hpp"
+#include "display.hpp"
 #include "jackclient.hpp"
 #include "../lib/AudioAPI.hpp"
 #include "../lib/CallbackResponse.hpp"
 #include <CL/cl.hpp>
-//#include <QApplication>
+#include <QApplication>
 #include <jack/jack.h>
 #include <math.h>
 #include <iostream>
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     std::ofstream sinout("../../test/data/sine.txt");
     if (sinout.is_open()){
         for (int i=0; i < N; i++){
-            x[PAD + 2*i] = sin(2*M_PI*2048*i / (double) N/4);
+            x[PAD + 2*i] = sin(2*M_PI*64*i / (double) N);
             x[PAD + 2*i + 1] = 0;
             sinout << x[PAD + 2*i] << std::endl;
         }

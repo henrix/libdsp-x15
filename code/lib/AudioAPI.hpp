@@ -41,7 +41,8 @@ class AudioAPI
 	cl::CommandQueue *_Qfft, *_Qifft;
 	cl::Context *_context;
 
-	static void _twGen(float *w, int n);
+	static void _twGenFFT(float *w, int n);
+	static void _twGenIFFT(float *w, int n);
 
 public:
 	enum ops {
