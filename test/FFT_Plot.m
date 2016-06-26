@@ -25,22 +25,24 @@ formatSpec = '%f';
 sinData = fscanf(sinID, formatSpec);
 fftData = fscanf(fftID, formatSpec);
 ifftData = fscanf(ifftID, formatSpec);
+#ifftData = (-1) .* ifftData;
 fclose(sinID);
 fclose(fftID);
 fclose(ifftID);
 
 N = (16*1024);
-t = 0:1/16384:1 - 1/16384;
+t = 0:1/N:1 - 1/N;
 f = -(N/2):(N/2)-1;
 [minFFT, minFFT_i] = min(fftData);
 [maxFFT, maxFFT_i] = max(fftData);
 [minIFFT, minIFFT_i] = min(ifftData);
 [maxIFFT, maxIFFT_i] = max(ifftData);
+size_period_sine = 128;
 
 figure(1)
 clf();
 subplot(3,1,1)
-stem(t(1:50), sinData(1:50))
+stem(t(1:size_period_sine*2), sinData(1:size_period_sine*2))
 grid on
 title('Plot of generated sine')
 xlabel('Time (s)')
@@ -59,7 +61,7 @@ title('Plot of computed sine spectrum (frequency not scaled)')
 xlabel('Frequency (Hz)')
 ylabel('Amplitude')
 subplot(3,1,3)
-stem(t(1:50), ifftData(1:50))
+stem(t(1:size_period_sine*2), ifftData(1:size_period_sine*2))
 strMin = [num2str(f(minIFFT_i)), ' Hz'];
 strMax = [num2str(f(maxIFFT_i)), ' Hz'];
 text(f(minIFFT_i),minIFFT,strMin,'HorizontalAlignment','left');
