@@ -30,6 +30,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include "WaveIO.hpp"
 
 int N = (16*1024);
 bool fftFinished = false, ifftFinished = false;
@@ -66,14 +67,12 @@ int main(int argc, char* argv[])
         std::cout << "Couldn't write sine test output" << std::endl;
     }
 
-    //JACKClient jackClient;
+    JACKClient jackClient;
     //jackClient.addCallback(callbackJACK);
     api = new AudioAPI();
     api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384, callbackFFT);
     while(!fftFinished){}
     for (int i=0; i < 2*N; i++){
-        //x[PAD + 2*i] = y[PAD + 2*i];
-        //x[PAD + 2*i + 1] = 0;
         x[i] = y[i];
     }
 
