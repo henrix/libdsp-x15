@@ -22,12 +22,12 @@
 #include <CL/cl.hpp>
 
 #include "ocl_util.h"
+#include <string>
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
 #include <fstream>
 #include <map>
-
 
 class AudioAPI
 {
@@ -69,6 +69,8 @@ public:
 		void (*callback)(cl_event ev, cl_int e_status, void *user_data));
 	int ocl_DSPF_sp_ifftSPxSP(int N, float *x, 
 		float *y, int n_min, int n_max,
+		void (*callback)(cl_event ev, cl_int e_status, void *user_data));
+	int convReverbFromWAV(int N, float *x, const std::string &filename, float *y,
 		void (*callback)(cl_event ev, cl_int e_status, void *user_data));
 };
 

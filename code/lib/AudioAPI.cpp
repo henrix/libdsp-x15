@@ -17,6 +17,7 @@
 
 #include "AudioAPI.hpp"
 #include "CallbackResponse.hpp"
+#include "WaveIO.hpp"
 
 #define	PAD	0
 
@@ -205,4 +206,13 @@ int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 	}
 	catch (cl::Error &err)
 	{ std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; }
+}
+
+int AudioAPI::convReverbFromWAV(int N, float *x, const std::string &filename, float *y,
+        void (*callback)(cl_event ev, cl_int e_status, void *user_data)){
+    try {
+        
+    }
+    catch (cl::Error &err)
+    { std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; }
 }

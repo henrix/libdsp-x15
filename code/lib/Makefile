@@ -75,7 +75,7 @@ endif
 
 all: $(TARGET_LIB) 
 	
-$(TARGET_LIB): AudioAPI.o #audiokernel.out
+$(TARGET_LIB): AudioAPI.o WaveIO.o #audiokernel.out
 	ar rcs $@ $^
 
 clean::
