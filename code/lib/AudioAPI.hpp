@@ -21,7 +21,7 @@
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
 
-#include "ocl_util.h"
+#include <ocl_util.h>
 #include <string>
 #include <cstdlib>
 #include <cmath>

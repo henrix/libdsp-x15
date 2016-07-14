@@ -1,4 +1,4 @@
-TARGET_LIB = libaudio-x15.a
+TARGET_LIB = libaudio-x15.so
 TARGET_ROOTDIR = /opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/targetNFS/
 BIN = /opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/linux-devkit/sysroots/x86_64-arago-linux/usr/bin/
 
@@ -13,11 +13,11 @@ DSP_INCLUDE = -I$(TARGET_ROOTDIR)/usr/share/ti/cgt-c6x/include
 DSP_INCLUDE += -I$(TARGET_ROOTDIR)/usr/share/ti/opencl
 
 CPP = g++ 
-CPP_FLAGS = -O3 -g #-Wall 
+CPP_FLAGS = -shared -fPIC -O3 -g -Wall 
 CL6X  = cl6x -mv6600 --abi=eabi $(DSP_INCLUDE)
 CLOCL = clocl
 
-# LIBS  = lib/libaudio-x15.a -ljack -lOpenCL -locl_util
+LIBS  = -ljack -lOpenCL -locl_util -lsndfile
 
 UNAME_M :=$(shell uname -m)
 
@@ -25,7 +25,7 @@ UNAME_M :=$(shell uname -m)
 ifneq ($(TI_OCL_INSTALL),)
     CPP        = g++
     CPP_FLAGS += -I$(TI_OCL_INSTALL)/usr/include
-    LD_FLAGS  += -L$(TI_OCL_INSTALL)/usr/lib 
+    LD_FLAGS  += -L$(TI_OCL_INSTALL)/usr/lib -lOpenCL
     LIBAUDIO_LIBS += -lbfd
 
 # Cross compile on x86
@@ -50,7 +50,7 @@ else ifneq (,$(findstring 86, $(UNAME_M)))
 
     # If cross-compilineg, provide path to dependent ARM libraries on the 
     # target filesystem
-    all: LD_FLAGS = -L$(TARGET_ROOTDIR)/lib -L$(TARGET_ROOTDIR)/usr/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/usr/lib 
+    all: LD_FLAGS = -L$(TARGET_ROOTDIR)/lib -L$(TARGET_ROOTDIR)/usr/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/lib -Wl,-rpath-link,$(TARGET_ROOTDIR)/usr/lib -shared
 endif
 
 %.o: %.cpp
@@ -76,12 +76,12 @@ endif
 all: $(TARGET_LIB) 
 	
 $(TARGET_LIB): AudioAPI.o WaveIO.o #audiokernel.out
-	ar rcs $@ $^
+	@$(CPP) $(CPP_FLAGS) $(LD_FLAGS) $(LIBS) -o $(TARGET_LIB) AudioAPI.o WaveIO.o #audiokernel.out
 
 clean::
-	@rm -f $(EXE) *.o *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h *.a
+	@rm -f $(TARGET_LIB) *.o *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h *.a
 
-test: clean $(EXE)
-	@echo Running   $(EXE)
-	@./$(EXE) >> /dev/null
+test: clean $(TARGET_LIB)
+	@echo Running   $(TARGET_LIB)
+	@./$(TARGET_LIB) >> /dev/null
 	@if [ $$? -ne 0 ] ; then echo "FAILED !!!" ; fi	
