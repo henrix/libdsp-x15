@@ -22,7 +22,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
-#include "qcustomplot/qcustomplot.h"
+//#include "qcustomplot/qcustomplot.h"
 
 namespace Ui {
 class Display;

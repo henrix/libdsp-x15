@@ -18,19 +18,19 @@
  ***********************************************************************/
 
 #define	PAD	0
-#define __CL_ENABLE_EXCEPTIONS
+//#define __CL_ENABLE_EXCEPTIONS
 
 #include "display.hpp"
 #include "jackclient.hpp"
 #include "../lib/AudioAPI.hpp"
 #include "../lib/CallbackResponse.hpp"
-#include <CL/cl.hpp>
+//#include <CL/cl.hpp>
 #include <QApplication>
 #include <jack/jack.h>
 #include <math.h>
 #include <iostream>
 #include <fstream>
-#include "WaveIO.hpp"
+#include "../lib/WaveIO.hpp"
 
 int N = (16*1024);
 bool fftFinished = false, ifftFinished = false;
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
         std::cout << "Couldn't write sine test output" << std::endl;
     }
 
-    JACKClient jackClient;
+    //JACKClient jackClient;
     //jackClient.addCallback(callbackJACK);
     api = new AudioAPI();
     api->ocl_DSPF_sp_fftSPxSP(N, x, y, 4, 16384, callbackFFT);
@@ -137,5 +137,5 @@ void callbackIFFT(cl_event ev, cl_int type, void *user_data){
 }
 
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out){
-    //std::cout << "_process() callback called with " << n_frames << " called" << std::endl;
+    std::cout << "_process() callback called with " << n_frames << " called" << std::endl;
 }
