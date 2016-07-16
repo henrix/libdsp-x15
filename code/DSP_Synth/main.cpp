@@ -18,13 +18,13 @@
  ***********************************************************************/
 
 #define	PAD	0
-//#define __CL_ENABLE_EXCEPTIONS
 
+//#define __CL_ENABLE_EXCEPTIONS
+//#include <CL/cl.hpp>
 #include "display.hpp"
 #include "jackclient.hpp"
 #include "../lib/AudioAPI.hpp"
 #include "../lib/CallbackResponse.hpp"
-//#include <CL/cl.hpp>
 #include <QApplication>
 #include <jack/jack.h>
 #include <math.h>
@@ -35,8 +35,8 @@
 int N = (16*1024);
 bool fftFinished = false, ifftFinished = false;
 
-void callbackFFT(cl_event ev, cl_int type, void *user_data);
-void callbackIFFT(cl_event ev, cl_int type, void *user_data);
+void callbackFFT(CallbackResponse *clbkRes);
+void callbackIFFT(CallbackResponse *clbkRes);
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out);
 
 int main(int argc, char* argv[])
@@ -44,8 +44,10 @@ int main(int argc, char* argv[])
     AudioAPI *api;
     int sampling_rate = 48000;
     int bufsize = 2*N;
-    float *x = (float*) __malloc_ddr(sizeof(float)*2*N);
-    float *y = (float*) __malloc_ddr(sizeof(float)*2*N);
+    //float *x = (float*) __malloc_ddr(sizeof(float)*2*N);
+    //float *y = (float*) __malloc_ddr(sizeof(float)*2*N);
+    float *x = new float[2*N];
+    float *y = new float[2*N];
 
     //QApplication a(argc, argv);
     //Display w;
@@ -82,8 +84,10 @@ int main(int argc, char* argv[])
     std::cout << "Main finished" << std::endl;
 
     delete api;
-    __free_ddr(x);
-    __free_ddr(y);
+    delete[] x;
+    delete[] y;
+    //__free_ddr(x);
+    //__free_ddr(y);
 
     //return a.exec(); //TODO: Create JACKClient in new thread (fix QT return a.exec()); Move memory allocation to AudioAPI;
 }
@@ -91,12 +95,12 @@ int main(int argc, char* argv[])
 /**
  * Callbacks
  */
-void callbackFFT(cl_event ev, cl_int type, void *user_data){
-    std::cout << "Event type callback FFT: " << type << std::endl;
-    CallbackResponse *clbkRes = (CallbackResponse*) user_data;
+void callbackFFT(CallbackResponse *clbkRes){
+    //std::cout << "Event type callback FFT: " << type << std::endl;
+    //CallbackResponse *clbkRes = (CallbackResponse*) user_data;
     float *y = clbkRes->getDataPtr();
 
-    if (clbkRes->getOp() == AudioAPI::FFT){
+    if (clbkRes->getOp() == CallbackResponse::FFT){
         std::ofstream fftoutsine("../../test/data/fft_sine.txt");
         if (fftoutsine.is_open()){
             for (int i=0; i < N; i++){
@@ -113,12 +117,12 @@ void callbackFFT(cl_event ev, cl_int type, void *user_data){
     }
 }
 
-void callbackIFFT(cl_event ev, cl_int type, void *user_data){
-    std::cout << "Event type callback IFFT: " << type << std::endl;
-    CallbackResponse *clbkRes = (CallbackResponse*) user_data;
+void callbackIFFT(CallbackResponse *clbkRes){
+    //std::cout << "Event type callback IFFT: " << type << std::endl;
+    //CallbackResponse *clbkRes = (CallbackResponse*) user_data;
     float *y = clbkRes->getDataPtr();
 
-    if (clbkRes->getOp() == AudioAPI::IFFT){
+    if (clbkRes->getOp() == CallbackResponse::IFFT){
         std::ofstream ifftout("../../test/data/ifft_sine_spectrum.txt");
         if (ifftout.is_open()){
             for (int i=0; i < N; i++){
