@@ -13,7 +13,7 @@ DSP_INCLUDE = -I$(TARGET_ROOTDIR)/usr/share/ti/cgt-c6x/include
 DSP_INCLUDE += -I$(TARGET_ROOTDIR)/usr/share/ti/opencl
 
 CPP = g++ 
-CPP_FLAGS = -shared -fPIC -O3 -g -Wall 
+CPP_FLAGS = -shared -fPIC -O3 -g -Wall -std=c++11
 CL6X  = cl6x -mv6600 --abi=eabi $(DSP_INCLUDE)
 CLOCL = clocl
 
@@ -75,8 +75,8 @@ endif
 
 all: $(TARGET_LIB) 
 	
-$(TARGET_LIB): AudioAPI.o WaveIO.o #audiokernel.out
-	@$(CPP) $(CPP_FLAGS) $(LD_FLAGS) $(LIBS) -o $(TARGET_LIB) AudioAPI.o WaveIO.o #audiokernel.out
+$(TARGET_LIB): CallbackResponse.o WaveIO.o AudioAPI.o #audiokernel.out
+	@$(CPP) $(CPP_FLAGS) $(LD_FLAGS) $(LIBS) -o $(TARGET_LIB) CallbackResponse.o WaveIO.o AudioAPI.o #audiokernel.out
 
 clean::
 	@rm -f $(TARGET_LIB) *.o *.o *.obj *.out *.asm *.if *.opt *.bc *.objc *.map *.bin *.dsp_h *.a

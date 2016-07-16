@@ -15,15 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#include "AudioAPI.hpp"
-#include "CallbackResponse.hpp"
-#include "WaveIO.hpp"
+#define PAD 0
 
-#define	PAD	0
+#include "AudioAPI.hpp"
+#include "WaveIO.hpp"
+#include <ocl_util.h>
+#include <functional>
+
+
+void (*AudioAPI::_pCallbackFFT)(CallbackResponse *resData) = NULL;
+void (*AudioAPI::_pCallbackIFFT)(CallbackResponse *resData) = NULL;
+
+void* AudioAPI::_allocBuffer(std::size_t size) {
+    return __malloc_ddr(size);
+}
 
 /*
     Function for generating Specialized sequence of twiddle factors
-    (took from TI OpenCL (FFT) example)
 */
 void AudioAPI::_twGenFFT(float *w, int n) {
     int i, j, k;
@@ -63,7 +71,7 @@ void AudioAPI::_twGenIFFT(float *w, int n) {
     }
 }
 
-AudioAPI::AudioAPI() : _N_fft(0), _N_ifft(0) {
+AudioAPI::AudioAPI() : _N_fft(-1), _N_ifft(-1) {
 	try {
         _context = new cl::Context(CL_DEVICE_TYPE_ACCELERATOR);
         std::vector<cl::Device> devices = _context->getInfo<CL_CONTEXT_DEVICES>();
@@ -93,31 +101,42 @@ AudioAPI::~AudioAPI() {
 	delete _bufFFTY;
 	delete _bufFFTW;
 	delete _program;
-	__free_ddr(_wFFT);
+	if (_wFFT)
+        __free_ddr(_wFFT);
+    if (_xFFT)
+        __free_ddr(_xFFT);
+    if (_yFFT)
+        __free_ddr(_yFFT);
 }
 
 int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
 		float *y, int n_min, int n_max,
-		void (*callback)(cl_event ev, cl_int e_status, void *user_data)) {
+		void (*callback)(CallbackResponse *resData)) {
 
     try{
         if (N != _N_fft) {
             _N_fft = N;
-            delete _fftKernel;
+            /*delete _fftKernel;
             delete _bufFFTX;
             delete _bufFFTY;
             delete _bufFFTW;
 
             if (_wFFT)
                 __free_ddr(_wFFT);
+            if (_xFFT)
+                __free_ddr(_xFFT);
+            if (_yFFT)
+                __free_ddr(_yFFT);*/
 
             _bufsize_fft = sizeof(float) * (2*_N_fft + PAD + PAD);
-            _wFFT = (float*) __malloc_ddr(sizeof(float)*2*_N_fft);
+            _wFFT = (float*) _allocBuffer(sizeof(float)*2*_N_fft);
+            _xFFT = (float*) _allocBuffer(sizeof(float)*2*_N_fft);
+            _yFFT = (float*) _allocBuffer(sizeof(float)*2*_N_fft);
 
             _twGenFFT(_wFFT, _N_fft);
-            
-            _bufFFTX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_fft, x);
-            _bufFFTY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_fft, y);
+
+            _bufFFTX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_fft, _xFFT);
+            _bufFFTY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_fft, _yFFT);
             _bufFFTW = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_fft, _wFFT);
 
             _fftKernel = new cl::Kernel(*_program, "ocl_DSPF_sp_fftSPxSP");
@@ -130,6 +149,9 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
             _fftKernel->setArg(5, _N_fft); //n_max
         }
 
+        for (int i=0; i < _N_fft; i++)
+            _xFFT[i] = x[i];
+
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);
@@ -138,8 +160,17 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
         _Qfft->enqueueNDRangeKernel(*_fftKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _Qfft->enqueueReadBuffer(*_bufFFTY, CL_TRUE, 0, _bufsize_fft, y, &evss, &ev1);
 
-        CallbackResponse *clbkRes = new CallbackResponse(FFT, 2*_N_fft, y);
-        ev1.setCallback(CL_COMPLETE, callback, clbkRes);
+        _pCallbackFFT = callback;
+        auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
+            CallbackResponse *res = (CallbackResponse*) user_data;
+            _pCallbackFFT(res);
+        };
+
+        //TODO: Use standard c++ function pointer for callback here
+
+        CallbackResponse *clbkRes = new CallbackResponse(CallbackResponse::FFT, 2*_N_fft, y);
+        //ev1.setCallback(CL_COMPLETE, callback, clbkRes);
+        ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
 
         //ocl_event_times(evs[0], "Write X");
         //ocl_event_times(evs[1], "Twiddle");
@@ -147,33 +178,41 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
         //ocl_event_times(ev2, "Read Y");
 
         //TODO: Generate and return ID for referencing task in callback
+
+        return 0;
     }
     catch (cl::Error &err)
-    { std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; }	
+    { std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; }
 }
 
-int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x, 
+int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 	float *y, int n_min, int n_max,
-	void (*callback)(cl_event ev, cl_int e_status, void *user_data)) {
+	void (*callback)(CallbackResponse *resData)) {
 
 	try{
 		if (N != _N_ifft) {
 			_N_ifft = N;
-	        delete _ifftKernel;
+	        /*delete _ifftKernel;
 	        delete _bufIFFTX;
 	        delete _bufIFFTY;
-	        //delete _bufIFFTW;
+	        delete _bufIFFTW;
 
 	        if (_wIFFT)
 	            __free_ddr(_wIFFT);
+            if (_xIFFT)
+                __free_ddr(_xIFFT);
+            if (_yIFFT)
+                __free_ddr(_yIFFT);*/
 
 	        _bufsize_ifft = sizeof(float) * (2*_N_ifft + PAD + PAD);
-	        _wIFFT = (float*) __malloc_ddr(sizeof(float)*2*_N_ifft);
+	        _wIFFT = (float*) _allocBuffer(sizeof(float)*2*_N_ifft);
+            _xIFFT = (float*) _allocBuffer(sizeof(float)*2*_N_ifft);
+            _yIFFT = (float*) _allocBuffer(sizeof(float)*2*_N_ifft);
 
 	        _twGenIFFT(_wIFFT, _N_ifft);
 
-	        _bufIFFTX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_ifft, x);
-	        _bufIFFTY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_ifft, y);
+	        _bufIFFTX = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_ifft, _xIFFT);
+	        _bufIFFTY = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, _bufsize_ifft, _yIFFT);
 	        _bufIFFTW = new cl::Buffer(*_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufsize_ifft, _wIFFT);
 
 	        _ifftKernel = new cl::Kernel(*_program, "ocl_DSPF_sp_ifftSPxSP");
@@ -186,6 +225,9 @@ int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 	        _ifftKernel->setArg(5, _N_ifft); //n_max
 	    }
 
+        for (int i=0; i < _N_ifft; i++)
+            _xIFFT[i] = x[i];
+
 	    cl::Event ev1;
 	    std::vector<cl::Event> evs(2);
 	    std::vector<cl::Event> evss(1);
@@ -194,8 +236,14 @@ int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 	    _Qifft->enqueueNDRangeKernel(*_ifftKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
 	    _Qifft->enqueueReadBuffer(*_bufIFFTY, CL_TRUE, 0, _bufsize_ifft, y, &evss, &ev1);
 
-	    CallbackResponse *clbkRes = new CallbackResponse(IFFT, 2*_N_ifft, y);
-	    ev1.setCallback(CL_COMPLETE, callback, clbkRes);
+        _pCallbackIFFT = callback;
+        auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
+            CallbackResponse *res = (CallbackResponse*) user_data;
+            _pCallbackIFFT(res);
+        };
+
+	    CallbackResponse *clbkRes = new CallbackResponse(CallbackResponse::IFFT, 2*_N_ifft, y);
+	    ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
 
 	    //ocl_event_times(evs[0], "Write X");
 	    //ocl_event_times(evs[1], "Twiddle");
@@ -203,6 +251,8 @@ int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 	    //ocl_event_times(ev2, "Read Y");
 
 	    //TODO: Generate and return ID for referencing task in callback
+
+        return 0;
 	}
 	catch (cl::Error &err)
 	{ std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; }
@@ -211,7 +261,7 @@ int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 int AudioAPI::convReverbFromWAV(int N, float *x, const std::string &filename, float *y,
         void (*callback)(cl_event ev, cl_int e_status, void *user_data)){
     try {
-        
+        return 0;
     }
     catch (cl::Error &err)
     { std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; }

@@ -15,34 +15,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#ifndef CALLBACKRESPONSE_HPP_
-#define CALLBACKRESPONSE_HPP_
+#include "CallbackResponse.hpp"
 
-class CallbackResponse {
+CallbackResponse::CallbackResponse() : _op(CallbackResponse::UNDEFINED), _dataSize(0), _dataPtr(0) {
 
-public:
-	enum Ops {
-		FFT,
-		IFFT,
-		FIR,
-		IIR,
-		CONV,
-		UNDEFINED
-	};
-	CallbackResponse();
-	CallbackResponse(Ops op, unsigned int dataSize, float *dataPtr);
-	~CallbackResponse();
-	CallbackResponse::Ops getOp() const;
-	void setOp(Ops op);
-	unsigned int getDataSize() const;
-	void setDataSize(unsigned int size);
-	float* getDataPtr() const;
-	void setDataPtr(float *data);
+}
 
-private:
-    Ops _op;
-	unsigned int _dataSize;
-	float *_dataPtr;
-};
 
-#endif //CALLBACK_RESPONSE_HPP_
+CallbackResponse::CallbackResponse(Ops op, unsigned int dataSize, float *dataPtr) {
+	_op = op;
+	_dataSize = dataSize;
+	_dataPtr = dataPtr;
+}
+
+CallbackResponse::~CallbackResponse() {
+
+}
+
+CallbackResponse::Ops CallbackResponse::getOp() const {
+	return _op;
+}
+
+void CallbackResponse::setOp(Ops op){
+	_op = op;
+}
+
+unsigned int CallbackResponse::getDataSize() const {
+	return _dataSize;
+}
+
+void CallbackResponse::setDataSize(unsigned int size) {
+	_dataSize = size;
+}
+
+float* CallbackResponse::getDataPtr() const {
+	return _dataPtr;
+}
+
+void CallbackResponse::setDataPtr(float *data){
+	_dataPtr = data;
+}
