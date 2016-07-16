@@ -18,7 +18,7 @@
 #include "WaveIO.hpp"
 
 int WaveIO::readWAV(const std::string &filename, float *wav, int numItems, int numChannels){
-	int framesRead;
+	//int framesRead;
 	SF_INFO wavMetaData;
 	char *cstr = new char[filename.length()+1];
 	std::strcpy(cstr, filename.c_str());

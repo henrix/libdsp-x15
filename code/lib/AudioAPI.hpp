@@ -25,22 +25,15 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
 
-class AudioAPI
+class AudioAPIImpl;
+class AudioAPI 
 {
 	unsigned int _sampling_rate, _bufsize_fft, _bufsize_ifft;
 	int _N_fft, _N_ifft;
 	float *_xFFT, *_xIFFT, *_yFFT, *_yIFFT, *_wFFT, *_wIFFT;
-	cl::Kernel *_fftKernel, *_ifftKernel;
-	cl::Buffer *_bufFFTX, *_bufFFTY, *_bufFFTW;
-	cl::Buffer *_bufIFFTX, *_bufIFFTY, *_bufIFFTW;
-	cl::Program *_program;
-	cl::CommandQueue *_Qfft, *_Qifft;
-	cl::Context *_context;
+	AudioAPIImpl *_pimpl;
 
-	//static void (*_pCallbackFFT)(cl_event ev, cl_int e_status, void *user_data);
 	static void (*_pCallbackFFT)(CallbackResponse *resData);
 	static void (*_pCallbackIFFT)(CallbackResponse *resData);
 
@@ -58,8 +51,8 @@ public:
 	int ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 		float *y, int n_min, int n_max,
 		void (*callback)(CallbackResponse *resData));
-	int convReverbFromWAV(int N, float *x, const std::string &filename, float *y,
-		void (*callback)(cl_event ev, cl_int e_status, void *user_data));
+	//int convReverbFromWAV(int N, float *x, const std::string &filename, float *y,
+	//	void (*callback)(cl_event ev, cl_int e_status, void *user_data));
 };
 
 #endif //AUDIOAPI_HPP_
