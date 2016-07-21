@@ -26,7 +26,7 @@ TBD
 
 #### QCustomPlot for realtime plots
 1. wget http://www.qcustomplot.com/release/1.3.2/QCustomPlot.tar.gz
-2. mdkir qcustomplot
+2. mdkir <this_repo>/code/qcustomplot
 3. tar -xvzf QCustomPlot.tar.gz -C qcustomplot
 
 ### [CTAG face2|4 Audio Card](http://www.creative-technologies.de/linux-based-low-latency-multichannel-audio-system-2/) Driver
@@ -40,12 +40,12 @@ TBD
 
 ### C66x Audio / Signal Library
 1. Clone this repo on BeagleBoard-X15
-2. Switch to repo/code/lib
+2. Switch to <this_repo>/code/lib
 3. make
 
 ### QT Demo App
 1. Clone this repo
-2. Switch to repo/code/test-libaudio-x15
+2. Switch to <this_repo>/code/test-libaudio-x15
 3. qmake test-libaudio-x15.pro
 4. make
 
