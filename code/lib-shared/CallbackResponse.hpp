@@ -18,10 +18,12 @@
 #ifndef CALLBACKRESPONSE_HPP_
 #define CALLBACKRESPONSE_HPP_
 
+#include <cstddef>
+
 class CallbackResponse {
 
 public:
-	enum Ops {
+    enum Ops {
 		FFT,
 		IFFT,
 		FIR,
@@ -34,8 +36,9 @@ public:
 	~CallbackResponse();
 	CallbackResponse::Ops getOp() const;
 	void setOp(Ops op);
-	unsigned int getDataSize() const;
-	void setDataSize(unsigned int size);
+	size_t getDataSize() const;
+	void setDataSize(size_t size);
+	size_t getN() const;
 	float* getDataPtr() const;
 	void setDataPtr(float *data);
 

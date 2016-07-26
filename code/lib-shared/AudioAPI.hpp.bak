@@ -27,8 +27,10 @@
 #include <map>
 
 class AudioAPIImpl;
-class AudioAPI 
+class AudioAPI
 {
+
+	//May move to implementation class (but one more dereferencing operation)
 	unsigned int _sampling_rate, _bufsize_fft, _bufsize_ifft;
 	int _N_fft, _N_ifft;
 	float *_xFFT, *_xIFFT, *_yFFT, *_yIFFT, *_wFFT, *_wIFFT;
@@ -45,6 +47,9 @@ public:
 	AudioAPI();
 	~AudioAPI();
 
+	/**
+	 * DSP operations
+	 */
 	int ocl_DSPF_sp_fftSPxSP(int N, float *x,
 		float *y, int n_min, int n_max,
 		void (*callback)(CallbackResponse *resData));

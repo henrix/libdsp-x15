@@ -48,6 +48,10 @@ void CallbackResponse::setDataSize(unsigned int size) {
 	_dataSize = size;
 }
 
+size_t CallbackResponse::getN() const {
+	return _dataSize / 2;
+}
+
 float* CallbackResponse::getDataPtr() const {
 	return _dataPtr;
 }

@@ -18,7 +18,7 @@
 #define PAD 0
 
 #include "AudioAPI.hpp"
-#include "WaveIO.hpp"
+//#include "WaveIO.hpp"
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.hpp>
 #include <ocl_util.h>
@@ -27,7 +27,7 @@
 void (*AudioAPI::_pCallbackFFT)(CallbackResponse *resData) = NULL;
 void (*AudioAPI::_pCallbackIFFT)(CallbackResponse *resData) = NULL;
 
-class AudioAPIImpl 
+class AudioAPIImpl
 {
 public:
     cl::Kernel *_fftKernel, *_ifftKernel;
@@ -167,10 +167,14 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);
+
+        //Until here callback of jack is executed
         _pimpl->_Qfft->enqueueWriteBuffer(*_pimpl->_bufFFTX, CL_FALSE, 0, _bufsize_fft, x, 0, &evs[0]);
         _pimpl->_Qfft->enqueueWriteBuffer(*_pimpl->_bufFFTW, CL_FALSE, 0, _bufsize_fft, _wFFT, 0, &evs[1]);
         _pimpl->_Qfft->enqueueNDRangeKernel(*_pimpl->_fftKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _pimpl->_Qfft->enqueueReadBuffer(*_pimpl->_bufFFTY, CL_TRUE, 0, _bufsize_fft, y, &evss, &ev1);
+        std::cout << "Blabla" << std::endl;
+
 
         _pCallbackFFT = callback;
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
@@ -183,14 +187,14 @@ int AudioAPI::ocl_DSPF_sp_fftSPxSP(int N, float *x,
 
         //ocl_event_times(evs[0], "Write X");
         //ocl_event_times(evs[1], "Twiddle");
-        ocl_event_times(ev1, "FFT");
+        //ocl_event_times(ev1, "FFT");
         //ocl_event_times(ev2, "Read Y");
 
         //TODO: Generate and return ID for referencing task in callback
     }
     catch (cl::Error &err)
-    { 
-        std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl; 
+    {
+        std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 
     return 0;
@@ -258,13 +262,13 @@ int AudioAPI::ocl_DSPF_sp_ifftSPxSP(int N, float *x,
 
 	    //ocl_event_times(evs[0], "Write X");
 	    //ocl_event_times(evs[1], "Twiddle");
-	    ocl_event_times(ev1, "IFFT");
+	    //ocl_event_times(ev1, "IFFT");
 	    //ocl_event_times(ev2, "Read Y");
 
 	    //TODO: Generate and return ID for referencing task in callback
 	}
 	catch (cl::Error &err)
-	{ 
+	{
         std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 
