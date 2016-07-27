@@ -198,7 +198,10 @@ void API::ocl_DSPF_sp_fftSPxSP(){
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
-        ocl_event_times(ev1, "FFT");
+        /*ocl_event_times(evs[0], "Write X");
+        ocl_event_times(evs[1], "Twiddle");
+        ocl_event_times(evss[0], "FFT");
+        ocl_event_times(ev1, "Read Y");*/
     }
     catch (cl::Error &err)
     {
@@ -222,7 +225,10 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
-        ocl_event_times(ev1, "IFFT");
+        /*ocl_event_times(evs[0], "Write X");
+        ocl_event_times(evs[1], "Twiddle");
+        ocl_event_times(evss[0], "IFFT");
+        ocl_event_times(ev1, "Read Y");*/
     }
     catch (cl::Error &err)
     {

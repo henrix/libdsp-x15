@@ -28,13 +28,19 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <condition_variable>
+
+std::mutex mtx;
+std::condition_variable cv;
 
 void callback(CallbackResponse *clbkRes);
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out);
 
-int N = (16*1024);
+int N = (48000); // = sample rate
+float audio_buffer[48000];
+
 bool fftFinished = false, ifftFinished = false;
-//Gnuplot gp;
+Gnuplot gp;
 API api(callback);
 
 int main(int argc, char* argv[])
@@ -46,7 +52,7 @@ int main(int argc, char* argv[])
     /**
      * Generate sine
      */
-    float *xFFT = api.getBufX(CallbackResponse::FFT);
+    /*float *xFFT = api.getBufX(CallbackResponse::FFT);
     std::ofstream sinout("../../test/data/sine.txt");
     if (sinout.is_open()){
         for (int i=0; i < N; i++){
@@ -58,11 +64,9 @@ int main(int argc, char* argv[])
     }
     else{
         std::cout << "Couldn't write sine test output" << std::endl;
-    }
+    }*/
 
-    //JACKClient jackClient;
-    //jackClient.addCallback(callbackJACK);
-    api.ocl_DSPF_sp_fftSPxSP();  
+    /*api.ocl_DSPF_sp_fftSPxSP();  
     while(!fftFinished){}
     float *yFFT = api.getBufY(CallbackResponse::FFT);
     float *xIFFT = api.getBufX(CallbackResponse::IFFT);
@@ -70,7 +74,14 @@ int main(int argc, char* argv[])
         xIFFT[i] = yFFT[i];
     }
     api.ocl_DSPF_sp_ifftSPxSP();
-    while(!ifftFinished){}
+    while(!ifftFinished){}*/
+
+    JACKClient jackClient;
+    jackClient.addCallback(callbackJACK);
+
+    std::unique_lock<std::mutex> lck(mtx);
+    cv.wait(lck);
+    //while(42){}
 
     return 0;
 }
@@ -81,14 +92,17 @@ int main(int argc, char* argv[])
 void callback(CallbackResponse *clbkRes){
     //std::cout << "Event type callback FFT: " << type << std::endl;
     float *y = clbkRes->getDataPtr();
-    //int n = clbkRes->getN();
-    /*std::vector<float> pts(n);
-    pts.assign(_y, _y+n);
-    for (int i=0; i < pts.size(); i++){
-        std::cout << i << ": " << pts[PAD + 2*i + 1] << std::endl;
-    }*/
 
     if (clbkRes->getOp() == CallbackResponse::FFT){
+        //int n = clbkRes->getN();
+        std::vector<float> pts(N);
+        pts.assign(y, y+N);
+        gp << "plot '-' binary" << gp.binFmt1d(pts, "array") << "with lines notitle\n";
+        gp.sendBinary1d(pts);
+        gp.flush();
+    }
+
+    /*if (clbkRes->getOp() == CallbackResponse::FFT){
         std::ofstream fftoutsine("../../test/data/fft_sine.txt");
         if (fftoutsine.is_open()){
             for (int i=0; i < N; i++){
@@ -104,6 +118,7 @@ void callback(CallbackResponse *clbkRes){
         /*gp << "plot '-' binary" << gp.binFmt1d(pts, "array") << "with lines notitle\n";
         gp.sendBinary1d(pts);
 		gp.flush();*/
+    /*
 
         delete clbkRes;
         fftFinished = true;
@@ -123,21 +138,24 @@ void callback(CallbackResponse *clbkRes){
         std::cout << "IFFT calculation completed." << std::endl;
         delete clbkRes;
         ifftFinished = true;
-    }
+    }*/
 }
 
-bool flag = false;
+size_t count = 0;
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out){
-    //std::cout << "_process() callback called with " << n_frames << " called" << std::endl;
-    /*std::cout << "in: " << in[n_frames - 1] << std::endl;
-    if (!flag){
-        x = new float[n_frames*2];
-        flag = true;
+    //std::cout << "Buffer size: " << n_frames << " - in: " << in[n_frames - 1] << std::endl;
+
+    /*for (int i=0; i < n_frames; i++)
+        audio_buffer[i+count] = in[i];*/
+
+    float *x = api.getBufX(CallbackResponse::FFT);
+    for (int i=0; i < n_frames; i++){
+        x[PAD + 2*i + count] = in[i];
+        x[PAD + 2*i + 1 + count] = 0;
     }
 
-    for (int i=0; i < n_frames; i++){
-        x[PAD + 2*i] = in[i];
-        x[PAD + 2*i + 1] = 0;
-    }*/
-    //api.ocl_DSPF_sp_fftSPxSP(x, 4, n_frames);
+    count += n_frames;
+    if (count == N) 
+        api.ocl_DSPF_sp_fftSPxSP();
+    count %= N;
 }
