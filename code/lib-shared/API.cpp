@@ -40,9 +40,11 @@ public:
     std::unique_ptr<cl::Buffer> clBufXIFFT, clBufYIFFT, clBufWIFFT;
 };
 
+
 API::API(std::function<void(CallbackResponse *clRes)> callback)
     : _ptrImpl(new APIImpl(new cl::Context(CL_DEVICE_TYPE_ACCELERATOR))),
-    _nFFT(0), _nIFFT(0), _bufSizeFFT(0), _bufSizeIFFT(0)
+    _nFFT(0), _nIFFT(0), _bufSizeFFT(0), _bufSizeIFFT(0),
+    _bufXFFT(NULL), _bufYFFT(NULL), _bufXIFFT(NULL), _bufYIFFT(NULL)
 {
     _callback = callback;
     std::vector<cl::Device> devices = _ptrImpl->clContext->getInfo<CL_CONTEXT_DEVICES>();
@@ -67,7 +69,7 @@ API::~API(){
     __free_ddr(_bufYFFT);
     __free_ddr(_bufWFFT);
 }
-void API::prepareFFT(size_t N){
+void API::prepareFFT(size_t N, int n_min, int n_max){
     _nFFT = N;
     _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
     _bufXFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
@@ -81,10 +83,12 @@ void API::prepareFFT(size_t N){
     _ptrImpl->kernelFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
     _ptrImpl->kernelFFT->setArg(0, _nFFT);
     _ptrImpl->kernelFFT->setArg(1, *_ptrImpl->clBufXFFT);
-    _ptrImpl->kernelFFT->setArg(2, *_ptrImpl->clBufYFFT);
-    _ptrImpl->kernelFFT->setArg(3, *_ptrImpl->clBufWFFT);
+    _ptrImpl->kernelFFT->setArg(2, *_ptrImpl->clBufWFFT);
+    _ptrImpl->kernelFFT->setArg(3, *_ptrImpl->clBufYFFT);
+    _ptrImpl->kernelFFT->setArg(4, n_min);
+    _ptrImpl->kernelFFT->setArg(5, n_max);
 }
-void API::prepareIFFT(size_t N){
+void API::prepareIFFT(size_t N, int n_min, int n_max){
     _nIFFT = N;
     _bufSizeIFFT = sizeof(float) * (2*_nIFFT + PAD + PAD);
     _bufXIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
@@ -95,15 +99,39 @@ void API::prepareIFFT(size_t N){
     _ptrImpl->clBufYIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufYIFFT));
     _ptrImpl->clBufWIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufWIFFT));
 
-    _ptrImpl->kernelIFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
+    _ptrImpl->kernelIFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_ifftSPxSP"));
     _ptrImpl->kernelIFFT->setArg(0, _nIFFT);
     _ptrImpl->kernelIFFT->setArg(1, *_ptrImpl->clBufXIFFT);
-    _ptrImpl->kernelIFFT->setArg(2, *_ptrImpl->clBufYIFFT);
-    _ptrImpl->kernelIFFT->setArg(3, *_ptrImpl->clBufWIFFT);
+    _ptrImpl->kernelIFFT->setArg(2, *_ptrImpl->clBufWIFFT);
+    _ptrImpl->kernelIFFT->setArg(3, *_ptrImpl->clBufYIFFT);
+    _ptrImpl->kernelIFFT->setArg(4, n_min);
+    _ptrImpl->kernelIFFT->setArg(5, n_max);
 }
 void API::setCallback(std::function<void(CallbackResponse *clRes)> callback){
     _callback = callback;
 }
+float* API::getBufX(CallbackResponse::Ops op){
+    switch(op){
+        case CallbackResponse::FFT:
+            return _bufXFFT;
+        break;
+        case CallbackResponse::IFFT:
+            return _bufXIFFT;
+        break;
+    }
+}
+float* API::getBufY(CallbackResponse::Ops op){
+    switch(op){
+        case CallbackResponse::FFT:
+            return _bufYFFT;
+        break;
+        case CallbackResponse::IFFT:
+            return _bufYIFFT;
+        break;
+    }
+}
+
+
 void* API::_allocBuffer(size_t size){
     return __malloc_ddr(size);
 }
@@ -113,8 +141,10 @@ void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
 
     switch(op){
     case CallbackResponse::FFT:
-        for (j = 1, k = 0; j <= n >> 2; j = j << 2) {
-            for (i = 0; i < n >> 2; i += j) {
+        for (j = 1, k = 0; j <= n >> 2; j = j << 2)
+        {
+            for (i = 0; i < n >> 2; i += j)
+            {
                 w[k]     = (float) sin (2 * PI * i / n);
                 w[k + 1] = (float) cos (2 * PI * i / n);
                 w[k + 2] = (float) sin (4 * PI * i / n);
@@ -127,8 +157,10 @@ void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
         break;
 
     case CallbackResponse::IFFT:
-        for (j = 1, k = 0; j <= n >> 2; j = j << 2) {
-            for (i = 0; i < n >> 2; i += j) {
+        for (j = 1, k = 0; j <= n >> 2; j = j << 2)
+        {
+            for (i = 0; i < n >> 2; i += j)
+            {
                 w[k]     = (float) (-1)*sin (2 * PI * i / n);
                 w[k + 1] = (float) cos (2 * PI * i / n);
                 w[k + 2] = (float) (-1)*sin (4 * PI * i / n);
@@ -149,14 +181,8 @@ void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
 /**
  * DSP operations
  */
-void API::ocl_DSPF_sp_fftSPxSP(float *x, int n_min, int n_max){
+void API::ocl_DSPF_sp_fftSPxSP(){
     try{
-        for (unsigned int i=0; i < _nFFT; i++)
-            _bufXFFT[i] = x[i];
-
-        _ptrImpl->kernelFFT->setArg(4, n_min); //n_min
-        _ptrImpl->kernelFFT->setArg(5, n_max); //n_max
-
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);
@@ -179,14 +205,8 @@ void API::ocl_DSPF_sp_fftSPxSP(float *x, int n_min, int n_max){
         std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 }
-void API::ocl_DSPF_sp_ifftSPxSP(float *x, int n_min, int n_max){
+void API::ocl_DSPF_sp_ifftSPxSP(){
     try{
-        for (unsigned int i=0; i < _nIFFT; i++)
-            _bufXIFFT[i] = x[i];
-
-        _ptrImpl->kernelIFFT->setArg(4, n_min); //n_min
-        _ptrImpl->kernelIFFT->setArg(5, n_max); //n_max
-
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);

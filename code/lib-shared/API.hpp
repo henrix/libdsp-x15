@@ -27,15 +27,17 @@ class API {
 public:
     API(std::function<void(CallbackResponse *clRes)> callback);
     ~API();
-    void prepareFFT(size_t N);
-    void prepareIFFT(size_t N);
+    void prepareFFT(size_t N, int n_min, int n_max);
+    void prepareIFFT(size_t N, int n_min, int n_max);
     void setCallback(std::function<void(CallbackResponse *clRes)> callback); //Is executed for all operations
+    float* getBufX(CallbackResponse::Ops op);
+    float* getBufY(CallbackResponse::Ops op);
 
     /**
      * DSP operations
      */
-    void ocl_DSPF_sp_fftSPxSP(float *x, int n_min, int n_max);
-	void ocl_DSPF_sp_ifftSPxSP(float *x, int n_min, int n_max);
+    void ocl_DSPF_sp_fftSPxSP();
+	void ocl_DSPF_sp_ifftSPxSP();
 
 private:
     void* _allocBuffer(size_t size);
@@ -44,9 +46,9 @@ private:
     static std::function<void(CallbackResponse *clRes)> _callback;
     std::unique_ptr<APIImpl> _ptrImpl;
     size_t _nFFT, _nIFFT;
+    size_t _bufSizeFFT, _bufSizeIFFT;
     float *_bufXFFT, *_bufYFFT, *_bufWFFT;
     float *_bufXIFFT, *_bufYIFFT, *_bufWIFFT;
-    size_t _bufSizeFFT, _bufSizeIFFT;
 };
 
 #endif //API

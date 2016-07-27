@@ -34,22 +34,19 @@ void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack
 
 int N = (16*1024);
 bool fftFinished = false, ifftFinished = false;
-float *y;
 //Gnuplot gp;
 API api(callback);
-float *xFFT, *xIFFT;
 
 int main(int argc, char* argv[])
 {
-    api.prepareFFT(N);
+    api.prepareFFT(N, 4, N);
+    api.prepareIFFT(N, 4, N);
     //gp << "set yrange [-1:1]\n";
-
-    xFFT = new float[2*N];
-    xIFFT = new float[2*N];
 
     /**
      * Generate sine
      */
+    float *xFFT = api.getBufX(CallbackResponse::FFT);
     std::ofstream sinout("../../test/data/sine.txt");
     if (sinout.is_open()){
         for (int i=0; i < N; i++){
@@ -65,20 +62,15 @@ int main(int argc, char* argv[])
 
     //JACKClient jackClient;
     //jackClient.addCallback(callbackJACK);
-    api.prepareFFT(N);
-    api.prepareIFFT(N); 
-
-    api.ocl_DSPF_sp_fftSPxSP(xFFT, 4, N);   
-
+    api.ocl_DSPF_sp_fftSPxSP();  
     while(!fftFinished){}
+    float *yFFT = api.getBufY(CallbackResponse::FFT);
+    float *xIFFT = api.getBufX(CallbackResponse::IFFT);
     for (int i=0; i < 2*N; i++){
-        xIFFT[i] = y[i];
+        xIFFT[i] = yFFT[i];
     }
-    api.ocl_DSPF_sp_ifftSPxSP(xIFFT, 4, N);
+    api.ocl_DSPF_sp_ifftSPxSP();
     while(!ifftFinished){}
-
-    delete[] xFFT;
-    delete[] xIFFT;
 
     return 0;
 }
@@ -88,7 +80,7 @@ int main(int argc, char* argv[])
  */
 void callback(CallbackResponse *clbkRes){
     //std::cout << "Event type callback FFT: " << type << std::endl;
-    y = clbkRes->getDataPtr();
+    float *y = clbkRes->getDataPtr();
     //int n = clbkRes->getN();
     /*std::vector<float> pts(n);
     pts.assign(_y, _y+n);
