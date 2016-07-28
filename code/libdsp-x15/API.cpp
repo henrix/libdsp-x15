@@ -52,26 +52,36 @@ API::API(std::function<void(CallbackResponse *clRes)> callback)
     devices[0].getInfo(CL_DEVICE_MAX_COMPUTE_UNITS, &num);
     std::cout << "Found " << num << " DSP compute cores." << std::endl;
 
-    std::ifstream t("audiokernel.cl");
+    std::ifstream t("../libdsp-x15/audiokernel.cl");
     if (!t) {
         std::cerr << "Error Opening Kernel Source file\n"; exit(-1);
     }
     std::string kSrc((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
     cl::Program::Sources source(1, std::make_pair(kSrc.c_str(),kSrc.length()));
     _ptrImpl->clProgram = std::unique_ptr<cl::Program>(new cl::Program(*_ptrImpl->clContext, source));
-    _ptrImpl->clProgram->build(devices, "dsplib.ae66");
+    _ptrImpl->clProgram->build(devices, "../libdsp-x15/dsplib.ae66");
 
     _ptrImpl->queueFFT = std::unique_ptr<cl::CommandQueue>(new cl::CommandQueue(*_ptrImpl->clContext, devices[0], CL_QUEUE_PROFILING_ENABLE));
     _ptrImpl->queueIFFT = std::unique_ptr<cl::CommandQueue>(new cl::CommandQueue(*_ptrImpl->clContext, devices[0], CL_QUEUE_PROFILING_ENABLE));
 }
 API::~API(){
-    __free_ddr(_bufXFFT);
-    __free_ddr(_bufYFFT);
-    __free_ddr(_bufWFFT);
+    if (_bufXFFT)
+        __free_ddr(_bufXFFT);
+    if (_bufYFFT)
+        __free_ddr(_bufYFFT);
+    if (_bufWFFT)
+        __free_ddr(_bufWFFT);
 }
 void API::prepareFFT(size_t N, int n_min, int n_max){
     _nFFT = N;
     _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
+
+    /*if (_bufXFFT)
+        __free_ddr(_bufXFFT);
+    if (_bufYFFT)
+        __free_ddr(_bufYFFT);
+    if (_bufWFFT)
+        __free_ddr(_bufWFFT);*/
     _bufXFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
     _bufYFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
     _bufWFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
@@ -91,6 +101,13 @@ void API::prepareFFT(size_t N, int n_min, int n_max){
 void API::prepareIFFT(size_t N, int n_min, int n_max){
     _nIFFT = N;
     _bufSizeIFFT = sizeof(float) * (2*_nIFFT + PAD + PAD);
+
+    /*if (_bufXFFT)
+        __free_ddr(_bufXFFT);
+    if (_bufYFFT)
+        __free_ddr(_bufYFFT);
+    if (_bufWFFT)
+        __free_ddr(_bufWFFT);*/
     _bufXIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
     _bufYIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
     _bufWIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
@@ -198,10 +215,10 @@ void API::ocl_DSPF_sp_fftSPxSP(){
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
-        /*ocl_event_times(evs[0], "Write X");
+        ocl_event_times(evs[0], "Write X");
         ocl_event_times(evs[1], "Twiddle");
         ocl_event_times(evss[0], "FFT");
-        ocl_event_times(ev1, "Read Y");*/
+        ocl_event_times(ev1, "Read Y");
     }
     catch (cl::Error &err)
     {
@@ -225,10 +242,10 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
-        /*ocl_event_times(evs[0], "Write X");
+        ocl_event_times(evs[0], "Write X");
         ocl_event_times(evs[1], "Twiddle");
         ocl_event_times(evss[0], "IFFT");
-        ocl_event_times(ev1, "Read Y");*/
+        ocl_event_times(ev1, "Read Y");
     }
     catch (cl::Error &err)
     {
