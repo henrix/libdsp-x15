@@ -20,8 +20,10 @@
 
 #include "CallbackResponse.hpp"
 #include "ConfigOps.hpp"
+#include <map>
 #include <functional>
 #include <memory>
+#include <array>
 
 class APIImpl;
 class API {
@@ -29,10 +31,19 @@ public:
     API(std::function<void(CallbackResponse *clRes)> callback, bool debug = false);
     ~API();
     void setCallback(std::function<void(CallbackResponse *clRes)> callback); //Is executed for all operations
-    float* getBufX(ConfigOps::Ops op);
-    float* getBufY(ConfigOps::Ops op);
+    float* getBufIn(ConfigOps::Ops op);
+    float* getBufOut(ConfigOps::Ops op);
     void setDebug(const bool debug);
-    void prepareOp(ConfigOps config);
+    void prepareFFT(int N, int n_min, int n_max);
+    void prepareIFFT(int N, int n_min, int n_max);
+    void prepareFILTER_BIQUAD(std::array<float, 3> b, std::array<float, 2> a, float delay[], int nx);
+    void prepareFILTER_FIRCIRC(int csize, int nh, int ny);
+    void prepareFILTER_FIR_CPLX();
+    void prepareFILTER_FIR_GEN();
+    void prepareFILTER_FIR_R2();
+    void prepareFILTER_IIR();
+    void prepareFILTER_IIRLAT();
+
 
     /**
      * DSP operations
@@ -43,15 +54,16 @@ public:
 private:
     void* _allocBuffer(size_t size);
     static void _genTwiddles(ConfigOps::Ops op, int n, float *w);
-    void _prepareFFT(int N, int n_min, int n_max);
-    void _prepareIFFT(int N, int n_min, int n_max);
+    void _clean(ConfigOps::Ops op);
+
+    std::map<ConfigOps::Ops, std::unique_ptr<ConfigOps>> _kernelConfigs;
+    std::map<std::string, float*> _buffers;
+    std::map<ConfigOps::Ops, bool> _opPrepared;
 
     static std::function<void(CallbackResponse *clRes)> _callback;
     std::unique_ptr<APIImpl> _ptrImpl;
     size_t _nFFT, _nIFFT;
     size_t _bufSizeFFT, _bufSizeIFFT;
-    float *_bufXFFT, *_bufYFFT, *_bufWFFT;
-    float *_bufXIFFT, *_bufYIFFT, *_bufWIFFT;
     bool _debug;
 };
 

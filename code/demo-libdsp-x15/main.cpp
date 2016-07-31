@@ -66,21 +66,10 @@ bool fftFinished = false, ifftFinished = false;
 void test_FFT_IFFT(int n){
 
 	testEnabled = true;
-	ConfigOps configFFT(ConfigOps::FFT);
-	configFFT.setParam("N", n);
-	configFFT.setParam("n_min", 4);
-	configFFT.setParam("n_max", n);
-	api.prepareOp(configFFT);
-	ConfigOps configIFFT(ConfigOps::IFFT);
-	configIFFT.setParam<int>("N", n);
-	configIFFT.setParam<int>("n_min", 4);
-	configIFFT.setParam<int>("n_max", n);
-	api.prepareOp(configFFT);
-	api.prepareOp(configIFFT);
-	//api.prepareFFT(n, 4, n);
-	//api.prepareIFFT(n, 4, n);
+	api.prepareFFT(n, 4, n);
+	api.prepareIFFT(n, 4, n);
 
-	float *xFFT = api.getBufX(ConfigOps::FFT);
+	float *xFFT = api.getBufIn(ConfigOps::FFT);
 
 	/* Generate sine */
 	std::ofstream sinout("../../test/data/sine.txt");
@@ -98,8 +87,8 @@ void test_FFT_IFFT(int n){
 
     api.ocl_DSPF_sp_fftSPxSP();
     while(!fftFinished){}
-    float *yFFT = api.getBufY(ConfigOps::FFT);
-    float *xIFFT = api.getBufX(ConfigOps::IFFT);
+    float *yFFT = api.getBufOut(ConfigOps::FFT);
+    float *xIFFT = api.getBufIn(ConfigOps::IFFT);
     for (int i=0; i < 2*n; i++){
         xIFFT[i] = yFFT[i];
     }
@@ -160,7 +149,7 @@ void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack
     /*for (int i=0; i < n_frames; i++)
         audio_buffer[i+count] = in[i];*/
 
-    float *x = api.getBufX(ConfigOps::FFT);
+    float *x = api.getBufIn(ConfigOps::FFT);
     for (int i=0; i < n_frames; i++){
         x[PAD + 2*i + count] = in[i];
         x[PAD + 2*i + 1 + count] = 0;

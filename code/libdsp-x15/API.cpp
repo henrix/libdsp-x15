@@ -33,21 +33,29 @@ public:
 
     /* OpenCL stuff */
     std::unique_ptr<cl::Context> clContext;
-    std::unique_ptr<cl::CommandQueue> queueFFT, queueIFFT;
+    std::unique_ptr<cl::CommandQueue> clCmdQueue;
     std::unique_ptr<cl::Program> clProgram;
-    std::unique_ptr<cl::Kernel> kernelFFT, kernelIFFT;
-    std::unique_ptr<cl::Buffer> clBufXFFT, clBufYFFT, clBufWFFT;
-    std::unique_ptr<cl::Buffer> clBufXIFFT, clBufYIFFT, clBufWIFFT;
+    std::map<std::string, std::unique_ptr<cl::Kernel>> clKernels;
+    std::map<std::string, std::unique_ptr<cl::Buffer>> clBuffers;
 };
 
 
 API::API(std::function<void(CallbackResponse *clRes)> callback, bool debug)
     : _ptrImpl(new APIImpl(new cl::Context(CL_DEVICE_TYPE_ACCELERATOR))),
-    _nFFT(0), _nIFFT(0), _bufSizeFFT(0), _bufSizeIFFT(0),
-    _bufXFFT(NULL), _bufYFFT(NULL), _bufXIFFT(NULL), _bufYIFFT(NULL),
-    _debug(debug)
+    _nFFT(0), _nIFFT(0), _bufSizeFFT(0), _bufSizeIFFT(0), _debug(debug)
 {
-    _callback = callback;
+    _callback = callback; //static
+
+    _opPrepared[ConfigOps::FFT] = false;
+    _opPrepared[ConfigOps::IFFT] = false;
+    _opPrepared[ConfigOps::FILTER_BIQUAD] = false;
+    _opPrepared[ConfigOps::FILTER_FIRCIRC] = false;
+    _opPrepared[ConfigOps::FILTER_FIR_CPLX] = false;
+    _opPrepared[ConfigOps::FILTER_FIR_GEN] = false;
+    _opPrepared[ConfigOps::FILTER_FIR_R2] = false;
+    _opPrepared[ConfigOps::FILTER_IIR] = false;
+    _opPrepared[ConfigOps::FILTER_IIRLAT] = false;
+
     std::vector<cl::Device> devices = _ptrImpl->clContext->getInfo<CL_CONTEXT_DEVICES>();
     int num;
     devices[0].getInfo(CL_DEVICE_MAX_COMPUTE_UNITS, &num);
@@ -62,60 +70,26 @@ API::API(std::function<void(CallbackResponse *clRes)> callback, bool debug)
     _ptrImpl->clProgram = std::unique_ptr<cl::Program>(new cl::Program(*_ptrImpl->clContext, source));
     _ptrImpl->clProgram->build(devices, "../libdsp-x15/dsplib.ae66");
 
-    _ptrImpl->queueFFT = std::unique_ptr<cl::CommandQueue>(new cl::CommandQueue(*_ptrImpl->clContext, devices[0], CL_QUEUE_PROFILING_ENABLE));
-    _ptrImpl->queueIFFT = std::unique_ptr<cl::CommandQueue>(new cl::CommandQueue(*_ptrImpl->clContext, devices[0], CL_QUEUE_PROFILING_ENABLE));
+    _ptrImpl->clCmdQueue = std::unique_ptr<cl::CommandQueue>(new cl::CommandQueue(*_ptrImpl->clContext, devices[0], CL_QUEUE_PROFILING_ENABLE));
 }
 API::~API(){
-    if (_bufXFFT)
-        __free_ddr(_bufXFFT);
-    if (_bufYFFT)
-        __free_ddr(_bufYFFT);
-    if (_bufWFFT)
-        __free_ddr(_bufWFFT);
+    if (_opPrepared.at(ConfigOps::FFT)){
+        _clean(ConfigOps::FFT);
+    }
+    if (_opPrepared.at(ConfigOps::IFFT)){
+        _clean(ConfigOps::IFFT);
+    }
 }
 void API::setCallback(std::function<void(CallbackResponse *clRes)> callback){
     _callback = callback;
 }
-float* API::getBufX(ConfigOps::Ops op){
+float* API::getBufIn(ConfigOps::Ops op){
     switch(op){
         case ConfigOps::FFT:
-            return _bufXFFT;
+            return _buffers.at("FFT_X");
         break;
         case ConfigOps::IFFT:
-            return _bufXIFFT;
-        break;
-    }
-}
-float* API::getBufY(ConfigOps::Ops op){
-    switch(op){
-        case ConfigOps::FFT:
-            return _bufYFFT;
-        break;
-        case ConfigOps::IFFT:
-            return _bufYIFFT;
-        break;
-    }
-}
-void API::setDebug(const bool debug){
-    _debug = debug;
-}
-void API::prepareOp(ConfigOps config){
-    switch(config.getOp()){
-        case ConfigOps::FFT:
-        {
-            int N = config.getParam<int>("N");
-            int n_min = config.getParam<int>("n_min");
-            int n_max = config.getParam<int>("n_max");
-            _prepareFFT(N, n_min, n_max);
-        }
-        break;
-        case ConfigOps::IFFT:
-        {
-            int N = config.getParam<int>("N");
-            int n_min = config.getParam<int>("n_min");
-            int n_max = config.getParam<int>("n_max");
-            _prepareIFFT(N, n_min, n_max);
-        }
+            return _buffers.at("IFFT_X");
         break;
         case ConfigOps::FILTER_BIQUAD:
         break;
@@ -132,8 +106,107 @@ void API::prepareOp(ConfigOps config){
         case ConfigOps::FILTER_IIRLAT:
         break;
     }
+    return NULL;
 }
+float* API::getBufOut(ConfigOps::Ops op){
+    switch(op){
+        case ConfigOps::FFT:
+            return _buffers.at("FFT_Y");
+        break;
+        case ConfigOps::IFFT:
+            return _buffers.at("IFFT_Y");
+        break;
+        case ConfigOps::FILTER_BIQUAD:
+        break;
+        case ConfigOps::FILTER_FIRCIRC:
+        break;
+        case ConfigOps::FILTER_FIR_CPLX:
+        break;
+        case ConfigOps::FILTER_FIR_GEN:
+        break;
+        case ConfigOps::FILTER_FIR_R2:
+        break;
+        case ConfigOps::FILTER_IIR:
+        break;
+        case ConfigOps::FILTER_IIRLAT:
+        break;
+    }
+    return NULL;
+}
+void API::setDebug(const bool debug){
+    _debug = debug;
+}
+void API::prepareFFT(int N, int n_min, int n_max){
+    if (_opPrepared.at(ConfigOps::FFT)){
+        _clean(ConfigOps::FFT);
+    }
 
+    _nFFT = N;
+    _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
+    /*_kernelConfigs[ConfigOps::FFT] = std::unique_ptr<ConfigOps>(new ConfigOps(ConfigOps::FFT));
+    ConfigOps configFFT(ConfigOps::FFT);
+    configFFT.setParam<int>("N", N);
+    configFFT.setParam<int>("n_min", n_min);
+    configFFT.setParam<int>("n_max", n_max);*/
+
+    _buffers["FFT_X"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+    _buffers["FFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+    _buffers["FFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+
+    _genTwiddles(ConfigOps::FFT, _nFFT, _buffers.at("FFT_W"));
+
+    _ptrImpl->clBuffers["FFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_X")));
+    _ptrImpl->clBuffers["FFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_W")));
+    _ptrImpl->clBuffers["FFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_Y")));
+
+    _ptrImpl->clKernels["FFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
+    _ptrImpl->clKernels.at("FFT")->setArg(0, _nFFT);
+    _ptrImpl->clKernels.at("FFT")->setArg(1, *_ptrImpl->clBuffers.at("FFT_X"));
+    _ptrImpl->clKernels.at("FFT")->setArg(2, *_ptrImpl->clBuffers.at("FFT_W"));
+    _ptrImpl->clKernels.at("FFT")->setArg(3, *_ptrImpl->clBuffers.at("FFT_Y"));
+    _ptrImpl->clKernels.at("FFT")->setArg(4, n_min);
+    _ptrImpl->clKernels.at("FFT")->setArg(5, n_max);
+
+    _opPrepared[ConfigOps::FFT] = true;
+}
+void API::prepareIFFT(int N, int n_min, int n_max){
+    if (_opPrepared.at(ConfigOps::IFFT)){
+        _clean(ConfigOps::IFFT);
+    }
+
+    _nIFFT = N;
+    _bufSizeIFFT = sizeof(float) * (2*_nIFFT + PAD + PAD);
+
+    _buffers["IFFT_X"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+    _buffers["IFFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+    _buffers["IFFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+
+    _genTwiddles(ConfigOps::IFFT, _nIFFT, _buffers.at("IFFT_W"));
+
+    _ptrImpl->clBuffers["IFFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_X")));
+    _ptrImpl->clBuffers["IFFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_W")));
+    _ptrImpl->clBuffers["IFFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_Y")));
+
+    _ptrImpl->clKernels["IFFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_ifftSPxSP"));
+    _ptrImpl->clKernels.at("IFFT")->setArg(0, _nIFFT);
+    _ptrImpl->clKernels.at("IFFT")->setArg(1, *_ptrImpl->clBuffers.at("IFFT_X"));
+    _ptrImpl->clKernels.at("IFFT")->setArg(2, *_ptrImpl->clBuffers.at("IFFT_W"));
+    _ptrImpl->clKernels.at("IFFT")->setArg(3, *_ptrImpl->clBuffers.at("IFFT_Y"));
+    _ptrImpl->clKernels.at("IFFT")->setArg(4, n_min);
+    _ptrImpl->clKernels.at("IFFT")->setArg(5, n_max);
+
+    _opPrepared[ConfigOps::IFFT] = true;
+}
+void API::prepareFILTER_BIQUAD(std::array<float, 3> b, std::array<float, 2> a, float delay[], int nx){
+    if (_opPrepared.at(ConfigOps::FILTER_BIQUAD)){
+        _clean(ConfigOps::FILTER_BIQUAD);
+    }
+
+
+}
+void API::prepareFILTER_FIRCIRC(int csize, int nh, int ny){
+
+}
 
 void* API::_allocBuffer(size_t size){
     return __malloc_ddr(size);
@@ -142,8 +215,7 @@ void API::_genTwiddles(ConfigOps::Ops op, int n, float *w){
     int i, j, k;
     const double PI = 3.141592654;
 
-    switch(op){
-    case ConfigOps::FFT:
+    if (op == ConfigOps::FFT){
         for (j = 1, k = 0; j <= n >> 2; j = j << 2)
         {
             for (i = 0; i < n >> 2; i += j)
@@ -157,9 +229,8 @@ void API::_genTwiddles(ConfigOps::Ops op, int n, float *w){
                 k += 6;
             }
         }
-        break;
-
-    case ConfigOps::IFFT:
+    }
+    else if (op == ConfigOps::IFFT){
         for (j = 1, k = 0; j <= n >> 2; j = j << 2)
         {
             for (i = 0; i < n >> 2; i += j)
@@ -173,63 +244,61 @@ void API::_genTwiddles(ConfigOps::Ops op, int n, float *w){
                 k += 6;
             }
         }
-        break;
-
-    default:
-        break;
     }
 }
-void API::_prepareFFT(int N, int n_min, int n_max){
-    _nFFT = N;
-    _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
 
-    /*if (_bufXFFT)
-        __free_ddr(_bufXFFT);
-    if (_bufYFFT)
-        __free_ddr(_bufYFFT);
-    if (_bufWFFT)
-        __free_ddr(_bufWFFT);*/
-    _bufXFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-    _bufYFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-    _bufWFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-    _genTwiddles(ConfigOps::FFT, _nFFT, _bufWFFT);
-    _ptrImpl->clBufXFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufXFFT));
-    _ptrImpl->clBufYFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufYFFT));
-    _ptrImpl->clBufWFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufWFFT));
+void API::_clean(ConfigOps::Ops op){
+    switch(op){
+        case ConfigOps::FFT:
+        {
+            __free_ddr(_buffers.at("FFT_X"));
+            __free_ddr(_buffers.at("FFT_W"));
+            __free_ddr(_buffers.at("FFT_Y"));
+        }
+        break;
+        case ConfigOps::IFFT:
+        {
+            __free_ddr(_buffers.at("IFFT_X"));
+            __free_ddr(_buffers.at("IFFT_W"));
+            __free_ddr(_buffers.at("IFFT_Y"));
+        }
+        break;
+        case ConfigOps::FILTER_BIQUAD:
+        {
 
-    _ptrImpl->kernelFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
-    _ptrImpl->kernelFFT->setArg(0, _nFFT);
-    _ptrImpl->kernelFFT->setArg(1, *_ptrImpl->clBufXFFT);
-    _ptrImpl->kernelFFT->setArg(2, *_ptrImpl->clBufWFFT);
-    _ptrImpl->kernelFFT->setArg(3, *_ptrImpl->clBufYFFT);
-    _ptrImpl->kernelFFT->setArg(4, n_min);
-    _ptrImpl->kernelFFT->setArg(5, n_max);
-}
-void API::_prepareIFFT(int N, int n_min, int n_max){
-    _nIFFT = N;
-    _bufSizeIFFT = sizeof(float) * (2*_nIFFT + PAD + PAD);
+        }
+        break;
+        case ConfigOps::FILTER_FIRCIRC:
+        {
 
-    /*if (_bufXFFT)
-        __free_ddr(_bufXFFT);
-    if (_bufYFFT)
-        __free_ddr(_bufYFFT);
-    if (_bufWFFT)
-        __free_ddr(_bufWFFT);*/
-    _bufXIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-    _bufYIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-    _bufWIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-    _genTwiddles(ConfigOps::IFFT, _nIFFT, _bufWIFFT);
-    _ptrImpl->clBufXIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufXIFFT));
-    _ptrImpl->clBufYIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufYIFFT));
-    _ptrImpl->clBufWIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufWIFFT));
+        }
+        break;
+        case ConfigOps::FILTER_FIR_CPLX:
+        {
 
-    _ptrImpl->kernelIFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_ifftSPxSP"));
-    _ptrImpl->kernelIFFT->setArg(0, _nIFFT);
-    _ptrImpl->kernelIFFT->setArg(1, *_ptrImpl->clBufXIFFT);
-    _ptrImpl->kernelIFFT->setArg(2, *_ptrImpl->clBufWIFFT);
-    _ptrImpl->kernelIFFT->setArg(3, *_ptrImpl->clBufYIFFT);
-    _ptrImpl->kernelIFFT->setArg(4, n_min);
-    _ptrImpl->kernelIFFT->setArg(5, n_max);
+        }
+        break;
+        case ConfigOps::FILTER_FIR_GEN:
+        {
+
+        }
+        break;
+        case ConfigOps::FILTER_FIR_R2:
+        {
+
+        }
+        break;
+        case ConfigOps::FILTER_IIR:
+        {
+
+        }
+        break;
+        case ConfigOps::FILTER_IIRLAT:
+        {
+
+        }
+        break;
+    }
 }
 
 
@@ -242,12 +311,12 @@ void API::ocl_DSPF_sp_fftSPxSP(){
         std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);
 
-        _ptrImpl->queueFFT->enqueueWriteBuffer(*_ptrImpl->clBufXFFT, CL_FALSE, 0, _bufSizeFFT, _bufXFFT, 0, &evs[0]);
-        _ptrImpl->queueFFT->enqueueWriteBuffer(*_ptrImpl->clBufWFFT, CL_FALSE, 0, _bufSizeFFT, _bufWFFT, 0, &evs[1]);
-        _ptrImpl->queueFFT->enqueueNDRangeKernel(*_ptrImpl->kernelFFT, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
-        _ptrImpl->queueFFT->enqueueReadBuffer(*_ptrImpl->clBufYFFT, CL_TRUE, 0, _bufSizeFFT, _bufYFFT, &evss, &ev1);
+        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FFT_X"), CL_FALSE, 0, _bufSizeFFT, _buffers.at("FFT_X"), 0, &evs[0]);
+        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FFT_W"), CL_FALSE, 0, _bufSizeFFT, _buffers.at("FFT_W"), 0, &evs[1]);
+        _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("FFT"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
+        _ptrImpl->clCmdQueue->enqueueReadBuffer(*_ptrImpl->clBuffers.at("FFT_Y"), CL_TRUE, 0, _bufSizeFFT, _buffers.at("FFT_Y"), &evss, &ev1);
 
-        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::FFT, 2*_nFFT, _bufYFFT);
+        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::FFT, 2*_nFFT, _buffers.at("FFT_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
             _callback(res);
@@ -272,12 +341,12 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
         std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);
 
-        _ptrImpl->queueIFFT->enqueueWriteBuffer(*_ptrImpl->clBufXIFFT, CL_FALSE, 0, _bufSizeIFFT, _bufXIFFT, 0, &evs[0]);
-        _ptrImpl->queueIFFT->enqueueWriteBuffer(*_ptrImpl->clBufWIFFT, CL_FALSE, 0, _bufSizeIFFT, _bufWIFFT, 0, &evs[1]);
-        _ptrImpl->queueIFFT->enqueueNDRangeKernel(*_ptrImpl->kernelIFFT, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
-        _ptrImpl->queueIFFT->enqueueReadBuffer(*_ptrImpl->clBufYIFFT, CL_TRUE, 0, _bufSizeIFFT, _bufYIFFT, &evss, &ev1);
+        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("IFFT_X"), CL_FALSE, 0, _bufSizeIFFT, _buffers.at("IFFT_X"), 0, &evs[0]);
+        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("IFFT_W"), CL_FALSE, 0, _bufSizeIFFT, _buffers.at("IFFT_W"), 0, &evs[1]);
+        _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("IFFT"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
+        _ptrImpl->clCmdQueue->enqueueReadBuffer(*_ptrImpl->clBuffers.at("IFFT_Y"), CL_TRUE, 0, _bufSizeIFFT, _buffers.at("IFFT_Y"), &evss, &ev1);
 
-        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::IFFT, 2*_nIFFT, _bufYIFFT);
+        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::IFFT, 2*_nIFFT, _buffers.at("IFFT_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
             _callback(res);
