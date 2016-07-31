@@ -4,8 +4,13 @@ CPP = g++
 CPP_FLAGS = -g -Wall -std=c++11
 LFLAGS = -Wl,-O1
 LIBS  = ../libdsp-x15/libdsp-x15.so -ljack
+# -L/usr/lib/arm-linux-gnueabihf -lSDL2
+#sdl_cflags := $(shell pkg-config --cflags sdl2 SDL2_mixer)
+#CPP_FLAGS += $(sdl_flags)
+#sdl_libs := $(shell pkg-config --libs sdl2 SDL2_mixer)
+#LIBS += $(sdl_libs)
 
-OBJECTS = jackclient.o main.o 
+OBJECTS = jackclient.o main.o
 
 %.o: %.cpp
 	@echo Compiling $<
