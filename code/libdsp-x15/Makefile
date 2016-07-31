@@ -22,7 +22,7 @@ CPP_FLAGS = -fPIC -O3 -g -Wall -std=c++11
 CPP_FLAGS += -I$(TI_OCL_INSTALL)/usr/include
 LD_FLAGS  += -L$(TI_OCL_INSTALL)/usr/lib
 
-OBJECTS = CallbackResponse.o API.o
+OBJECTS = ConfigOps.o CallbackResponse.o API.o
 
 UNAME_M :=$(shell uname -m)
 

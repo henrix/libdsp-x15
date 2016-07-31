@@ -15,42 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#include "CallbackResponse.hpp"
+#include "ConfigOps.hpp"
 
-CallbackResponse::CallbackResponse(ConfigOps::Ops op, unsigned int dataSize, float *dataPtr) {
-	_op = op;
-	_dataSize = dataSize;
-	_dataPtr = dataPtr;
-}
+ConfigOps::ConfigOps(Ops op) : _op(op) {}
 
-CallbackResponse::~CallbackResponse() {
-
-}
-
-ConfigOps::Ops CallbackResponse::getOp() const {
-	return _op;
-}
-
-void CallbackResponse::setOp(ConfigOps::Ops op){
-	_op = op;
-}
-
-unsigned int CallbackResponse::getDataSize() const {
-	return _dataSize;
-}
-
-void CallbackResponse::setDataSize(unsigned int size) {
-	_dataSize = size;
-}
-
-size_t CallbackResponse::getN() const {
-	return _dataSize / 2;
-}
-
-float* CallbackResponse::getDataPtr() const {
-	return _dataPtr;
-}
-
-void CallbackResponse::setDataPtr(float *data){
-	_dataPtr = data;
+ConfigOps::Ops ConfigOps::getOp() const {
+    return _op;
 }

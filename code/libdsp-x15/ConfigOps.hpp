@@ -15,29 +15,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#ifndef CALLBACKRESPONSE_HPP_
-#define CALLBACKRESPONSE_HPP_
+#ifndef CONFIGOPS_HPP_
+#define CONFIGOPS_HPP_
 
-#include <cstddef>
-#include "ConfigOps.hpp"
+#include <iostream>
+#include <map>
+#include <boost/any.hpp>
 
-class CallbackResponse {
-
+class ConfigOps {
 public:
-	CallbackResponse(ConfigOps::Ops op, unsigned int dataSize, float *dataPtr);
-	~CallbackResponse();
-	ConfigOps::Ops getOp() const;
-	void setOp(ConfigOps::Ops op);
-	size_t getDataSize() const;
-	void setDataSize(size_t size);
-	size_t getN() const;
-	float* getDataPtr() const;
-	void setDataPtr(float *data);
+    enum Ops {
+		FFT,
+		IFFT,
+		FILTER_BIQUAD,
+		FILTER_FIRCIRC,
+		FILTER_FIR_CPLX,
+		FILTER_FIR_GEN,
+		FILTER_FIR_R2,
+        FILTER_IIR,
+        FILTER_IIRLAT
+	};
+
+	ConfigOps(Ops op) ;
+	Ops getOp() const ;
+    template<typename T> T getParam(std::string param_name) const {
+        try{
+            T val = boost::any_cast<T>(_params.at(param_name));
+            return val;
+        }
+        catch(const std::exception &ec){
+            std::cout << "error: " << ec.what() << std::endl;
+        }
+    }
+    template<typename T> void setParam(std::string param_name, T val){
+        _params[param_name] = val;
+    }
+
 
 private:
-    ConfigOps::Ops _op;
-	unsigned int _dataSize;
-	float *_dataPtr;
+    Ops _op;
+    std::map<std::string, boost::any> _params;
 };
 
-#endif //CALLBACK_RESPONSE_HPP_
+#endif //CONFIGOPS_HPP_

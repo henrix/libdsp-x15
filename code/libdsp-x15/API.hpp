@@ -19,6 +19,7 @@
 #define API_HPP_
 
 #include "CallbackResponse.hpp"
+#include "ConfigOps.hpp"
 #include <functional>
 #include <memory>
 
@@ -27,12 +28,11 @@ class API {
 public:
     API(std::function<void(CallbackResponse *clRes)> callback, bool debug = false);
     ~API();
-    void prepareFFT(size_t N, int n_min, int n_max);
-    void prepareIFFT(size_t N, int n_min, int n_max);
     void setCallback(std::function<void(CallbackResponse *clRes)> callback); //Is executed for all operations
-    float* getBufX(CallbackResponse::Ops op);
-    float* getBufY(CallbackResponse::Ops op);
+    float* getBufX(ConfigOps::Ops op);
+    float* getBufY(ConfigOps::Ops op);
     void setDebug(const bool debug);
+    void prepareOp(ConfigOps config);
 
     /**
      * DSP operations
@@ -42,7 +42,9 @@ public:
 
 private:
     void* _allocBuffer(size_t size);
-    static void _genTwiddles(CallbackResponse::Ops op, int n, float *w);
+    static void _genTwiddles(ConfigOps::Ops op, int n, float *w);
+    void _prepareFFT(int N, int n_min, int n_max);
+    void _prepareIFFT(int N, int n_min, int n_max);
 
     static std::function<void(CallbackResponse *clRes)> _callback;
     std::unique_ptr<APIImpl> _ptrImpl;

@@ -73,77 +73,25 @@ API::~API(){
     if (_bufWFFT)
         __free_ddr(_bufWFFT);
 }
-void API::prepareFFT(size_t N, int n_min, int n_max){
-    _nFFT = N;
-    _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
-
-    /*if (_bufXFFT)
-        __free_ddr(_bufXFFT);
-    if (_bufYFFT)
-        __free_ddr(_bufYFFT);
-    if (_bufWFFT)
-        __free_ddr(_bufWFFT);*/
-    _bufXFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-    _bufYFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-    _bufWFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-    _genTwiddles(CallbackResponse::FFT, _nFFT, _bufWFFT);
-    _ptrImpl->clBufXFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufXFFT));
-    _ptrImpl->clBufYFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufYFFT));
-    _ptrImpl->clBufWFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufWFFT));
-
-    _ptrImpl->kernelFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
-    _ptrImpl->kernelFFT->setArg(0, _nFFT);
-    _ptrImpl->kernelFFT->setArg(1, *_ptrImpl->clBufXFFT);
-    _ptrImpl->kernelFFT->setArg(2, *_ptrImpl->clBufWFFT);
-    _ptrImpl->kernelFFT->setArg(3, *_ptrImpl->clBufYFFT);
-    _ptrImpl->kernelFFT->setArg(4, n_min);
-    _ptrImpl->kernelFFT->setArg(5, n_max);
-}
-void API::prepareIFFT(size_t N, int n_min, int n_max){
-    _nIFFT = N;
-    _bufSizeIFFT = sizeof(float) * (2*_nIFFT + PAD + PAD);
-
-    /*if (_bufXFFT)
-        __free_ddr(_bufXFFT);
-    if (_bufYFFT)
-        __free_ddr(_bufYFFT);
-    if (_bufWFFT)
-        __free_ddr(_bufWFFT);*/
-    _bufXIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-    _bufYIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-    _bufWIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-    _genTwiddles(CallbackResponse::IFFT, _nIFFT, _bufWIFFT);
-    _ptrImpl->clBufXIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufXIFFT));
-    _ptrImpl->clBufYIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufYIFFT));
-    _ptrImpl->clBufWIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufWIFFT));
-
-    _ptrImpl->kernelIFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_ifftSPxSP"));
-    _ptrImpl->kernelIFFT->setArg(0, _nIFFT);
-    _ptrImpl->kernelIFFT->setArg(1, *_ptrImpl->clBufXIFFT);
-    _ptrImpl->kernelIFFT->setArg(2, *_ptrImpl->clBufWIFFT);
-    _ptrImpl->kernelIFFT->setArg(3, *_ptrImpl->clBufYIFFT);
-    _ptrImpl->kernelIFFT->setArg(4, n_min);
-    _ptrImpl->kernelIFFT->setArg(5, n_max);
-}
 void API::setCallback(std::function<void(CallbackResponse *clRes)> callback){
     _callback = callback;
 }
-float* API::getBufX(CallbackResponse::Ops op){
+float* API::getBufX(ConfigOps::Ops op){
     switch(op){
-        case CallbackResponse::FFT:
+        case ConfigOps::FFT:
             return _bufXFFT;
         break;
-        case CallbackResponse::IFFT:
+        case ConfigOps::IFFT:
             return _bufXIFFT;
         break;
     }
 }
-float* API::getBufY(CallbackResponse::Ops op){
+float* API::getBufY(ConfigOps::Ops op){
     switch(op){
-        case CallbackResponse::FFT:
+        case ConfigOps::FFT:
             return _bufYFFT;
         break;
-        case CallbackResponse::IFFT:
+        case ConfigOps::IFFT:
             return _bufYIFFT;
         break;
     }
@@ -151,17 +99,51 @@ float* API::getBufY(CallbackResponse::Ops op){
 void API::setDebug(const bool debug){
     _debug = debug;
 }
+void API::prepareOp(ConfigOps config){
+    switch(config.getOp()){
+        case ConfigOps::FFT:
+        {
+            int N = config.getParam<int>("N");
+            int n_min = config.getParam<int>("n_min");
+            int n_max = config.getParam<int>("n_max");
+            _prepareFFT(N, n_min, n_max);
+        }
+        break;
+        case ConfigOps::IFFT:
+        {
+            int N = config.getParam<int>("N");
+            int n_min = config.getParam<int>("n_min");
+            int n_max = config.getParam<int>("n_max");
+            _prepareIFFT(N, n_min, n_max);
+        }
+        break;
+        case ConfigOps::FILTER_BIQUAD:
+        break;
+        case ConfigOps::FILTER_FIRCIRC:
+        break;
+        case ConfigOps::FILTER_FIR_CPLX:
+        break;
+        case ConfigOps::FILTER_FIR_GEN:
+        break;
+        case ConfigOps::FILTER_FIR_R2:
+        break;
+        case ConfigOps::FILTER_IIR:
+        break;
+        case ConfigOps::FILTER_IIRLAT:
+        break;
+    }
+}
 
 
 void* API::_allocBuffer(size_t size){
     return __malloc_ddr(size);
 }
-void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
+void API::_genTwiddles(ConfigOps::Ops op, int n, float *w){
     int i, j, k;
     const double PI = 3.141592654;
 
     switch(op){
-    case CallbackResponse::FFT:
+    case ConfigOps::FFT:
         for (j = 1, k = 0; j <= n >> 2; j = j << 2)
         {
             for (i = 0; i < n >> 2; i += j)
@@ -177,7 +159,7 @@ void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
         }
         break;
 
-    case CallbackResponse::IFFT:
+    case ConfigOps::IFFT:
         for (j = 1, k = 0; j <= n >> 2; j = j << 2)
         {
             for (i = 0; i < n >> 2; i += j)
@@ -197,6 +179,58 @@ void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
         break;
     }
 }
+void API::_prepareFFT(int N, int n_min, int n_max){
+    _nFFT = N;
+    _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
+
+    /*if (_bufXFFT)
+        __free_ddr(_bufXFFT);
+    if (_bufYFFT)
+        __free_ddr(_bufYFFT);
+    if (_bufWFFT)
+        __free_ddr(_bufWFFT);*/
+    _bufXFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+    _bufYFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+    _bufWFFT = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+    _genTwiddles(ConfigOps::FFT, _nFFT, _bufWFFT);
+    _ptrImpl->clBufXFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufXFFT));
+    _ptrImpl->clBufYFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufYFFT));
+    _ptrImpl->clBufWFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _bufWFFT));
+
+    _ptrImpl->kernelFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
+    _ptrImpl->kernelFFT->setArg(0, _nFFT);
+    _ptrImpl->kernelFFT->setArg(1, *_ptrImpl->clBufXFFT);
+    _ptrImpl->kernelFFT->setArg(2, *_ptrImpl->clBufWFFT);
+    _ptrImpl->kernelFFT->setArg(3, *_ptrImpl->clBufYFFT);
+    _ptrImpl->kernelFFT->setArg(4, n_min);
+    _ptrImpl->kernelFFT->setArg(5, n_max);
+}
+void API::_prepareIFFT(int N, int n_min, int n_max){
+    _nIFFT = N;
+    _bufSizeIFFT = sizeof(float) * (2*_nIFFT + PAD + PAD);
+
+    /*if (_bufXFFT)
+        __free_ddr(_bufXFFT);
+    if (_bufYFFT)
+        __free_ddr(_bufYFFT);
+    if (_bufWFFT)
+        __free_ddr(_bufWFFT);*/
+    _bufXIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+    _bufYIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+    _bufWIFFT = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+    _genTwiddles(ConfigOps::IFFT, _nIFFT, _bufWIFFT);
+    _ptrImpl->clBufXIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufXIFFT));
+    _ptrImpl->clBufYIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufYIFFT));
+    _ptrImpl->clBufWIFFT = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _bufWIFFT));
+
+    _ptrImpl->kernelIFFT = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_ifftSPxSP"));
+    _ptrImpl->kernelIFFT->setArg(0, _nIFFT);
+    _ptrImpl->kernelIFFT->setArg(1, *_ptrImpl->clBufXIFFT);
+    _ptrImpl->kernelIFFT->setArg(2, *_ptrImpl->clBufWIFFT);
+    _ptrImpl->kernelIFFT->setArg(3, *_ptrImpl->clBufYIFFT);
+    _ptrImpl->kernelIFFT->setArg(4, n_min);
+    _ptrImpl->kernelIFFT->setArg(5, n_max);
+}
 
 
 /**
@@ -213,7 +247,7 @@ void API::ocl_DSPF_sp_fftSPxSP(){
         _ptrImpl->queueFFT->enqueueNDRangeKernel(*_ptrImpl->kernelFFT, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _ptrImpl->queueFFT->enqueueReadBuffer(*_ptrImpl->clBufYFFT, CL_TRUE, 0, _bufSizeFFT, _bufYFFT, &evss, &ev1);
 
-        CallbackResponse *clbkRes = new CallbackResponse(CallbackResponse::FFT, 2*_nFFT, _bufYFFT);
+        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::FFT, 2*_nFFT, _bufYFFT);
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
             _callback(res);
@@ -243,13 +277,13 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
         _ptrImpl->queueIFFT->enqueueNDRangeKernel(*_ptrImpl->kernelIFFT, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _ptrImpl->queueIFFT->enqueueReadBuffer(*_ptrImpl->clBufYIFFT, CL_TRUE, 0, _bufSizeIFFT, _bufYIFFT, &evss, &ev1);
 
-        CallbackResponse *clbkRes = new CallbackResponse(CallbackResponse::IFFT, 2*_nIFFT, _bufYIFFT);
+        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::IFFT, 2*_nIFFT, _bufYIFFT);
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
-        
+
         if (_debug){
             ocl_event_times(evs[0], "Write X");
             ocl_event_times(evs[1], "Twiddle");
