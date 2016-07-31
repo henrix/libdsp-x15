@@ -25,13 +25,14 @@
 class APIImpl;
 class API {
 public:
-    API(std::function<void(CallbackResponse *clRes)> callback);
+    API(std::function<void(CallbackResponse *clRes)> callback, bool debug = false);
     ~API();
     void prepareFFT(size_t N, int n_min, int n_max);
     void prepareIFFT(size_t N, int n_min, int n_max);
     void setCallback(std::function<void(CallbackResponse *clRes)> callback); //Is executed for all operations
     float* getBufX(CallbackResponse::Ops op);
     float* getBufY(CallbackResponse::Ops op);
+    void setDebug(const bool debug);
 
     /**
      * DSP operations
@@ -49,6 +50,7 @@ private:
     size_t _bufSizeFFT, _bufSizeIFFT;
     float *_bufXFFT, *_bufYFFT, *_bufWFFT;
     float *_bufXIFFT, *_bufYIFFT, *_bufWIFFT;
+    bool _debug;
 };
 
 #endif //API

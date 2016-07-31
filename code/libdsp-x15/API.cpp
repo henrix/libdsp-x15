@@ -41,10 +41,11 @@ public:
 };
 
 
-API::API(std::function<void(CallbackResponse *clRes)> callback)
+API::API(std::function<void(CallbackResponse *clRes)> callback, bool debug)
     : _ptrImpl(new APIImpl(new cl::Context(CL_DEVICE_TYPE_ACCELERATOR))),
     _nFFT(0), _nIFFT(0), _bufSizeFFT(0), _bufSizeIFFT(0),
-    _bufXFFT(NULL), _bufYFFT(NULL), _bufXIFFT(NULL), _bufYIFFT(NULL)
+    _bufXFFT(NULL), _bufYFFT(NULL), _bufXIFFT(NULL), _bufYIFFT(NULL),
+    _debug(debug)
 {
     _callback = callback;
     std::vector<cl::Device> devices = _ptrImpl->clContext->getInfo<CL_CONTEXT_DEVICES>();
@@ -147,6 +148,9 @@ float* API::getBufY(CallbackResponse::Ops op){
         break;
     }
 }
+void API::setDebug(const bool debug){
+    _debug = debug;
+}
 
 
 void* API::_allocBuffer(size_t size){
@@ -215,10 +219,13 @@ void API::ocl_DSPF_sp_fftSPxSP(){
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
-        ocl_event_times(evs[0], "Write X");
-        ocl_event_times(evs[1], "Twiddle");
-        ocl_event_times(evss[0], "FFT");
-        ocl_event_times(ev1, "Read Y");
+
+        if (_debug){
+            ocl_event_times(evs[0], "Write X");
+            ocl_event_times(evs[1], "Twiddle");
+            ocl_event_times(evss[0], "FFT");
+            ocl_event_times(ev1, "Read Y");
+        }
     }
     catch (cl::Error &err)
     {
@@ -242,10 +249,13 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
-        ocl_event_times(evs[0], "Write X");
-        ocl_event_times(evs[1], "Twiddle");
-        ocl_event_times(evss[0], "IFFT");
-        ocl_event_times(ev1, "Read Y");
+        
+        if (_debug){
+            ocl_event_times(evs[0], "Write X");
+            ocl_event_times(evs[1], "Twiddle");
+            ocl_event_times(evss[0], "IFFT");
+            ocl_event_times(ev1, "Read Y");
+        }
     }
     catch (cl::Error &err)
     {
