@@ -17,11 +17,58 @@
 
 #include "display.hpp"
 #include <iostream>
-#include <SDL2/SDL.h>
 
-Display::Display(){
-    if (SDL_Init(SDL_INIT_VIDEO) != 0){
-		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-		//return 1;
-	}
+Display::Display(size_t width, size_t height) : _width(width), _height(height) {
+
+    /* Initialize the SDL library */
+    if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
+        fprintf(stderr,
+                "Couldn't initialize SDL: %s\n", SDL_GetError());
+        exit(1);
+    }
+
+    atexit(SDL_Quit);
+
+    _screen = SDL_SetVideoMode(width, height, 8, SDL_HWSURFACE);
+    if ( _screen == NULL ) {
+        fprintf(stderr, "Couldn't set 640x480x8 video mode: %s\n",
+                        SDL_GetError());
+        exit(1);
+    }
+
+}
+
+Display::~Display() {
+    SDL_Quit();
+}
+
+void Display::draw(size_t length, float *pixels){
+    int width_tmp;
+    (length > _width) ? width_tmp = length / _width : width_tmp = 1;
+
+    if ( SDL_MUSTLOCK(_screen) ){
+        if ( SDL_LockSurface(_screen) < 0 ) {
+            fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+            return;
+        }
+    }
+
+    /* offset pixels ([-1 1] -> [0 height]) */
+    for (int i=0; i < _width; i++){
+        _putPixel(i, (((double)_height/2.0) * pixels[i*width_tmp]) + _height/2);
+        //std::cout << "y: " << _height * points[i*width_tmp] << std::endl;
+    }
+
+    if ( SDL_MUSTLOCK(_screen) ) 
+        SDL_UnlockSurface(_screen);
+    
+    //SDL_UpdateRect(_screen, _width/2, _height/2, 1, 1); //Update just on pixel
+    SDL_UpdateRect(_screen, 0, 0, 0, 0); //Update entire screen
+}
+
+void Display::_putPixel(size_t x, size_t y){
+    int bpp = _screen->format->BytesPerPixel;
+    y = _height - y;
+    Uint8 *p = (Uint8 *)_screen->pixels + y * _screen->pitch + x * bpp;
+    *p = 0xFF;
 }

@@ -18,11 +18,25 @@
 #ifndef DISPLAY_HPP_
 #define DISPLAY_HPP_
 
+#define DIM 500
+
+#include <SDL/SDL.h>
+
 class Display{
 public:
-    Display();
+    Display(size_t width, size_t height);
+    ~Display();
+    /** 
+     * draw pixel vector 
+     *	length should be equal or multiple of width
+     *	pixel range should be between -1.0 and 1.0
+     */
+    void draw(size_t length, float *pixels);
 private:
+	void _putPixel(size_t x, size_t y);
 
+	size_t _width, _height;
+    SDL_Surface *_screen;
 };
 
 #endif //DISPLAY_HPP_
