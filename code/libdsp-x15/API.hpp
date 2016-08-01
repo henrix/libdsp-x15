@@ -25,6 +25,13 @@
 #include <memory>
 #include <array>
 
+/*
+    TODO:
+    - Create more command queues for multicores
+    - Implement filter operations
+    - Create GUI for realtime plots
+*/
+
 class APIImpl;
 class API {
 public:

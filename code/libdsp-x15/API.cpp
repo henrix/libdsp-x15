@@ -137,65 +137,81 @@ void API::setDebug(const bool debug){
     _debug = debug;
 }
 void API::prepareFFT(int N, int n_min, int n_max){
-    if (_opPrepared.at(ConfigOps::FFT)){
-        _clean(ConfigOps::FFT);
+    try{
+        if (_opPrepared.at(ConfigOps::FFT)){
+            _clean(ConfigOps::FFT);
+        }
+
+        _nFFT = N;
+        _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
+        /*_kernelConfigs[ConfigOps::FFT] = std::unique_ptr<ConfigOps>(new ConfigOps(ConfigOps::FFT));
+        ConfigOps configFFT(ConfigOps::FFT);
+        configFFT.setParam<int>("N", N);
+        configFFT.setParam<int>("n_min", n_min);
+        configFFT.setParam<int>("n_max", n_max);*/
+
+        _buffers["FFT_X"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+        _buffers["FFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+        _buffers["FFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
+
+        _genTwiddles(ConfigOps::FFT, _nFFT, _buffers.at("FFT_W"));
+
+        _ptrImpl->clBuffers["FFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_X")));
+        _ptrImpl->clBuffers["FFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_W")));
+        _ptrImpl->clBuffers["FFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_Y")));
+
+        _ptrImpl->clKernels["FFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
+        _ptrImpl->clKernels.at("FFT")->setArg(0, _nFFT);
+        _ptrImpl->clKernels.at("FFT")->setArg(1, *_ptrImpl->clBuffers.at("FFT_X"));
+        _ptrImpl->clKernels.at("FFT")->setArg(2, *_ptrImpl->clBuffers.at("FFT_W"));
+        _ptrImpl->clKernels.at("FFT")->setArg(3, *_ptrImpl->clBuffers.at("FFT_Y"));
+        _ptrImpl->clKernels.at("FFT")->setArg(4, n_min);
+        _ptrImpl->clKernels.at("FFT")->setArg(5, n_max);
+
+        _opPrepared[ConfigOps::FFT] = true;
     }
-
-    _nFFT = N;
-    _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
-    /*_kernelConfigs[ConfigOps::FFT] = std::unique_ptr<ConfigOps>(new ConfigOps(ConfigOps::FFT));
-    ConfigOps configFFT(ConfigOps::FFT);
-    configFFT.setParam<int>("N", N);
-    configFFT.setParam<int>("n_min", n_min);
-    configFFT.setParam<int>("n_max", n_max);*/
-
-    _buffers["FFT_X"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-    _buffers["FFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-    _buffers["FFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-
-    _genTwiddles(ConfigOps::FFT, _nFFT, _buffers.at("FFT_W"));
-
-    _ptrImpl->clBuffers["FFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_X")));
-    _ptrImpl->clBuffers["FFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_W")));
-    _ptrImpl->clBuffers["FFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_Y")));
-
-    _ptrImpl->clKernels["FFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
-    _ptrImpl->clKernels.at("FFT")->setArg(0, _nFFT);
-    _ptrImpl->clKernels.at("FFT")->setArg(1, *_ptrImpl->clBuffers.at("FFT_X"));
-    _ptrImpl->clKernels.at("FFT")->setArg(2, *_ptrImpl->clBuffers.at("FFT_W"));
-    _ptrImpl->clKernels.at("FFT")->setArg(3, *_ptrImpl->clBuffers.at("FFT_Y"));
-    _ptrImpl->clKernels.at("FFT")->setArg(4, n_min);
-    _ptrImpl->clKernels.at("FFT")->setArg(5, n_max);
-
-    _opPrepared[ConfigOps::FFT] = true;
+    catch(cl::Error &err){
+        std::cout << "OpenCL error in prepareFFT: " << err.what() << std::endl;
+    }
+    catch(const std::exception &err){
+        std::cout << "OpenCL error in prepareFFT: " << err.what() << std::endl;
+    }
 }
 void API::prepareIFFT(int N, int n_min, int n_max){
-    if (_opPrepared.at(ConfigOps::IFFT)){
-        _clean(ConfigOps::IFFT);
+    try{
+        if (_opPrepared.at(ConfigOps::IFFT)){
+            _clean(ConfigOps::IFFT);
+        }
+
+        _nIFFT = N;
+        _bufSizeIFFT = sizeof(float) * (2*_nIFFT + PAD + PAD);
+
+        _buffers["IFFT_X"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+        _buffers["IFFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+        _buffers["IFFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
+
+        _genTwiddles(ConfigOps::IFFT, _nIFFT, _buffers.at("IFFT_W"));
+
+        _ptrImpl->clBuffers["IFFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_X")));
+        _ptrImpl->clBuffers["IFFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_W")));
+        _ptrImpl->clBuffers["IFFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_Y")));
+
+        _ptrImpl->clKernels["IFFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_ifftSPxSP"));
+        _ptrImpl->clKernels.at("IFFT")->setArg(0, _nIFFT);
+        _ptrImpl->clKernels.at("IFFT")->setArg(1, *_ptrImpl->clBuffers.at("IFFT_X"));
+        _ptrImpl->clKernels.at("IFFT")->setArg(2, *_ptrImpl->clBuffers.at("IFFT_W"));
+        _ptrImpl->clKernels.at("IFFT")->setArg(3, *_ptrImpl->clBuffers.at("IFFT_Y"));
+        _ptrImpl->clKernels.at("IFFT")->setArg(4, n_min);
+        _ptrImpl->clKernels.at("IFFT")->setArg(5, n_max);
+
+        _opPrepared[ConfigOps::IFFT] = true;
     }
-
-    _nIFFT = N;
-    _bufSizeIFFT = sizeof(float) * (2*_nIFFT + PAD + PAD);
-
-    _buffers["IFFT_X"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-    _buffers["IFFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-    _buffers["IFFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
-
-    _genTwiddles(ConfigOps::IFFT, _nIFFT, _buffers.at("IFFT_W"));
-
-    _ptrImpl->clBuffers["IFFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_X")));
-    _ptrImpl->clBuffers["IFFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_W")));
-    _ptrImpl->clBuffers["IFFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_Y")));
-
-    _ptrImpl->clKernels["IFFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_ifftSPxSP"));
-    _ptrImpl->clKernels.at("IFFT")->setArg(0, _nIFFT);
-    _ptrImpl->clKernels.at("IFFT")->setArg(1, *_ptrImpl->clBuffers.at("IFFT_X"));
-    _ptrImpl->clKernels.at("IFFT")->setArg(2, *_ptrImpl->clBuffers.at("IFFT_W"));
-    _ptrImpl->clKernels.at("IFFT")->setArg(3, *_ptrImpl->clBuffers.at("IFFT_Y"));
-    _ptrImpl->clKernels.at("IFFT")->setArg(4, n_min);
-    _ptrImpl->clKernels.at("IFFT")->setArg(5, n_max);
-
-    _opPrepared[ConfigOps::IFFT] = true;
+    catch(cl::Error &err){
+        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+    }
+    catch(const std::exception &err){
+        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+    }
 }
 void API::prepareFILTER_BIQUAD(std::array<float, 3> b, std::array<float, 2> a, float delay[], int nx){
     if (_opPrepared.at(ConfigOps::FILTER_BIQUAD)){
@@ -307,6 +323,11 @@ void API::_clean(ConfigOps::Ops op){
  */
 void API::ocl_DSPF_sp_fftSPxSP(){
     try{
+        if (!_opPrepared.at(ConfigOps::FFT)){
+            std::cerr << "FFT operation not prepared yet! Stopping DSP operation." << std::endl;
+            return;
+        }
+
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);
@@ -337,6 +358,11 @@ void API::ocl_DSPF_sp_fftSPxSP(){
 }
 void API::ocl_DSPF_sp_ifftSPxSP(){
     try{
+        if (!_opPrepared.at(ConfigOps::IFFT)){
+            std::cerr << "IFFT operation not prepared yet! Stopping DSP operation." << std::endl;
+            return;
+        }
+
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);
