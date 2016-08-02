@@ -42,9 +42,11 @@ Display::~Display() {
     SDL_Quit();
 }
 
-void Display::draw(size_t length, float *pixels){
+void Display::drawPixels(size_t length, float *pixels){
     int width_tmp;
     (length > _width) ? width_tmp = length / _width : width_tmp = 1;
+
+    SDL_FillRect(_screen, NULL, 0x000000);
 
     if ( SDL_MUSTLOCK(_screen) ){
         if ( SDL_LockSurface(_screen) < 0 ) {
@@ -63,6 +65,33 @@ void Display::draw(size_t length, float *pixels){
         SDL_UnlockSurface(_screen);
     
     //SDL_UpdateRect(_screen, _width/2, _height/2, 1, 1); //Update just on pixel
+    SDL_UpdateRect(_screen, 0, 0, 0, 0); //Update entire screen
+}
+
+void Display::drawLines(size_t length, float *lineends){
+    int width_tmp;
+    (length > _width) ? width_tmp = length / _width : width_tmp = 1;
+
+    SDL_FillRect(_screen, NULL, 0x000000);
+
+    if ( SDL_MUSTLOCK(_screen) ){
+        if ( SDL_LockSurface(_screen) < 0 ) {
+            fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+            return;
+        }
+    }
+
+    /* offset pixels ([-1 1] -> [0 height]) */
+    for (int i=0; i < _width; i++){
+        float max = (((double)_height/2.0) * lineends[i*width_tmp]) + _height/2;
+        for (float j=0; j < max; j+=1.0){
+            _putPixel(i, j);
+        }
+    }
+
+    if ( SDL_MUSTLOCK(_screen) ) 
+        SDL_UnlockSurface(_screen);
+    
     SDL_UpdateRect(_screen, 0, 0, 0, 0); //Update entire screen
 }
 

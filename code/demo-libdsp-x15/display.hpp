@@ -31,7 +31,8 @@ public:
      *	length should be equal or multiple of width
      *	pixel range should be between -1.0 and 1.0
      */
-    void draw(size_t length, float *pixels);
+    void drawPixels(size_t length, float *pixels);
+    void drawLines(size_t length, float *lineends);
 private:
 	void _putPixel(size_t x, size_t y);
 
