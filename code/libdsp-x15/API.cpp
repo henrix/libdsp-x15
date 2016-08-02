@@ -26,6 +26,19 @@
 #include <ocl_util.h>
 
 std::function<void(CallbackResponse *clRes)> API::_callback = NULL;
+/* Flags to indicate status of SDP operations */
+std::map<ConfigOps::Ops, bool> API::_opBusy = 
+    {
+        {ConfigOps::FFT, false},
+        {ConfigOps::IFFT, false},
+        {ConfigOps::FILTER_BIQUAD, false},
+        {ConfigOps::FILTER_FIRCIRC, false},
+        {ConfigOps::FILTER_FIR_CPLX, false},
+        {ConfigOps::FILTER_FIR_GEN, false},
+        {ConfigOps::FILTER_FIR_R2, false},
+        {ConfigOps::FILTER_IIR, false},
+        {ConfigOps::FILTER_IIRLAT, false}
+    };
 
 class APIImpl {
 public:
@@ -132,6 +145,37 @@ float* API::getBufOut(ConfigOps::Ops op){
         break;
     }
     return NULL;
+}
+bool API::isBusy(ConfigOps::Ops op){
+    switch(op){
+        case ConfigOps::FFT:
+            return _opBusy.at(ConfigOps::FFT);
+        break;
+        case ConfigOps::IFFT:
+            return _opBusy.at(ConfigOps::IFFT);
+        break;
+        case ConfigOps::FILTER_BIQUAD:
+            return _opBusy.at(ConfigOps::FILTER_BIQUAD);
+        break;
+        case ConfigOps::FILTER_FIRCIRC:
+            return _opBusy.at(ConfigOps::FILTER_FIRCIRC);
+        break;
+        case ConfigOps::FILTER_FIR_CPLX:
+            return _opBusy.at(ConfigOps::FILTER_FIR_CPLX);
+        break;
+        case ConfigOps::FILTER_FIR_GEN:
+            return _opBusy.at(ConfigOps::FILTER_FIR_GEN);
+        break;
+        case ConfigOps::FILTER_FIR_R2:
+            return _opBusy.at(ConfigOps::FILTER_FIR_R2);
+        break;
+        case ConfigOps::FILTER_IIR:
+            return _opBusy.at(ConfigOps::FILTER_IIR);
+        break;
+        case ConfigOps::FILTER_IIRLAT:
+            return _opBusy.at(ConfigOps::FILTER_IIRLAT);
+        break;
+    }
 }
 void API::setDebug(const bool debug){
     _debug = debug;
@@ -327,6 +371,7 @@ void API::ocl_DSPF_sp_fftSPxSP(){
             std::cerr << "FFT operation not prepared yet! Stopping DSP operation." << std::endl;
             return;
         }
+        _opBusy[ConfigOps::FFT] = true;
 
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
@@ -340,6 +385,7 @@ void API::ocl_DSPF_sp_fftSPxSP(){
         CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::FFT, 2*_nFFT, _buffers.at("FFT_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
+            _opBusy[ConfigOps::FFT] = false;
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
@@ -362,6 +408,7 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
             std::cerr << "IFFT operation not prepared yet! Stopping DSP operation." << std::endl;
             return;
         }
+        _opBusy[ConfigOps::FFT] = true;
 
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
@@ -375,6 +422,7 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
         CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::IFFT, 2*_nIFFT, _buffers.at("IFFT_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
+            _opBusy[ConfigOps::FFT] = false;
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
@@ -404,6 +452,8 @@ float API::ocl_DSPF_sp_maxval(float *x, int nx){
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("MAXVAL"), CL_FALSE, 0, nx, x, 0, &eBuf[0]);
         _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("MAXVAL"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &eBuf, &eOp);
     
+        //TODO: Return result of DSP operation
+
         return 0.0;
     }
     catch(cl::Error &err){

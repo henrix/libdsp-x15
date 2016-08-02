@@ -40,6 +40,7 @@ public:
     void setCallback(std::function<void(CallbackResponse *clRes)> callback); //Is executed for all operations
     float* getBufIn(ConfigOps::Ops op);
     float* getBufOut(ConfigOps::Ops op);
+    bool isBusy(ConfigOps::Ops op);
     void setDebug(const bool debug);
     void prepareFFT(int N, int n_min, int n_max);
     void prepareIFFT(int N, int n_min, int n_max);
@@ -67,12 +68,14 @@ private:
     std::map<ConfigOps::Ops, std::unique_ptr<ConfigOps>> _kernelConfigs;
     std::map<std::string, float*> _buffers;
     std::map<ConfigOps::Ops, bool> _opPrepared;
+    static std::map<ConfigOps::Ops, bool> _opBusy;
 
     static std::function<void(CallbackResponse *clRes)> _callback;
     std::unique_ptr<APIImpl> _ptrImpl;
     size_t _nFFT, _nIFFT;
     size_t _bufSizeFFT, _bufSizeIFFT;
     bool _debug;
+
 };
 
 #endif //API
