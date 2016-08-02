@@ -43,6 +43,12 @@ int main(int argc, char* argv[]) {
 
     /* Execute FFT / IFFT test */
 	//test_FFT_IFFT(16*1024);
+    
+    /*float points[N];
+    for (int i=0; i < N; i++)
+        points[i] = (float)i*(1.0/(float)(N/2.0)) - 1.0;
+    display.drawPixels(N, points);*/
+    //display.drawLines(N, points);
 
 	/* Realtime plots of audio input signal */
     api.prepareFFT(N, 4, N);
@@ -98,6 +104,7 @@ void test_FFT_IFFT(int n){
 /**
  * Callbacks
  */
+//TODO: return const dataptr (btw deny manipulation)
 void callbackDSP(CallbackResponse *clbkRes){
     float *y = clbkRes->getDataPtr();
     int n = clbkRes->getN();
@@ -118,8 +125,17 @@ void callbackDSP(CallbackResponse *clbkRes){
         	}
         	fftFinished = true;
         }
-
-        display.draw(n, y);
+        /*float max = 0;
+        for (int i=0; i < n; i++){
+            if (y[PAD + 2*i + 1] > max)
+                max = y[PAD + 2*i + 1];
+        }
+        std::cout << "Max in spectrum: " << max << std::endl;*/
+        float pixels[n];
+        for (int i=0; i < n; i++){
+            pixels[i] = y[PAD + 2*i + 1] / 10000.0; //Amplitude of spectrum
+        }
+        display.drawPixels(n, pixels);
     }
     else if (clbkRes->getOp() == ConfigOps::IFFT){
 
@@ -156,7 +172,8 @@ void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack
     }
 
     count += n_frames;
-    if (count >= N)
+    if (count >= N && !api.isBusy(ConfigOps::FFT))
         api.ocl_DSPF_sp_fftSPxSP();
     count %= N;
+    //display.drawPixels(n_frames, in);
 }
