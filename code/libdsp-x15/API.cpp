@@ -158,7 +158,7 @@ void API::prepareFFT(int N, int n_min, int n_max){
 
         _ptrImpl->clBuffers["FFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_X")));
         _ptrImpl->clBuffers["FFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_W")));
-        _ptrImpl->clBuffers["FFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_Y")));
+        _ptrImpl->clBuffers["FFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY,  _bufSizeFFT, _buffers.at("FFT_Y")));
 
         _ptrImpl->clKernels["FFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
         _ptrImpl->clKernels.at("FFT")->setArg(0, _nFFT);
@@ -194,7 +194,7 @@ void API::prepareIFFT(int N, int n_min, int n_max){
 
         _ptrImpl->clBuffers["IFFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_X")));
         _ptrImpl->clBuffers["IFFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_W")));
-        _ptrImpl->clBuffers["IFFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_Y")));
+        _ptrImpl->clBuffers["IFFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_Y")));
 
         _ptrImpl->clKernels["IFFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_ifftSPxSP"));
         _ptrImpl->clKernels.at("IFFT")->setArg(0, _nIFFT);
@@ -389,5 +389,27 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
     catch (cl::Error &err)
     {
         std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
+    }
+}
+float API::ocl_DSPF_sp_maxval(float *x, int nx){
+    try{
+        _ptrImpl->clBuffers["MAXVAL"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, nx, x));
+ 
+        _ptrImpl->clKernels["MAXVAL"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "DSPF_sp_maxval"));
+        _ptrImpl->clKernels.at("MAXVAL")->setArg(0, *_ptrImpl->clBuffers.at("MAXVAL"));
+        _ptrImpl->clKernels.at("MAXVAL")->setArg(1, nx);
+
+        cl::Event eOp;
+        std::vector<cl::Event> eBuf(1);
+        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("MAXVAL"), CL_FALSE, 0, nx, x, 0, &eBuf[0]);
+        _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("MAXVAL"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &eBuf, &eOp);
+    
+        return 0.0;
+    }
+    catch(cl::Error &err){
+        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+    }
+    catch(const std::exception &err){
+        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
     }
 }
