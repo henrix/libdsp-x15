@@ -189,9 +189,8 @@ void callbackDSP(CallbackResponse *clbkRes){
             shutdown(0); 
         }
         else if (event.type == SDL_MOUSEBUTTONDOWN){
-            std::cout << "SDL mouse button pressed" << std::endl;
-            if (event.button == SDL_BUTTON_LEFT)
-                std::cout << "button left" << std::endl;
+            std::cout << "x: " << event.button.x << std::endl;
+            std::cout << "y: " << event.button.y << std::endl;
         }
     }
     else if (clbkRes->getOp() == ConfigOps::IFFT){
@@ -236,7 +235,7 @@ void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack
         if (count >= N && !api.isBusy(ConfigOps::FFT)){
             //gsl_spline_init(spline, x, in, N);
 
-            api.ocl_DSPF_sp_fftSPxSP();
+            //api.ocl_DSPF_sp_fftSPxSP();
         }
         count %= N;
         //display.drawPixels(n_frames, in);
