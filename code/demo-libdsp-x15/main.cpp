@@ -27,19 +27,40 @@
 #include <cmath>
 #include <jack/jack.h>
 #include <condition_variable>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_spline.h>
+#include <signal.h>
 
 void test_FFT_IFFT(int n);
+void shutdown(int status);
 void callbackDSP(CallbackResponse *clbkRes);
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out);
 
-int N = 512; // should be equal or higher than audio buffer size
+const int N = 512; // should be equal or higher than audio buffer size
+const int N_intp = 16*1024;
 bool testEnabled = false;
 API api(callbackDSP);
+//Display display(N/2, N/2);
 Display display(N, N);
+JACKClient *jackClient;
 std::mutex mtx;
 std::condition_variable cv;
 
+//GNU scientific lib (for interpolation)
+gsl_interp_accel *acc;
+gsl_spline *spline;
+float x_intp[N];
+
 int main(int argc, char* argv[]) {
+
+    signal(SIGABRT, shutdown);
+    signal(SIGTERM, shutdown);
+
+    //acc = gsl_interp_accel_alloc ();
+    //spline = gsl_spline_alloc (gsl_interp_linear, N);
+    //for (int i=0; i < N; i++){
+    //    x_intp[i] = i*div;
+    //}
 
     /* Execute FFT / IFFT test */
 	//test_FFT_IFFT(16*1024);
@@ -52,8 +73,8 @@ int main(int argc, char* argv[]) {
 
 	/* Realtime plots of audio input signal */
     api.prepareFFT(N, 4, N);
-    JACKClient jackClient;
-    jackClient.addCallback(callbackJACK);
+    jackClient = new JACKClient();
+    jackClient->addCallback(callbackJACK);
     std::unique_lock<std::mutex> lck(mtx);
     cv.wait(lck);
 
@@ -100,11 +121,23 @@ void test_FFT_IFFT(int n){
     api.setDebug(false);
 }
 
+/**
+ * Custom exit function for clean up etc.
+ */
+void shutdown(int status){
+    SDL_Quit();
+    jackClient->stop();
+    delete jackClient;
+    cv.notify_one();
+    exit(status);
+}
+
 
 /**
  * Callbacks
  */
 //TODO: return const dataptr (btw deny manipulation)
+bool callbackBusy = false;
 void callbackDSP(CallbackResponse *clbkRes){
     float *y = clbkRes->getDataPtr();
     int n = clbkRes->getN();
@@ -125,17 +158,41 @@ void callbackDSP(CallbackResponse *clbkRes){
         	}
         	fftFinished = true;
         }
-        /*float max = 0;
+
+        /* Get max of calculated spectrum for amplitude scaling */
+        //ERROR here in recalculated pixels (integer instead of float)
+        float max = 0.0;
         for (int i=0; i < n; i++){
             if (y[PAD + 2*i + 1] > max)
-                max = y[PAD + 2*i + 1];
+                max = (float)y[PAD + 2*i + 1];
         }
-        std::cout << "Max in spectrum: " << max << std::endl;*/
+        //std::cout << "Max in raw spectrum: " << max << std::endl;
+
         float pixels[n];
-        for (int i=0; i < n; i++){
-            pixels[i] = y[PAD + 2*i + 1] / 10000.0; //Amplitude of spectrum
+        for (int i=0; i < n/2; i++){
+            pixels[i*2] = fabs((float)y[PAD + 2*i + 1] / (float)max); //Amplitude of spectrum
+            pixels[i*2+1] = pixels[i*2];
         }
-        display.drawPixels(n, pixels);
+
+        max = 0.0;
+        for (int i=0; i < n; i++){
+            if (pixels[i] > max)
+                max = pixels[i];
+        }
+        //std::cout << "Max in scaled spectrum: " << max << std::endl;
+
+        //display.drawPixels(n, pixels);
+        display.drawLines(n, pixels);
+        SDL_Event event;
+        SDL_PollEvent(&event);
+        if (event.type == SDL_QUIT){ 
+            shutdown(0); 
+        }
+        else if (event.type == SDL_MOUSEBUTTONDOWN){
+            std::cout << "SDL mouse button pressed" << std::endl;
+            if (event.button == SDL_BUTTON_LEFT)
+                std::cout << "button left" << std::endl;
+        }
     }
     else if (clbkRes->getOp() == ConfigOps::IFFT){
 
@@ -155,25 +212,35 @@ void callbackDSP(CallbackResponse *clbkRes){
     	}
     }
 
+    callbackBusy = false;
+
     delete clbkRes;
 }
 
 size_t count = 0;
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out){
-    //std::cout << "Buffer size: " << n_frames << " - in: " << in[n_frames - 1] << std::endl;
+    if (!callbackBusy){
+        callbackBusy = true;
+        //std::cout << "Buffer size: " << n_frames << " - in: " << in[n_frames - 1] << std::endl;
 
-    /*for (int i=0; i < n_frames; i++)
-        audio_buffer[i+count] = in[i];*/
+        /*for (int i=0; i < n_frames; i++)
+            audio_buffer[i+count] = in[i];*/
 
-    float *x = api.getBufIn(ConfigOps::FFT);
-    for (int i=0; i < n_frames; i++){
-        x[PAD + 2*i + count] = in[i];
-        x[PAD + 2*i + 1 + count] = 0;
+        float *x = api.getBufIn(ConfigOps::FFT);
+        for (int i=0; i < n_frames; i++){
+            x[PAD + 2*i + count] = in[i];
+            x[PAD + 2*i + 1 + count] = 0;
+        }
+
+        count += n_frames;
+        if (count >= N && !api.isBusy(ConfigOps::FFT)){
+            //gsl_spline_init(spline, x, in, N);
+
+            api.ocl_DSPF_sp_fftSPxSP();
+        }
+        count %= N;
+        //display.drawPixels(n_frames, in);
     }
-
-    count += n_frames;
-    if (count >= N && !api.isBusy(ConfigOps::FFT))
-        api.ocl_DSPF_sp_fftSPxSP();
-    count %= N;
-    //display.drawPixels(n_frames, in);
+    
 }
+
