@@ -32,12 +32,8 @@ std::map<ConfigOps::Ops, bool> API::_opBusy =
         {ConfigOps::FFT, false},
         {ConfigOps::IFFT, false},
         {ConfigOps::FILTER_BIQUAD, false},
-        {ConfigOps::FILTER_FIRCIRC, false},
-        {ConfigOps::FILTER_FIR_CPLX, false},
-        {ConfigOps::FILTER_FIR_GEN, false},
         {ConfigOps::FILTER_FIR_R2, false},
-        {ConfigOps::FILTER_IIR, false},
-        {ConfigOps::FILTER_IIRLAT, false}
+        {ConfigOps::FILTER_IIR, false}
     };
 
 class APIImpl {
@@ -48,7 +44,7 @@ public:
     std::unique_ptr<cl::Context> clContext;
     std::unique_ptr<cl::CommandQueue> clCmdQueue;
     std::unique_ptr<cl::Program> clProgram;
-    std::map<std::string, std::unique_ptr<cl::Kernel>> clKernels;
+    std::map<std::string, std::unique_ptr<cl::Kernel>> clKernels; //TODO: Change key from string to enum
     std::map<std::string, std::unique_ptr<cl::Buffer>> clBuffers;
 };
 
@@ -62,12 +58,8 @@ API::API(std::function<void(CallbackResponse *clRes)> callback, bool debug)
     _opPrepared[ConfigOps::FFT] = false;
     _opPrepared[ConfigOps::IFFT] = false;
     _opPrepared[ConfigOps::FILTER_BIQUAD] = false;
-    _opPrepared[ConfigOps::FILTER_FIRCIRC] = false;
-    _opPrepared[ConfigOps::FILTER_FIR_CPLX] = false;
-    _opPrepared[ConfigOps::FILTER_FIR_GEN] = false;
     _opPrepared[ConfigOps::FILTER_FIR_R2] = false;
     _opPrepared[ConfigOps::FILTER_IIR] = false;
-    _opPrepared[ConfigOps::FILTER_IIRLAT] = false;
 
     std::vector<cl::Device> devices = _ptrImpl->clContext->getInfo<CL_CONTEXT_DEVICES>();
     int num;
@@ -105,18 +97,11 @@ float* API::getBufIn(ConfigOps::Ops op){
             return _buffers.at("IFFT_X");
         break;
         case ConfigOps::FILTER_BIQUAD:
-        break;
-        case ConfigOps::FILTER_FIRCIRC:
-        break;
-        case ConfigOps::FILTER_FIR_CPLX:
-        break;
-        case ConfigOps::FILTER_FIR_GEN:
+            return _buffers.at("FILTER_BIQUAD_X");
         break;
         case ConfigOps::FILTER_FIR_R2:
         break;
         case ConfigOps::FILTER_IIR:
-        break;
-        case ConfigOps::FILTER_IIRLAT:
         break;
     }
     return NULL;
@@ -130,18 +115,11 @@ float* API::getBufOut(ConfigOps::Ops op){
             return _buffers.at("IFFT_Y");
         break;
         case ConfigOps::FILTER_BIQUAD:
-        break;
-        case ConfigOps::FILTER_FIRCIRC:
-        break;
-        case ConfigOps::FILTER_FIR_CPLX:
-        break;
-        case ConfigOps::FILTER_FIR_GEN:
+            return _buffers.at("FILTER_BIQUAD_Y");
         break;
         case ConfigOps::FILTER_FIR_R2:
         break;
         case ConfigOps::FILTER_IIR:
-        break;
-        case ConfigOps::FILTER_IIRLAT:
         break;
     }
     return NULL;
@@ -157,23 +135,11 @@ bool API::isBusy(ConfigOps::Ops op){
         case ConfigOps::FILTER_BIQUAD:
             return _opBusy.at(ConfigOps::FILTER_BIQUAD);
         break;
-        case ConfigOps::FILTER_FIRCIRC:
-            return _opBusy.at(ConfigOps::FILTER_FIRCIRC);
-        break;
-        case ConfigOps::FILTER_FIR_CPLX:
-            return _opBusy.at(ConfigOps::FILTER_FIR_CPLX);
-        break;
-        case ConfigOps::FILTER_FIR_GEN:
-            return _opBusy.at(ConfigOps::FILTER_FIR_GEN);
-        break;
         case ConfigOps::FILTER_FIR_R2:
             return _opBusy.at(ConfigOps::FILTER_FIR_R2);
         break;
         case ConfigOps::FILTER_IIR:
             return _opBusy.at(ConfigOps::FILTER_IIR);
-        break;
-        case ConfigOps::FILTER_IIRLAT:
-            return _opBusy.at(ConfigOps::FILTER_IIRLAT);
         break;
     }
 }
@@ -218,7 +184,7 @@ void API::prepareFFT(int N, int n_min, int n_max){
         std::cout << "OpenCL error in prepareFFT: " << err.what() << std::endl;
     }
     catch(const std::exception &err){
-        std::cout << "OpenCL error in prepareFFT: " << err.what() << std::endl;
+        std::cout << "Error in prepareFFT: " << err.what() << std::endl;
     }
 }
 void API::prepareIFFT(int N, int n_min, int n_max){
@@ -254,18 +220,55 @@ void API::prepareIFFT(int N, int n_min, int n_max){
         std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
     }
     catch(const std::exception &err){
-        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+        std::cout << "Error in prepareIFFT: " << err.what() << std::endl;
     }
 }
-void API::prepareFILTER_BIQUAD(std::array<float, 3> b, std::array<float, 2> a, float delay[], int nx){
-    if (_opPrepared.at(ConfigOps::FILTER_BIQUAD)){
-        _clean(ConfigOps::FILTER_BIQUAD);
-    }
+void API::prepareFILTER_BIQUAD(int nx){
+    try{
+        if (_opPrepared.at(ConfigOps::FILTER_BIQUAD)){
+            _clean(ConfigOps::FILTER_BIQUAD);
+        }
 
+        _nxFILTER_BIQUAD = nx;
+
+        _buffers["FILTER_BIQUAD_X"] = (float*) _allocBuffer(sizeof(float)*nx);
+        _buffers["FILTER_BIQUAD_B"] = (float*) _allocBuffer(sizeof(float)*3);
+        _buffers["FILTER_BIQUAD_A"] = (float*) _allocBuffer(sizeof(float)*2);
+        _buffers["FILTER_BIQUAD_Y"] = (float*) _allocBuffer(sizeof(float)*nx);
+
+        _ptrImpl->clBuffers["FILTER_BIQUAD_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, nx, _buffers.at("FILTER_BIQUAD_X")));
+        _ptrImpl->clBuffers["FILTER_BIQUAD_B"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, 3, _buffers.at("FILTER_BIQUAD_B")));
+        _ptrImpl->clBuffers["FILTER_BIQUAD_A"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, 2, _buffers.at("FILTER_BIQUAD_A")));
+        _ptrImpl->clBuffers["FILTER_BIQUAD_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, nx, _buffers.at("FILTER_BIQUAD_Y")));
+
+        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(0, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_X"));
+        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(1, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_B"));
+        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(2, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_A"));
+        //arg 3 = filter delays
+        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(4, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"));
+        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(5, nx);
+
+        _opPrepared[ConfigOps::FILTER_BIQUAD] = true;
+    }
+    catch(cl::Error &err){
+        std::cout << "OpenCL error in prepareFILTER_BIQUAD: " << err.what() << std::endl;
+    }
+    catch(const std::exception &err){
+        std::cout << "Error in prepareFILTER_BIQUAD: " << err.what() << std::endl;
+    }
+}
+void API::prepareFILTER_FIR_R2(int nh, int nr, float *h){
 
 }
-void API::prepareFILTER_FIRCIRC(int csize, int nh, int ny){
+void API::prepareFILTER_IIR(){
 
+}
+
+void API::configFILTER_BIQUAD(float *b, float *a, float *delays){
+    for (int i=0; i < 3; i++)
+        _buffers.at("FILTER_BIQUAD_B")[i] = b[i];
+    for (int i=0; i < 2; i++)
+        _buffers.at("FILTER_BIQUAD_A")[i] = a[i];
 }
 
 void* API::_allocBuffer(size_t size){
@@ -325,22 +328,10 @@ void API::_clean(ConfigOps::Ops op){
         break;
         case ConfigOps::FILTER_BIQUAD:
         {
-
-        }
-        break;
-        case ConfigOps::FILTER_FIRCIRC:
-        {
-
-        }
-        break;
-        case ConfigOps::FILTER_FIR_CPLX:
-        {
-
-        }
-        break;
-        case ConfigOps::FILTER_FIR_GEN:
-        {
-
+            __free_ddr(_buffers.at("FILTER_BIQUAD_X"));
+            __free_ddr(_buffers.at("FILTER_BIQUAD_B"));
+            __free_ddr(_buffers.at("FILTER_BIQUAD_A"));
+            __free_ddr(_buffers.at("FILTER_BIQUAD_Y"));
         }
         break;
         case ConfigOps::FILTER_FIR_R2:
@@ -349,11 +340,6 @@ void API::_clean(ConfigOps::Ops op){
         }
         break;
         case ConfigOps::FILTER_IIR:
-        {
-
-        }
-        break;
-        case ConfigOps::FILTER_IIRLAT:
         {
 
         }
@@ -387,6 +373,7 @@ void API::ocl_DSPF_sp_fftSPxSP(){
             CallbackResponse *res = (CallbackResponse*) user_data;
             _opBusy[ConfigOps::FFT] = false;
             _callback(res);
+
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
 
@@ -399,7 +386,7 @@ void API::ocl_DSPF_sp_fftSPxSP(){
     }
     catch (cl::Error &err)
     {
-        std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
+        std::cerr << "Error in fft(): " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 }
 void API::ocl_DSPF_sp_ifftSPxSP(){
@@ -408,7 +395,7 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
             std::cerr << "IFFT operation not prepared yet! Stopping DSP operation." << std::endl;
             return;
         }
-        _opBusy[ConfigOps::FFT] = true;
+        _opBusy[ConfigOps::IFFT] = true;
 
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
@@ -422,7 +409,7 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
         CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::IFFT, 2*_nIFFT, _buffers.at("IFFT_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
-            _opBusy[ConfigOps::FFT] = false;
+            _opBusy[ConfigOps::IFFT] = false;
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
@@ -436,10 +423,51 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
     }
     catch (cl::Error &err)
     {
-        std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
+        std::cerr << "Error in ifft(): " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 }
-float API::ocl_DSPF_sp_maxval(float *x, int nx){
+void API::ocl_DSPF_sp_filter_biquad(){
+    try{
+        if (!_opPrepared.at(ConfigOps::FILTER_BIQUAD)){
+            std::cerr << "Filter biquad not prepared yet! Stopping DSP operation." << std::endl;
+            return;
+        }
+        _opBusy[ConfigOps::FILTER_BIQUAD] = true;
+
+        cl::Event ev1;
+        std::vector<cl::Event> evs(3);
+        std::vector<cl::Event> evss(1);
+
+        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_X"), CL_FALSE, 0, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_X"), 0, &evs[0]);
+        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_B"), CL_FALSE, 0, 3, _buffers.at("FILTER_BIQUAD_B"), 0, &evs[1]);
+        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_A"), CL_FALSE, 0, 2, _buffers.at("FILTER_BIQUAD_A"), 0, &evs[2]);
+        _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("FILTER_BIQUAD"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
+        _ptrImpl->clCmdQueue->enqueueReadBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"), CL_TRUE, 0, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_Y"), &evss, &ev1);
+    
+        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::FILTER_BIQUAD, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_Y"));
+        auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
+            CallbackResponse *res = (CallbackResponse*) user_data;
+            _opBusy[ConfigOps::FILTER_BIQUAD] = false;
+            _callback(res);
+        };
+        ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
+
+        if (_debug){
+            ocl_event_times(evs[0], "Write X");
+            ocl_event_times(evs[1], "Write B");
+            ocl_event_times(evs[2], "Write A");
+            ocl_event_times(evss[0], "FILTER_BIQUAD");
+            ocl_event_times(ev1, "Read Y");
+        }        
+    }
+    catch(cl::Error &err){
+        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+    }
+    catch(const std::exception &err){
+        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+    }
+}
+/*float API::ocl_DSPF_sp_maxval(float *x, int nx){
     try{
         _ptrImpl->clBuffers["MAXVAL"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, nx, x));
  
@@ -457,9 +485,9 @@ float API::ocl_DSPF_sp_maxval(float *x, int nx){
         return 0.0;
     }
     catch(cl::Error &err){
-        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+        std::cout << "OpenCL error in maxval(): " << err.what() << std::endl;
     }
     catch(const std::exception &err){
-        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+        std::cout << "Error in maxval(): " << err.what() << std::endl;
     }
-}
+}*/

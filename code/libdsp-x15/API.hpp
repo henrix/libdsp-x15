@@ -42,23 +42,28 @@ public:
     float* getBufOut(ConfigOps::Ops op);
     bool isBusy(ConfigOps::Ops op);
     void setDebug(const bool debug);
+
+    /**
+     * DSP operation init helpers
+     */
     void prepareFFT(int N, int n_min, int n_max);
     void prepareIFFT(int N, int n_min, int n_max);
-    void prepareFILTER_BIQUAD(std::array<float, 3> b, std::array<float, 2> a, float delay[], int nx);
-    void prepareFILTER_FIRCIRC(int csize, int nh, int ny);
-    void prepareFILTER_FIR_CPLX();
-    void prepareFILTER_FIR_GEN();
-    void prepareFILTER_FIR_R2();
+    void prepareFILTER_BIQUAD(int nx);
+    void prepareFILTER_FIR_R2(int nh, int nr, float *h);
     void prepareFILTER_IIR();
-    void prepareFILTER_IIRLAT();
 
+    /**
+     * DSP operation config helpers
+     */
+    void configFILTER_BIQUAD(float *b, float *a, float *delays);
 
     /**
      * DSP operations
      */
     void ocl_DSPF_sp_fftSPxSP();
 	void ocl_DSPF_sp_ifftSPxSP();
-    float ocl_DSPF_sp_maxval(float *x, int nx);
+    void ocl_DSPF_sp_filter_biquad();
+    //float ocl_DSPF_sp_maxval(float *x, int nx);
 
 private:
     void* _allocBuffer(size_t size);
@@ -73,6 +78,7 @@ private:
     static std::function<void(CallbackResponse *clRes)> _callback;
     std::unique_ptr<APIImpl> _ptrImpl;
     size_t _nFFT, _nIFFT;
+    size_t _nxFILTER_BIQUAD;
     size_t _bufSizeFFT, _bufSizeIFFT;
     bool _debug;
 

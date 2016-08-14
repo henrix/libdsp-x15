@@ -28,12 +28,8 @@ public:
 		FFT,
 		IFFT,
 		FILTER_BIQUAD,
-		FILTER_FIRCIRC,
-		FILTER_FIR_CPLX,
-		FILTER_FIR_GEN,
 		FILTER_FIR_R2,
-        FILTER_IIR,
-        FILTER_IIRLAT
+        FILTER_IIR
 	};
 
 	ConfigOps(Ops op) ;
