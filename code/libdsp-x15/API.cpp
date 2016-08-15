@@ -181,7 +181,7 @@ void API::prepareFFT(int N, int n_min, int n_max){
         _opPrepared[ConfigOps::FFT] = true;
     }
     catch(cl::Error &err){
-        std::cout << "OpenCL error in prepareFFT: " << err.what() << std::endl;
+        std::cout << "OpenCL error in prepareFFT: " << err.what() << "(" << err.err() << ")" << std::endl;
     }
     catch(const std::exception &err){
         std::cout << "Error in prepareFFT: " << err.what() << std::endl;
@@ -217,7 +217,7 @@ void API::prepareIFFT(int N, int n_min, int n_max){
         _opPrepared[ConfigOps::IFFT] = true;
     }
     catch(cl::Error &err){
-        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+        std::cout << "OpenCL error in prepareIFFT: " << err.what() << "(" << err.err() << ")" << std::endl;
     }
     catch(const std::exception &err){
         std::cout << "Error in prepareIFFT: " << err.what() << std::endl;
@@ -241,17 +241,18 @@ void API::prepareFILTER_BIQUAD(int nx){
         _ptrImpl->clBuffers["FILTER_BIQUAD_A"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, 2, _buffers.at("FILTER_BIQUAD_A")));
         _ptrImpl->clBuffers["FILTER_BIQUAD_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, nx, _buffers.at("FILTER_BIQUAD_Y")));
 
-        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(0, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_X"));
-        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(1, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_B"));
-        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(2, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_A"));
-        //arg 3 = filter delays
-        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(4, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"));
-        _ptrImpl->clKernels["FILTER_BIQUAD"]->setArg(5, nx);
+        _ptrImpl->clKernels["FILTER_BIQUAD"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_biquad"));
+        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(0, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_X"));
+        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(1, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_B"));
+        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(2, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_A"));
+        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(3, 0); //filter delays
+        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(4, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"));
+        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(5, nx);
 
         _opPrepared[ConfigOps::FILTER_BIQUAD] = true;
     }
     catch(cl::Error &err){
-        std::cout << "OpenCL error in prepareFILTER_BIQUAD: " << err.what() << std::endl;
+        std::cout << "OpenCL error in prepareFILTER_BIQUAD: " << err.what() << "(" << err.err() << ")" << std::endl;
     }
     catch(const std::exception &err){
         std::cout << "Error in prepareFILTER_BIQUAD: " << err.what() << std::endl;
@@ -438,6 +439,8 @@ void API::ocl_DSPF_sp_filter_biquad(){
         std::vector<cl::Event> evs(3);
         std::vector<cl::Event> evss(1);
 
+        std::cout << "Filter biquad op executed" << std::endl;
+
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_X"), CL_FALSE, 0, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_X"), 0, &evs[0]);
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_B"), CL_FALSE, 0, 3, _buffers.at("FILTER_BIQUAD_B"), 0, &evs[1]);
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_A"), CL_FALSE, 0, 2, _buffers.at("FILTER_BIQUAD_A"), 0, &evs[2]);
@@ -461,10 +464,10 @@ void API::ocl_DSPF_sp_filter_biquad(){
         }        
     }
     catch(cl::Error &err){
-        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+        std::cout << "OpenCL error in filter_biquad(): " << err.what() << "(" << err.err() << ")" << std::endl;
     }
     catch(const std::exception &err){
-        std::cout << "OpenCL error in prepareIFFT: " << err.what() << std::endl;
+        std::cout << "Error in filter_biquad(): " << err.what() << std::endl;
     }
 }
 /*float API::ocl_DSPF_sp_maxval(float *x, int nx){
