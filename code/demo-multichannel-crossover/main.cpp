@@ -23,6 +23,7 @@
 #include <condition_variable>
 #include <jack/jack.h>
 #include <signal.h>
+#include <fstream>
 
 void callbackDSP(CallbackResponse *clbkRes);
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out);
@@ -45,21 +46,31 @@ int main(){
     api.setDebug(true);
 	api.prepareFILTER_BIQUAD(N_SAMPLES);
 
-	b[0] = 0.2513790015131591; //b0
-	b[1] = 0.5027580030263182; //b1
-	b[2] = 0.2513790015131591; //b2
-	a[0] = -0.17124071441396285; //a1
-	a[1] = 0.1767567204665992; //a2
+	/*
+		Lowpass:
+			- 48 kHz sample rate
+			- 200 Hz cutoff
+			- 0.707 Q factor
+			- 6 dB gain
+	*/
+	b[0] = 0.0001682236792723621; //b0
+	b[1] = 0.0003364473585447242; //b1
+	b[2] = 0.0001682236792723621; //b2
+	a[0] = -1.9629797472685724; //a1
+	a[1] = 0.9636526419856617; //a2
 	api.configFILTER_BIQUAD(b, a, 0);
 
 	float freq = 1000.0; //Hz
 	float sample_rate = 48000.0;
 	float sine_test[N_SAMPLES];
 	float *buf_in = api.getBufIn(ConfigOps::FILTER_BIQUAD);
+	std::ofstream sinout("../../test/data/crossover/sine.txt");
 	for (int i=0; i < N_SAMPLES; i++){
 		sine_test[i] = sin(2*M_PI*freq*i / sample_rate);
 		buf_in[i] = sine_test[i];
+		sinout << sine_test[i] << std::endl;
 	}
+	sinout.close();
 
 	//jackClient = new JACKClient();
 	//jackClient->addCallback(callbackJACK);
@@ -76,14 +87,20 @@ int main(){
 void shutdown(int status){
     //jackClient->stop();
     //delete jackClient;
-    cv.notify_one();
+    cv.notify_one(); //TODO: Unlock mutex correctly
     exit(status);
 }
 
 void callbackDSP(CallbackResponse *clbkRes){
-	std::cout << "CallbackDSP executed" << std::endl;
+	float *y = clbkRes->getDataPtr();
 
-	//cv.notify_one();
+	std::ofstream filter_out("../../test/data/crossover/output.txt");
+	for (int i=0; i < N_SAMPLES; i++){
+		filter_out << y[i] << std::endl;
+	}
+	filter_out.close();
+
+	shutdown(0);
 }
 
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out){
