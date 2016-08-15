@@ -63,6 +63,7 @@ public:
     void ocl_DSPF_sp_fftSPxSP();
 	void ocl_DSPF_sp_ifftSPxSP();
     void ocl_DSPF_sp_filter_biquad();
+    void ocl_foo();
     //float ocl_DSPF_sp_maxval(float *x, int nx);
 
 private:

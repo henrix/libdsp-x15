@@ -40,7 +40,12 @@ kernel void ocl_DSPF_sp_ifftSPxSP(int N, global float *x, global float *w,
 kernel void ocl_DSPF_sp_biquad(global float *restrict x, global float *b,
 	global float *a, global float *delay, global float *restrict y, const int nx)
 {
-	DSPF_sp_biquad(x, b, a, delay, y, nx);
+	//printf("DSP kernel ocl_DSPF_sp_biquad() executed\n");
+	DSPF_sp_biquad(x, b, a, 0, y, nx);
+}
+kernel void ocl_foo()
+{
+	printf("DSP kernel foo() executed\n");
 }
 kernel void ocl_DSPF_sp_fircirc (global const float *x, global float *h,
 	global float *restrict y, int index, int csize, int nh, int ny)

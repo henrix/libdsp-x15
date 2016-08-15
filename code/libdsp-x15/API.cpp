@@ -245,7 +245,7 @@ void API::prepareFILTER_BIQUAD(int nx){
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(0, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_X"));
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(1, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_B"));
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(2, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_A"));
-        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(3, 0); //filter delays
+        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(3, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_B")); //filter delays
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(4, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"));
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(5, nx);
 
@@ -439,14 +439,12 @@ void API::ocl_DSPF_sp_filter_biquad(){
         std::vector<cl::Event> evs(3);
         std::vector<cl::Event> evss(1);
 
-        std::cout << "Filter biquad op executed" << std::endl;
-
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_X"), CL_FALSE, 0, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_X"), 0, &evs[0]);
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_B"), CL_FALSE, 0, 3, _buffers.at("FILTER_BIQUAD_B"), 0, &evs[1]);
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_A"), CL_FALSE, 0, 2, _buffers.at("FILTER_BIQUAD_A"), 0, &evs[2]);
         _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("FILTER_BIQUAD"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _ptrImpl->clCmdQueue->enqueueReadBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"), CL_TRUE, 0, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_Y"), &evss, &ev1);
-    
+
         CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::FILTER_BIQUAD, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
@@ -464,10 +462,19 @@ void API::ocl_DSPF_sp_filter_biquad(){
         }        
     }
     catch(cl::Error &err){
-        std::cout << "OpenCL error in filter_biquad(): " << err.what() << "(" << err.err() << ")" << std::endl;
+        std::cerr << "OpenCL error in filter_biquad(): " << err.what() << "(" << err.err() << ")" << std::endl;
     }
     catch(const std::exception &err){
-        std::cout << "Error in filter_biquad(): " << err.what() << std::endl;
+        std::cerr << "Error in filter_biquad(): " << err.what() << std::endl;
+    }
+}
+void API::ocl_foo(){
+    try{
+        _ptrImpl->clKernels["TEST_KERNEL"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_foo"));
+        _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("TEST_KERNEL"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), NULL, NULL);
+    }
+    catch(cl::Error &err){
+        std::cerr << "OpenCL error in foo(): " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 }
 /*float API::ocl_DSPF_sp_maxval(float *x, int nx){
