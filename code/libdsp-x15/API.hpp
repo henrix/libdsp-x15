@@ -33,35 +33,87 @@
 */
 
 class APIImpl;
+/**
+ * Class which offers API for DSP operations and helper functions
+ * @author Henrik Langer
+ * @date 17.09.2016
+ */
 class API {
 public:
-    API(std::function<void(CallbackResponse *clRes)> callback, bool debug = false);
+	/** Constructs DSP API
+	 * @param callback Function pointer to callback
+	 * @param debug Flag to enable debug outputs
+	 */
+    API(std::function<void(CallbackResponse *clbkRes)> callback, bool debug = false);
     ~API();
+    /** Sets new callback
+     * @param callback Function pointer to callback
+     */
     void setCallback(std::function<void(CallbackResponse *clRes)> callback); //Is executed for all operations
+    /** Returns pointer to input buffer (x) for DSP operations
+     * @param op DSP operation 
+     */
     float* getBufIn(ConfigOps::Ops op);
+    /** Returns pointer to output buffer (y) for DSP operations
+     * @param op DSP operation
+     */
     float* getBufOut(ConfigOps::Ops op);
+    /** Returns status of DSP operation
+     * @param op DSP operation
+     */
     bool isBusy(ConfigOps::Ops op);
+    /** Enables / disables debug outputs
+     * @param debug flag
+     */
     void setDebug(const bool debug);
 
-    /**
+    /*
      * DSP operation init helpers
      */
+
+    /** Prepares FFT operation (e.g. creates and initialises input/output buffers)
+     * @param N Length of Fast Fourier Transformation (FFT) in complex samples
+     * @param n_min Should be 4 if N can be represented as Power of 4 else, n_min should be 2
+     * @param n_max Size of FFT in complex samples
+     */
     void prepareFFT(int N, int n_min, int n_max);
+    /** Prepares IFFT operation
+     * @see prepareFFT(int,int,int)
+     */
     void prepareIFFT(int N, int n_min, int n_max);
+    /** Prepares biquad filter operation
+     * @param nx Number of input/output samples
+     */
     void prepareFILTER_BIQUAD(int nx);
+    /** 
+     *
+     */
     void prepareFILTER_FIR_R2(int nh, int nr, float *h);
     void prepareFILTER_IIR();
 
-    /**
+    /*
      * DSP operation config helpers
+     */
+
+    /** Configures biquad filter with normalized filter coefficients
+     * @param b Pointer to array with the 3 filter coefficients b0, b1, b2
+     * @param a Pointer to array with the 2 filter coefficients a0, a1
+     * @param delays Pointer to array with filter delays
      */
     void configFILTER_BIQUAD(float *b, float *a, float *delays);
 
-    /**
+    /*
      * DSP operations
      */
+
+    /** Enqueues and executes FFT operation on DSPs
+     */
     void ocl_DSPF_sp_fftSPxSP();
+    /** Enqueues and executes IFFT operation on DSPs
+     */
 	void ocl_DSPF_sp_ifftSPxSP();
+	/** Enqueues and executes biquad filter operation on DSPs
+	 */
     void ocl_DSPF_sp_filter_biquad();
     void ocl_foo();
     //float ocl_DSPF_sp_maxval(float *x, int nx);

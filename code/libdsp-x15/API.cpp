@@ -25,7 +25,7 @@
 #include <CL/cl.hpp>
 #include <ocl_util.h>
 
-std::function<void(CallbackResponse *clRes)> API::_callback = NULL;
+std::function<void(CallbackResponse *clbkRes)> API::_callback = NULL;
 /* Flags to indicate status of SDP operations */
 std::map<ConfigOps::Ops, bool> API::_opBusy = 
     {
@@ -49,7 +49,7 @@ public:
 };
 
 
-API::API(std::function<void(CallbackResponse *clRes)> callback, bool debug)
+API::API(std::function<void(CallbackResponse *clbkRes)> callback, bool debug)
     : _ptrImpl(new APIImpl(new cl::Context(CL_DEVICE_TYPE_ACCELERATOR))),
     _nFFT(0), _nIFFT(0), _bufSizeFFT(0), _bufSizeIFFT(0), _debug(debug)
 {
