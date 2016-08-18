@@ -24,9 +24,9 @@ addons:
       - graphviz
 
 # Build your code e.g. by calling make
-script:
-  - cd $TRAVIS_BUILD_DIR/code/libdsp-x15
-  - make
+#script:
+#  - cd $TRAVIS_BUILD_DIR/code/libdsp-x15
+#  - make
 
 # Generate and deploy documentation
 after_success:
