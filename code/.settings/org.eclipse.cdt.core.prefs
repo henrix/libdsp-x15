@@ -1,6 +1,0 @@
-eclipse.preferences.version=1
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.75477267/TARGET_ROOTDIR/delimiter=\:
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.75477267/TARGET_ROOTDIR/operation=append
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.75477267/TARGET_ROOTDIR/value=/opt/ti-processor-sdk-linux-am57xx-evm-02.00.02.11/targetNFS/
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.75477267/append=true
-environment/project/cdt.managedbuild.toolchain.gnu.cross.base.75477267/appendContributed=true
