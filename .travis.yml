@@ -25,7 +25,8 @@ addons:
 
 # Build your code e.g. by calling make
 script:
-#  - make
+  - cd $TRAVIS_BUILD_DIR/code/libdsp-x15
+  - make
 
 # Generate and deploy documentation
 after_success:
