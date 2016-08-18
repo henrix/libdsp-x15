@@ -29,7 +29,8 @@ addons:
 #  - make
 
 # Generate and deploy documentation
-after_success:
+#after_success:
+script:
   - cd $TRAVIS_BUILD_DIR
   - chmod +x generateDocumentationAndDeploy.sh
   - ./generateDocumentationAndDeploy.sh
