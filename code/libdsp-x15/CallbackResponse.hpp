@@ -28,6 +28,9 @@
 class CallbackResponse {
 
 public:
+	/**
+	 * Enum for all DSP operations
+	 */
 	enum Ops {
 		FFT,
 		IFFT,
