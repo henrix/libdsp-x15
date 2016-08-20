@@ -96,16 +96,14 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#aff66a439ea7b3533035e7df1057d6a4b">prepareFFT</a> (int N, int n_min, int n_max)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#aea87f49fb7c3ae4f84127056ed069354">prepareIFFT</a> (int N, int n_min, int n_max)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a6cce1f49c2bf4044c110f6362c598a65">prepareFILTER_BIQUAD</a> (int nx)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aad43bc6c2a2ca4dd6c87a22018b6a979"></a><!-- doxytag: member="API::prepareFILTER_FIR_R2" ref="aad43bc6c2a2ca4dd6c87a22018b6a979" args="(int nh, int nr, float *h)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>prepareFILTER_FIR_R2</b> (int nh, int nr, float *h)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a02dd34789b4274a7527ada6036b65a7f"></a><!-- doxytag: member="API::prepareFILTER_IIR" ref="a02dd34789b4274a7527ada6036b65a7f" args="()" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>prepareFILTER_IIR</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#aad43bc6c2a2ca4dd6c87a22018b6a979">prepareFILTER_FIR_R2</a> (int nh, int nr, float *h)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a02dd34789b4274a7527ada6036b65a7f">prepareFILTER_IIR</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#ab54cb00cc08fb5a8e847ecfd63aac5d1">configFILTER_BIQUAD</a> (float *b, float *a, float *delays)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a62e9ed0f473af9c0f38bece16204b154">ocl_DSPF_sp_fftSPxSP</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a8fdad78679cbaae85b52495e06097b14">ocl_DSPF_sp_ifftSPxSP</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a7aed755ef2f52e99f88ef915c64b12cb">ocl_DSPF_sp_filter_biquad</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5dc3c38c675e6c2ec3509926acce2857"></a><!-- doxytag: member="API::ocl_foo" ref="a5dc3c38c675e6c2ec3509926acce2857" args="()" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><b>ocl_foo</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a9dafdbc1ba4a5883ea5945de6c3e4ee7">ocl_DSPF_sp_fir_r2</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#ab5ad95af49d2276b45e94dd283b464e3">ocl_DSPF_sp_iir</a> ()</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Class which offers <a class="el" href="classAPI.html">API</a> for DSP operations and helper functions </p>
@@ -296,6 +294,23 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>ocl_foo</b> ()</td></
 
 </div>
 </div>
+<a class="anchor" id="a9dafdbc1ba4a5883ea5945de6c3e4ee7"></a><!-- doxytag: member="API::ocl_DSPF_sp_fir_r2" ref="a9dafdbc1ba4a5883ea5945de6c3e4ee7" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAPI.html#a9dafdbc1ba4a5883ea5945de6c3e4ee7">API::ocl_DSPF_sp_fir_r2</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Enqueues and executes real FIR </p>
+
+</div>
+</div>
 <a class="anchor" id="a8fdad78679cbaae85b52495e06097b14"></a><!-- doxytag: member="API::ocl_DSPF_sp_ifftSPxSP" ref="a8fdad78679cbaae85b52495e06097b14" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -310,6 +325,23 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>ocl_foo</b> ()</td></
 </div>
 <div class="memdoc">
 <p>Enqueues and executes IFFT operation on DSPs </p>
+
+</div>
+</div>
+<a class="anchor" id="ab5ad95af49d2276b45e94dd283b464e3"></a><!-- doxytag: member="API::ocl_DSPF_sp_iir" ref="ab5ad95af49d2276b45e94dd283b464e3" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAPI.html#ab5ad95af49d2276b45e94dd283b464e3">API::ocl_DSPF_sp_iir</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Enqueues and executes IIR </p>
 
 </div>
 </div>
@@ -376,6 +408,57 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>ocl_foo</b> ()</td></
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="aad43bc6c2a2ca4dd6c87a22018b6a979"></a><!-- doxytag: member="API::prepareFILTER_FIR_R2" ref="aad43bc6c2a2ca4dd6c87a22018b6a979" args="(int nh, int nr, float *h)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAPI.html#aad43bc6c2a2ca4dd6c87a22018b6a979">API::prepareFILTER_FIR_R2</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>h</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Prepares real FIR operation (not implemented yet) </p>
+
+</div>
+</div>
+<a class="anchor" id="a02dd34789b4274a7527ada6036b65a7f"></a><!-- doxytag: member="API::prepareFILTER_IIR" ref="a02dd34789b4274a7527ada6036b65a7f" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAPI.html#a02dd34789b4274a7527ada6036b65a7f">API::prepareFILTER_IIR</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Prepares IIR operation (not implemented yet) </p>
 
 </div>
 </div>
