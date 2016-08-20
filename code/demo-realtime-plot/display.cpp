@@ -36,6 +36,8 @@ Display::Display(size_t width, size_t height) : _width(width), _height(height) {
         exit(1);
     }
 
+    std::string title("Amplitude Spectrum");
+    SDL_WM_SetCaption(title.c_str(), NULL );
 }
 
 Display::~Display() {

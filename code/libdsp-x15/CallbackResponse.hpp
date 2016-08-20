@@ -19,7 +19,6 @@
 #define CALLBACKRESPONSE_HPP_
 
 #include <cstddef>
-#include "ConfigOps.hpp"
 
 /** 
  * Class which encapsulates result and settings of specific DSP operation (is parameter of DSP callback)
@@ -29,20 +28,27 @@
 class CallbackResponse {
 
 public:
+	enum Ops {
+		FFT,
+		IFFT,
+		FILTER_BIQUAD,
+		FILTER_FIR_R2,
+        FILTER_IIR
+	};
 	/** Constructs new CallbackResponse object
 	 * @param op DSP operation
  	 * @param dataSize Size of result data (varies from operation to operation (e.g. FFT/IFFT result is complex (double spaced))
  	 * @param dataPtr Pointer to result data of DSP operation
  	*/
-	CallbackResponse(ConfigOps::Ops op, unsigned int dataSize, float *dataPtr);
+	CallbackResponse(CallbackResponse::Ops op, unsigned int dataSize, float *dataPtr);
 	~CallbackResponse();
 	/** Return type of DSP operation
 	 */
-	ConfigOps::Ops getOp() const;
+	CallbackResponse::Ops getOp() const;
 	/** Sets type of DSP operation
 	 * @param op DSP operation
 	 */
-	void setOp(ConfigOps::Ops op);
+	void setOp(CallbackResponse::Ops op);
 	/** Returns size of result data
 	 */
 	size_t getDataSize() const;
@@ -60,7 +66,7 @@ public:
 	void setDataPtr(float *data);
 
 private:
-    ConfigOps::Ops _op;
+    CallbackResponse::Ops _op;
 	unsigned int _dataSize;
 	float *_dataPtr;
 };

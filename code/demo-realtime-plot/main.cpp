@@ -93,7 +93,7 @@ void test_FFT_IFFT(int n){
 	api.prepareFFT(n, 4, n);
 	api.prepareIFFT(n, 4, n);
 
-	float *xFFT = api.getBufIn(ConfigOps::FFT);
+	float *xFFT = api.getBufIn(CallbackResponse::FFT);
 
 	/* Generate sine */
 	std::ofstream sinout("../../test/data/sine.txt");
@@ -111,8 +111,8 @@ void test_FFT_IFFT(int n){
 
     api.ocl_DSPF_sp_fftSPxSP();
     while(!fftFinished){}
-    float *yFFT = api.getBufOut(ConfigOps::FFT);
-    float *xIFFT = api.getBufIn(ConfigOps::IFFT);
+    float *yFFT = api.getBufOut(CallbackResponse::FFT);
+    float *xIFFT = api.getBufIn(CallbackResponse::IFFT);
     for (int i=0; i < 2*n; i++){
         xIFFT[i] = yFFT[i];
     }
@@ -137,12 +137,11 @@ void shutdown(int status){
  * Callbacks
  */
 //TODO: return const dataptr (btw deny manipulation)
-bool callbackBusy = false;
 void callbackDSP(CallbackResponse *clbkRes){
     float *y = clbkRes->getDataPtr();
     int n = clbkRes->getN();
 
-    if (clbkRes->getOp() == ConfigOps::FFT){
+    if (clbkRes->getOp() == CallbackResponse::FFT){
 
     	/*Handle test callback */
         if (testEnabled){
@@ -183,17 +182,8 @@ void callbackDSP(CallbackResponse *clbkRes){
 
         //display.drawPixels(n, pixels);
         display.drawLines(n, pixels);
-        SDL_Event event;
-        SDL_PollEvent(&event);
-        if (event.type == SDL_QUIT){ 
-            shutdown(0); 
-        }
-        else if (event.type == SDL_MOUSEBUTTONDOWN){
-            std::cout << "x: " << event.button.x << std::endl;
-            std::cout << "y: " << event.button.y << std::endl;
-        }
     }
-    else if (clbkRes->getOp() == ConfigOps::IFFT){
+    else if (clbkRes->getOp() == CallbackResponse::IFFT){
 
     	/*Handle test callback */
     	if (testEnabled){
@@ -211,35 +201,40 @@ void callbackDSP(CallbackResponse *clbkRes){
     	}
     }
 
-    callbackBusy = false;
+    SDL_Event event;
+    SDL_PollEvent(&event);
+    if (event.type == SDL_QUIT){ 
+        shutdown(0); 
+    }
+    else if (event.type == SDL_MOUSEBUTTONDOWN){
+        std::cout << "x: " << event.button.x << std::endl;
+        std::cout << "y: " << event.button.y << std::endl;
+    }
 
     delete clbkRes;
 }
 
 size_t count = 0;
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out){
-    if (!callbackBusy){
-        callbackBusy = true;
-        //std::cout << "Buffer size: " << n_frames << " - in: " << in[n_frames - 1] << std::endl;
 
-        /*for (int i=0; i < n_frames; i++)
-            audio_buffer[i+count] = in[i];*/
+    //std::cout << "Buffer size: " << n_frames << " - in: " << in[n_frames - 1] << std::endl;
 
-        float *x = api.getBufIn(ConfigOps::FFT);
-        for (int i=0; i < n_frames; i++){
-            x[PAD + 2*i + count] = in[i];
-            x[PAD + 2*i + 1 + count] = 0;
-        }
+    /*for (int i=0; i < n_frames; i++)
+        audio_buffer[i+count] = in[i];*/
 
-        count += n_frames;
-        if (count >= N && !api.isBusy(ConfigOps::FFT)){
+    float *x = api.getBufIn(CallbackResponse::FFT);
+    for (int i=0; i < n_frames; i++){
+        x[PAD + 2*i + count] = in[i];
+        x[PAD + 2*i + 1 + count] = 0;
+    }
+
+    count += n_frames;
+    if (count >= N && !api.isBusy(CallbackResponse::FFT)){
             //gsl_spline_init(spline, x, in, N);
 
-            //api.ocl_DSPF_sp_fftSPxSP();
-        }
-        count %= N;
-        //display.drawPixels(n_frames, in);
+        api.ocl_DSPF_sp_fftSPxSP();
     }
-    
+    count %= N;
+    //display.drawPixels(n_frames, in);
 }
 

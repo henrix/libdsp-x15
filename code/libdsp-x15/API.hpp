@@ -19,7 +19,6 @@
 #define API_HPP_
 
 #include "CallbackResponse.hpp"
-#include "ConfigOps.hpp"
 #include <map>
 #include <functional>
 #include <memory>
@@ -53,15 +52,15 @@ public:
     /** Returns pointer to input buffer (x) for DSP operations
      * @param op DSP operation 
      */
-    float* getBufIn(ConfigOps::Ops op);
+    float* getBufIn(CallbackResponse::Ops op);
     /** Returns pointer to output buffer (y) for DSP operations
      * @param op DSP operation
      */
-    float* getBufOut(ConfigOps::Ops op);
+    float* getBufOut(CallbackResponse::Ops op);
     /** Returns status of DSP operation
      * @param op DSP operation
      */
-    bool isBusy(ConfigOps::Ops op);
+    bool isBusy(CallbackResponse::Ops op);
     /** Enables / disables debug outputs
      * @param debug flag
      */
@@ -120,13 +119,13 @@ public:
 
 private:
     void* _allocBuffer(size_t size);
-    static void _genTwiddles(ConfigOps::Ops op, int n, float *w);
-    void _clean(ConfigOps::Ops op);
+    static void _genTwiddles(CallbackResponse::Ops op, int n, float *w);
+    void _clean(CallbackResponse::Ops op);
 
-    std::map<ConfigOps::Ops, std::unique_ptr<ConfigOps>> _kernelConfigs;
+    std::map<CallbackResponse::Ops, std::unique_ptr<CallbackResponse>> _kernelConfigs;
     std::map<std::string, float*> _buffers;
-    std::map<ConfigOps::Ops, bool> _opPrepared;
-    static std::map<ConfigOps::Ops, bool> _opBusy;
+    std::map<CallbackResponse::Ops, bool> _opPrepared;
+    static std::map<CallbackResponse::Ops, bool> _opBusy;
 
     static std::function<void(CallbackResponse *clRes)> _callback;
     std::unique_ptr<APIImpl> _ptrImpl;

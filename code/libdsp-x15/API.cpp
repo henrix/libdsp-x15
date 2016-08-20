@@ -27,13 +27,13 @@
 
 std::function<void(CallbackResponse *clbkRes)> API::_callback = NULL;
 /* Flags to indicate status of SDP operations */
-std::map<ConfigOps::Ops, bool> API::_opBusy = 
+std::map<CallbackResponse::Ops, bool> API::_opBusy = 
     {
-        {ConfigOps::FFT, false},
-        {ConfigOps::IFFT, false},
-        {ConfigOps::FILTER_BIQUAD, false},
-        {ConfigOps::FILTER_FIR_R2, false},
-        {ConfigOps::FILTER_IIR, false}
+        {CallbackResponse::FFT, false},
+        {CallbackResponse::IFFT, false},
+        {CallbackResponse::FILTER_BIQUAD, false},
+        {CallbackResponse::FILTER_FIR_R2, false},
+        {CallbackResponse::FILTER_IIR, false}
     };
 
 class APIImpl {
@@ -55,11 +55,11 @@ API::API(std::function<void(CallbackResponse *clbkRes)> callback, bool debug)
 {
     _callback = callback; //static
 
-    _opPrepared[ConfigOps::FFT] = false;
-    _opPrepared[ConfigOps::IFFT] = false;
-    _opPrepared[ConfigOps::FILTER_BIQUAD] = false;
-    _opPrepared[ConfigOps::FILTER_FIR_R2] = false;
-    _opPrepared[ConfigOps::FILTER_IIR] = false;
+    _opPrepared[CallbackResponse::FFT] = false;
+    _opPrepared[CallbackResponse::IFFT] = false;
+    _opPrepared[CallbackResponse::FILTER_BIQUAD] = false;
+    _opPrepared[CallbackResponse::FILTER_FIR_R2] = false;
+    _opPrepared[CallbackResponse::FILTER_IIR] = false;
 
     std::vector<cl::Device> devices = _ptrImpl->clContext->getInfo<CL_CONTEXT_DEVICES>();
     int num;
@@ -78,68 +78,68 @@ API::API(std::function<void(CallbackResponse *clbkRes)> callback, bool debug)
     _ptrImpl->clCmdQueue = std::unique_ptr<cl::CommandQueue>(new cl::CommandQueue(*_ptrImpl->clContext, devices[0], CL_QUEUE_PROFILING_ENABLE));
 }
 API::~API(){
-    if (_opPrepared.at(ConfigOps::FFT)){
-        _clean(ConfigOps::FFT);
+    if (_opPrepared.at(CallbackResponse::FFT)){
+        _clean(CallbackResponse::FFT);
     }
-    if (_opPrepared.at(ConfigOps::IFFT)){
-        _clean(ConfigOps::IFFT);
+    if (_opPrepared.at(CallbackResponse::IFFT)){
+        _clean(CallbackResponse::IFFT);
     }
 }
 void API::setCallback(std::function<void(CallbackResponse *clRes)> callback){
     _callback = callback;
 }
-float* API::getBufIn(ConfigOps::Ops op){
+float* API::getBufIn(CallbackResponse::Ops op){
     switch(op){
-        case ConfigOps::FFT:
+        case CallbackResponse::FFT:
             return _buffers.at("FFT_X");
         break;
-        case ConfigOps::IFFT:
+        case CallbackResponse::IFFT:
             return _buffers.at("IFFT_X");
         break;
-        case ConfigOps::FILTER_BIQUAD:
+        case CallbackResponse::FILTER_BIQUAD:
             return _buffers.at("FILTER_BIQUAD_X");
         break;
-        case ConfigOps::FILTER_FIR_R2:
+        case CallbackResponse::FILTER_FIR_R2:
         break;
-        case ConfigOps::FILTER_IIR:
+        case CallbackResponse::FILTER_IIR:
         break;
     }
     return NULL;
 }
-float* API::getBufOut(ConfigOps::Ops op){
+float* API::getBufOut(CallbackResponse::Ops op){
     switch(op){
-        case ConfigOps::FFT:
+        case CallbackResponse::FFT:
             return _buffers.at("FFT_Y");
         break;
-        case ConfigOps::IFFT:
+        case CallbackResponse::IFFT:
             return _buffers.at("IFFT_Y");
         break;
-        case ConfigOps::FILTER_BIQUAD:
+        case CallbackResponse::FILTER_BIQUAD:
             return _buffers.at("FILTER_BIQUAD_Y");
         break;
-        case ConfigOps::FILTER_FIR_R2:
+        case CallbackResponse::FILTER_FIR_R2:
         break;
-        case ConfigOps::FILTER_IIR:
+        case CallbackResponse::FILTER_IIR:
         break;
     }
     return NULL;
 }
-bool API::isBusy(ConfigOps::Ops op){
+bool API::isBusy(CallbackResponse::Ops op){
     switch(op){
-        case ConfigOps::FFT:
-            return _opBusy.at(ConfigOps::FFT);
+        case CallbackResponse::FFT:
+            return _opBusy.at(CallbackResponse::FFT);
         break;
-        case ConfigOps::IFFT:
-            return _opBusy.at(ConfigOps::IFFT);
+        case CallbackResponse::IFFT:
+            return _opBusy.at(CallbackResponse::IFFT);
         break;
-        case ConfigOps::FILTER_BIQUAD:
-            return _opBusy.at(ConfigOps::FILTER_BIQUAD);
+        case CallbackResponse::FILTER_BIQUAD:
+            return _opBusy.at(CallbackResponse::FILTER_BIQUAD);
         break;
-        case ConfigOps::FILTER_FIR_R2:
-            return _opBusy.at(ConfigOps::FILTER_FIR_R2);
+        case CallbackResponse::FILTER_FIR_R2:
+            return _opBusy.at(CallbackResponse::FILTER_FIR_R2);
         break;
-        case ConfigOps::FILTER_IIR:
-            return _opBusy.at(ConfigOps::FILTER_IIR);
+        case CallbackResponse::FILTER_IIR:
+            return _opBusy.at(CallbackResponse::FILTER_IIR);
         break;
     }
 }
@@ -148,14 +148,14 @@ void API::setDebug(const bool debug){
 }
 void API::prepareFFT(int N, int n_min, int n_max){
     try{
-        if (_opPrepared.at(ConfigOps::FFT)){
-            _clean(ConfigOps::FFT);
+        if (_opPrepared.at(CallbackResponse::FFT)){
+            _clean(CallbackResponse::FFT);
         }
 
         _nFFT = N;
         _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
-        /*_kernelConfigs[ConfigOps::FFT] = std::unique_ptr<ConfigOps>(new ConfigOps(ConfigOps::FFT));
-        ConfigOps configFFT(ConfigOps::FFT);
+        /*_kernelConfigs[CallbackResponse::FFT] = std::unique_ptr<CallbackResponse>(new CallbackResponse(CallbackResponse::FFT));
+        CallbackResponse configFFT(CallbackResponse::FFT);
         configFFT.setParam<int>("N", N);
         configFFT.setParam<int>("n_min", n_min);
         configFFT.setParam<int>("n_max", n_max);*/
@@ -164,7 +164,7 @@ void API::prepareFFT(int N, int n_min, int n_max){
         _buffers["FFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
         _buffers["FFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
 
-        _genTwiddles(ConfigOps::FFT, _nFFT, _buffers.at("FFT_W"));
+        _genTwiddles(CallbackResponse::FFT, _nFFT, _buffers.at("FFT_W"));
 
         _ptrImpl->clBuffers["FFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_X")));
         _ptrImpl->clBuffers["FFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_W")));
@@ -178,7 +178,7 @@ void API::prepareFFT(int N, int n_min, int n_max){
         _ptrImpl->clKernels.at("FFT")->setArg(4, n_min);
         _ptrImpl->clKernels.at("FFT")->setArg(5, n_max);
 
-        _opPrepared[ConfigOps::FFT] = true;
+        _opPrepared[CallbackResponse::FFT] = true;
     }
     catch(cl::Error &err){
         std::cout << "OpenCL error in prepareFFT: " << err.what() << "(" << err.err() << ")" << std::endl;
@@ -189,8 +189,8 @@ void API::prepareFFT(int N, int n_min, int n_max){
 }
 void API::prepareIFFT(int N, int n_min, int n_max){
     try{
-        if (_opPrepared.at(ConfigOps::IFFT)){
-            _clean(ConfigOps::IFFT);
+        if (_opPrepared.at(CallbackResponse::IFFT)){
+            _clean(CallbackResponse::IFFT);
         }
 
         _nIFFT = N;
@@ -200,7 +200,7 @@ void API::prepareIFFT(int N, int n_min, int n_max){
         _buffers["IFFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
         _buffers["IFFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nIFFT);
 
-        _genTwiddles(ConfigOps::IFFT, _nIFFT, _buffers.at("IFFT_W"));
+        _genTwiddles(CallbackResponse::IFFT, _nIFFT, _buffers.at("IFFT_W"));
 
         _ptrImpl->clBuffers["IFFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_X")));
         _ptrImpl->clBuffers["IFFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeIFFT, _buffers.at("IFFT_W")));
@@ -214,7 +214,7 @@ void API::prepareIFFT(int N, int n_min, int n_max){
         _ptrImpl->clKernels.at("IFFT")->setArg(4, n_min);
         _ptrImpl->clKernels.at("IFFT")->setArg(5, n_max);
 
-        _opPrepared[ConfigOps::IFFT] = true;
+        _opPrepared[CallbackResponse::IFFT] = true;
     }
     catch(cl::Error &err){
         std::cout << "OpenCL error in prepareIFFT: " << err.what() << "(" << err.err() << ")" << std::endl;
@@ -225,8 +225,8 @@ void API::prepareIFFT(int N, int n_min, int n_max){
 }
 void API::prepareFILTER_BIQUAD(int nx){
     try{
-        if (_opPrepared.at(ConfigOps::FILTER_BIQUAD)){
-            _clean(ConfigOps::FILTER_BIQUAD);
+        if (_opPrepared.at(CallbackResponse::FILTER_BIQUAD)){
+            _clean(CallbackResponse::FILTER_BIQUAD);
         }
 
         _nxFILTER_BIQUAD = nx;
@@ -249,7 +249,7 @@ void API::prepareFILTER_BIQUAD(int nx){
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(4, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"));
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(5, nx);
 
-        _opPrepared[ConfigOps::FILTER_BIQUAD] = true;
+        _opPrepared[CallbackResponse::FILTER_BIQUAD] = true;
     }
     catch(cl::Error &err){
         std::cout << "OpenCL error in prepareFILTER_BIQUAD: " << err.what() << "(" << err.err() << ")" << std::endl;
@@ -275,11 +275,11 @@ void API::configFILTER_BIQUAD(float *b, float *a, float *delays){
 void* API::_allocBuffer(size_t size){
     return __malloc_ddr(size);
 }
-void API::_genTwiddles(ConfigOps::Ops op, int n, float *w){
+void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
     int i, j, k;
     const double PI = 3.141592654;
 
-    if (op == ConfigOps::FFT){
+    if (op == CallbackResponse::FFT){
         for (j = 1, k = 0; j <= n >> 2; j = j << 2)
         {
             for (i = 0; i < n >> 2; i += j)
@@ -294,7 +294,7 @@ void API::_genTwiddles(ConfigOps::Ops op, int n, float *w){
             }
         }
     }
-    else if (op == ConfigOps::IFFT){
+    else if (op == CallbackResponse::IFFT){
         for (j = 1, k = 0; j <= n >> 2; j = j << 2)
         {
             for (i = 0; i < n >> 2; i += j)
@@ -311,23 +311,23 @@ void API::_genTwiddles(ConfigOps::Ops op, int n, float *w){
     }
 }
 
-void API::_clean(ConfigOps::Ops op){
+void API::_clean(CallbackResponse::Ops op){
     switch(op){
-        case ConfigOps::FFT:
+        case CallbackResponse::FFT:
         {
             __free_ddr(_buffers.at("FFT_X"));
             __free_ddr(_buffers.at("FFT_W"));
             __free_ddr(_buffers.at("FFT_Y"));
         }
         break;
-        case ConfigOps::IFFT:
+        case CallbackResponse::IFFT:
         {
             __free_ddr(_buffers.at("IFFT_X"));
             __free_ddr(_buffers.at("IFFT_W"));
             __free_ddr(_buffers.at("IFFT_Y"));
         }
         break;
-        case ConfigOps::FILTER_BIQUAD:
+        case CallbackResponse::FILTER_BIQUAD:
         {
             __free_ddr(_buffers.at("FILTER_BIQUAD_X"));
             __free_ddr(_buffers.at("FILTER_BIQUAD_B"));
@@ -335,12 +335,12 @@ void API::_clean(ConfigOps::Ops op){
             __free_ddr(_buffers.at("FILTER_BIQUAD_Y"));
         }
         break;
-        case ConfigOps::FILTER_FIR_R2:
+        case CallbackResponse::FILTER_FIR_R2:
         {
 
         }
         break;
-        case ConfigOps::FILTER_IIR:
+        case CallbackResponse::FILTER_IIR:
         {
 
         }
@@ -354,11 +354,11 @@ void API::_clean(ConfigOps::Ops op){
  */
 void API::ocl_DSPF_sp_fftSPxSP(){
     try{
-        if (!_opPrepared.at(ConfigOps::FFT)){
+        if (!_opPrepared.at(CallbackResponse::FFT)){
             std::cerr << "FFT operation not prepared yet! Stopping DSP operation." << std::endl;
             return;
         }
-        _opBusy[ConfigOps::FFT] = true;
+        _opBusy[CallbackResponse::FFT] = true;
 
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
@@ -369,10 +369,10 @@ void API::ocl_DSPF_sp_fftSPxSP(){
         _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("FFT"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _ptrImpl->clCmdQueue->enqueueReadBuffer(*_ptrImpl->clBuffers.at("FFT_Y"), CL_TRUE, 0, _bufSizeFFT, _buffers.at("FFT_Y"), &evss, &ev1);
 
-        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::FFT, 2*_nFFT, _buffers.at("FFT_Y"));
+        CallbackResponse *clbkRes = new CallbackResponse(CallbackResponse::FFT, 2*_nFFT, _buffers.at("FFT_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
-            _opBusy[ConfigOps::FFT] = false;
+            _opBusy[CallbackResponse::FFT] = false;
             _callback(res);
 
         };
@@ -392,11 +392,11 @@ void API::ocl_DSPF_sp_fftSPxSP(){
 }
 void API::ocl_DSPF_sp_ifftSPxSP(){
     try{
-        if (!_opPrepared.at(ConfigOps::IFFT)){
+        if (!_opPrepared.at(CallbackResponse::IFFT)){
             std::cerr << "IFFT operation not prepared yet! Stopping DSP operation." << std::endl;
             return;
         }
-        _opBusy[ConfigOps::IFFT] = true;
+        _opBusy[CallbackResponse::IFFT] = true;
 
         cl::Event ev1;
         std::vector<cl::Event> evs(2);
@@ -407,10 +407,10 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
         _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("IFFT"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _ptrImpl->clCmdQueue->enqueueReadBuffer(*_ptrImpl->clBuffers.at("IFFT_Y"), CL_TRUE, 0, _bufSizeIFFT, _buffers.at("IFFT_Y"), &evss, &ev1);
 
-        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::IFFT, 2*_nIFFT, _buffers.at("IFFT_Y"));
+        CallbackResponse *clbkRes = new CallbackResponse(CallbackResponse::IFFT, 2*_nIFFT, _buffers.at("IFFT_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
-            _opBusy[ConfigOps::IFFT] = false;
+            _opBusy[CallbackResponse::IFFT] = false;
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);
@@ -429,11 +429,11 @@ void API::ocl_DSPF_sp_ifftSPxSP(){
 }
 void API::ocl_DSPF_sp_filter_biquad(){
     try{
-        if (!_opPrepared.at(ConfigOps::FILTER_BIQUAD)){
+        if (!_opPrepared.at(CallbackResponse::FILTER_BIQUAD)){
             std::cerr << "Filter biquad not prepared yet! Stopping DSP operation." << std::endl;
             return;
         }
-        _opBusy[ConfigOps::FILTER_BIQUAD] = true;
+        _opBusy[CallbackResponse::FILTER_BIQUAD] = true;
 
         cl::Event ev1;
         std::vector<cl::Event> evs(3);
@@ -445,10 +445,10 @@ void API::ocl_DSPF_sp_filter_biquad(){
         _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("FILTER_BIQUAD"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _ptrImpl->clCmdQueue->enqueueReadBuffer(*_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"), CL_TRUE, 0, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_Y"), &evss, &ev1);
 
-        CallbackResponse *clbkRes = new CallbackResponse(ConfigOps::FILTER_BIQUAD, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_Y"));
+        CallbackResponse *clbkRes = new CallbackResponse(CallbackResponse::FILTER_BIQUAD, _nxFILTER_BIQUAD, _buffers.at("FILTER_BIQUAD_Y"));
         auto lambda = [](cl_event ev, cl_int e_status, void *user_data) {
             CallbackResponse *res = (CallbackResponse*) user_data;
-            _opBusy[ConfigOps::FILTER_BIQUAD] = false;
+            _opBusy[CallbackResponse::FILTER_BIQUAD] = false;
             _callback(res);
         };
         ev1.setCallback(CL_COMPLETE, lambda, clbkRes);

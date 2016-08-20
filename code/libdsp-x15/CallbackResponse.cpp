@@ -17,7 +17,7 @@
 
 #include "CallbackResponse.hpp"
 
-CallbackResponse::CallbackResponse(ConfigOps::Ops op, unsigned int dataSize, float *dataPtr) {
+CallbackResponse::CallbackResponse(CallbackResponse::Ops op, unsigned int dataSize, float *dataPtr) {
 	_op = op;
 	_dataSize = dataSize;
 	_dataPtr = dataPtr;
@@ -27,11 +27,11 @@ CallbackResponse::~CallbackResponse() {
 
 }
 
-ConfigOps::Ops CallbackResponse::getOp() const {
+CallbackResponse::Ops CallbackResponse::getOp() const {
 	return _op;
 }
 
-void CallbackResponse::setOp(ConfigOps::Ops op){
+void CallbackResponse::setOp(CallbackResponse::Ops op){
 	_op = op;
 }
 
