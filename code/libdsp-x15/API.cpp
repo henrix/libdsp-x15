@@ -468,15 +468,6 @@ void API::ocl_DSPF_sp_filter_biquad(){
         std::cerr << "Error in filter_biquad(): " << err.what() << std::endl;
     }
 }
-void API::ocl_foo(){
-    try{
-        _ptrImpl->clKernels["TEST_KERNEL"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_foo"));
-        _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("TEST_KERNEL"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), NULL, NULL);
-    }
-    catch(cl::Error &err){
-        std::cerr << "OpenCL error in foo(): " << err.what() << "(" << err.err() << ")" << std::endl;
-    }
-}
 /*float API::ocl_DSPF_sp_maxval(float *x, int nx){
     try{
         _ptrImpl->clBuffers["MAXVAL"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, nx, x));

@@ -84,10 +84,11 @@ public:
      * @param nx Number of input/output samples
      */
     void prepareFILTER_BIQUAD(int nx);
-    /** 
-     *
+    /**  Prepares real FIR operation (not implemented yet)
      */
     void prepareFILTER_FIR_R2(int nh, int nr, float *h);
+    /** Prepares IIR operation (not implemented yet)
+     */
     void prepareFILTER_IIR();
 
     /*
@@ -114,7 +115,12 @@ public:
 	/** Enqueues and executes biquad filter operation on DSPs
 	 */
     void ocl_DSPF_sp_filter_biquad();
-    void ocl_foo();
+    /** Enqueues and executes real FIR
+     */
+    void ocl_DSPF_sp_fir_r2();
+    /** Enqueues and executes IIR
+     */
+    void ocl_DSPF_sp_iir();
     //float ocl_DSPF_sp_maxval(float *x, int nx);
 
 private:
