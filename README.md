@@ -2,8 +2,6 @@
 This repository is used for active development of the project "Improving the CTAG face2|4 Audio Card for BeagleBone-X15" by Henrik Langer (henrix) for Google Summer of Code (GSoC) 2016. The offical project description is published [here](https://summerofcode.withgoogle.com/projects/#5807138232336384).
 The C66x DSP library is developed in this repository. The Linux Kernel development can be found [here](https://github.com/henrix/beagle-linux).
 
-> Currently a bug in AM5728 DSP firmware causes kernel crash when recovery mode is enabled in remoteproc debugfs. By disabling remoteproc recovery kernel crash can be avoided (i.e. write "disable" to /sys/kernel/debug/remoteproc/remoteproc2/recovery and the same for remoteproc3).
-
 ## Build instructions
 ### [CTAG face2|4 Audio Card](http://www.creative-technologies.de/linux-based-low-latency-multichannel-audio-system-2/) Driver
 1. Compile kernel according to [Kernel_Compilation_Guide in ctag-face-2-4 repo](https://github.com/ctag-fh-kiel/ctag-face-2-4/blob/master/docs/Kernel_Compilation_Guide.md)
