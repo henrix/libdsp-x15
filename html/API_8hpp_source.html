@@ -99,76 +99,75 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00019"></a>00019 <span class="preprocessor"></span><span class="preprocessor">#define API_HPP_</span>
 <a name="l00020"></a>00020 <span class="preprocessor"></span>
 <a name="l00021"></a>00021 <span class="preprocessor">#include &quot;CallbackResponse.hpp&quot;</span>
-<a name="l00022"></a>00022 <span class="preprocessor">#include &quot;ConfigOps.hpp&quot;</span>
-<a name="l00023"></a>00023 <span class="preprocessor">#include &lt;map&gt;</span>
-<a name="l00024"></a>00024 <span class="preprocessor">#include &lt;functional&gt;</span>
-<a name="l00025"></a>00025 <span class="preprocessor">#include &lt;memory&gt;</span>
-<a name="l00026"></a>00026 <span class="preprocessor">#include &lt;array&gt;</span>
-<a name="l00027"></a>00027 
-<a name="l00028"></a>00028 <span class="comment">/*</span>
-<a name="l00029"></a>00029 <span class="comment">    TODO:</span>
-<a name="l00030"></a>00030 <span class="comment">    - Create more command queues for multicores</span>
-<a name="l00031"></a>00031 <span class="comment">    - Implement filter operations</span>
-<a name="l00032"></a>00032 <span class="comment">    - Create GUI for realtime plots</span>
-<a name="l00033"></a>00033 <span class="comment">*/</span>
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035 <span class="keyword">class </span>APIImpl;
-<a name="l00041"></a><a class="code" href="classAPI.html">00041</a> <span class="keyword">class </span><a class="code" href="classAPI.html">API</a> {
-<a name="l00042"></a>00042 <span class="keyword">public</span>:
-<a name="l00047"></a>00047     <a class="code" href="classAPI.html#ae93802268ffee08b6d347543666e1f35">API</a>(std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classCallbackResponse.html">CallbackResponse</a> *clbkRes)&gt; callback, <span class="keywordtype">bool</span> debug = <span class="keyword">false</span>);
-<a name="l00048"></a>00048     ~<a class="code" href="classAPI.html">API</a>();
-<a name="l00052"></a>00052     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#af673b62f6a0601444a6f1d4aff50046c">setCallback</a>(std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classCallbackResponse.html">CallbackResponse</a> *clRes)&gt; callback); <span class="comment">//Is executed for all operations</span>
-<a name="l00056"></a>00056 <span class="comment"></span>    <span class="keywordtype">float</span>* <a class="code" href="classAPI.html#a2dc402bf6d1331ed9040b4aa4fb03fa1">getBufIn</a>(ConfigOps::Ops op);
-<a name="l00060"></a>00060     <span class="keywordtype">float</span>* <a class="code" href="classAPI.html#a7b53fff4b96f52756ff02feeb3c837d0">getBufOut</a>(ConfigOps::Ops op);
-<a name="l00064"></a>00064     <span class="keywordtype">bool</span> <a class="code" href="classAPI.html#aed6f6d5854b9b73023af2b03774ef418">isBusy</a>(ConfigOps::Ops op);
-<a name="l00068"></a>00068     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a5ffb7593cf14abcbebda3e2ff012e2e7">setDebug</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> debug);
-<a name="l00069"></a>00069 
-<a name="l00070"></a>00070     <span class="comment">/*</span>
-<a name="l00071"></a>00071 <span class="comment">     * DSP operation init helpers</span>
-<a name="l00072"></a>00072 <span class="comment">     */</span>
-<a name="l00073"></a>00073 
-<a name="l00079"></a>00079     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aff66a439ea7b3533035e7df1057d6a4b">prepareFFT</a>(<span class="keywordtype">int</span> N, <span class="keywordtype">int</span> n_min, <span class="keywordtype">int</span> n_max);
-<a name="l00083"></a>00083     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aea87f49fb7c3ae4f84127056ed069354">prepareIFFT</a>(<span class="keywordtype">int</span> N, <span class="keywordtype">int</span> n_min, <span class="keywordtype">int</span> n_max);
-<a name="l00087"></a>00087     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a6cce1f49c2bf4044c110f6362c598a65">prepareFILTER_BIQUAD</a>(<span class="keywordtype">int</span> nx);
-<a name="l00091"></a>00091     <span class="keywordtype">void</span> prepareFILTER_FIR_R2(<span class="keywordtype">int</span> nh, <span class="keywordtype">int</span> nr, <span class="keywordtype">float</span> *h);
-<a name="l00092"></a>00092     <span class="keywordtype">void</span> prepareFILTER_IIR();
-<a name="l00093"></a>00093 
-<a name="l00094"></a>00094     <span class="comment">/*</span>
-<a name="l00095"></a>00095 <span class="comment">     * DSP operation config helpers</span>
-<a name="l00096"></a>00096 <span class="comment">     */</span>
-<a name="l00097"></a>00097 
-<a name="l00103"></a>00103     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#ab54cb00cc08fb5a8e847ecfd63aac5d1">configFILTER_BIQUAD</a>(<span class="keywordtype">float</span> *b, <span class="keywordtype">float</span> *a, <span class="keywordtype">float</span> *delays);
-<a name="l00104"></a>00104 
-<a name="l00105"></a>00105     <span class="comment">/*</span>
-<a name="l00106"></a>00106 <span class="comment">     * DSP operations</span>
-<a name="l00107"></a>00107 <span class="comment">     */</span>
-<a name="l00108"></a>00108 
-<a name="l00111"></a>00111     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a62e9ed0f473af9c0f38bece16204b154">ocl_DSPF_sp_fftSPxSP</a>();
-<a name="l00114"></a>00114     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a8fdad78679cbaae85b52495e06097b14">ocl_DSPF_sp_ifftSPxSP</a>();
-<a name="l00117"></a>00117     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a7aed755ef2f52e99f88ef915c64b12cb">ocl_DSPF_sp_filter_biquad</a>();
-<a name="l00118"></a>00118     <span class="keywordtype">void</span> ocl_foo();
-<a name="l00119"></a>00119     <span class="comment">//float ocl_DSPF_sp_maxval(float *x, int nx);</span>
-<a name="l00120"></a>00120 
-<a name="l00121"></a>00121 <span class="keyword">private</span>:
-<a name="l00122"></a>00122     <span class="keywordtype">void</span>* _allocBuffer(<span class="keywordtype">size_t</span> size);
-<a name="l00123"></a>00123     <span class="keyword">static</span> <span class="keywordtype">void</span> _genTwiddles(ConfigOps::Ops op, <span class="keywordtype">int</span> n, <span class="keywordtype">float</span> *w);
-<a name="l00124"></a>00124     <span class="keywordtype">void</span> _clean(ConfigOps::Ops op);
-<a name="l00125"></a>00125 
-<a name="l00126"></a>00126     std::map&lt;ConfigOps::Ops, std::unique_ptr&lt;ConfigOps&gt;&gt; _kernelConfigs;
-<a name="l00127"></a>00127     std::map&lt;std::string, float*&gt; _buffers;
-<a name="l00128"></a>00128     std::map&lt;ConfigOps::Ops, bool&gt; _opPrepared;
-<a name="l00129"></a>00129     <span class="keyword">static</span> std::map&lt;ConfigOps::Ops, bool&gt; _opBusy;
-<a name="l00130"></a>00130 
-<a name="l00131"></a>00131     <span class="keyword">static</span> std::function&lt;void(CallbackResponse *clRes)&gt; _callback;
-<a name="l00132"></a>00132     std::unique_ptr&lt;APIImpl&gt; _ptrImpl;
-<a name="l00133"></a>00133     <span class="keywordtype">size_t</span> _nFFT, _nIFFT;
-<a name="l00134"></a>00134     <span class="keywordtype">size_t</span> _nxFILTER_BIQUAD;
-<a name="l00135"></a>00135     <span class="keywordtype">size_t</span> _bufSizeFFT, _bufSizeIFFT;
-<a name="l00136"></a>00136     <span class="keywordtype">bool</span> _debug;
-<a name="l00137"></a>00137 
-<a name="l00138"></a>00138 };
-<a name="l00139"></a>00139 
-<a name="l00140"></a>00140 <span class="preprocessor">#endif //API</span>
+<a name="l00022"></a>00022 <span class="preprocessor">#include &lt;map&gt;</span>
+<a name="l00023"></a>00023 <span class="preprocessor">#include &lt;functional&gt;</span>
+<a name="l00024"></a>00024 <span class="preprocessor">#include &lt;memory&gt;</span>
+<a name="l00025"></a>00025 <span class="preprocessor">#include &lt;array&gt;</span>
+<a name="l00026"></a>00026 
+<a name="l00027"></a>00027 <span class="comment">/*</span>
+<a name="l00028"></a>00028 <span class="comment">    TODO:</span>
+<a name="l00029"></a>00029 <span class="comment">    - Create more command queues for multicores</span>
+<a name="l00030"></a>00030 <span class="comment">    - Implement filter operations</span>
+<a name="l00031"></a>00031 <span class="comment">    - Create GUI for realtime plots</span>
+<a name="l00032"></a>00032 <span class="comment">*/</span>
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034 <span class="keyword">class </span>APIImpl;
+<a name="l00040"></a><a class="code" href="classAPI.html">00040</a> <span class="keyword">class </span><a class="code" href="classAPI.html">API</a> {
+<a name="l00041"></a>00041 <span class="keyword">public</span>:
+<a name="l00046"></a>00046     <a class="code" href="classAPI.html#ae93802268ffee08b6d347543666e1f35">API</a>(std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classCallbackResponse.html">CallbackResponse</a> *clbkRes)&gt; callback, <span class="keywordtype">bool</span> debug = <span class="keyword">false</span>);
+<a name="l00047"></a>00047     ~<a class="code" href="classAPI.html">API</a>();
+<a name="l00051"></a>00051     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#af673b62f6a0601444a6f1d4aff50046c">setCallback</a>(std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classCallbackResponse.html">CallbackResponse</a> *clRes)&gt; callback); <span class="comment">//Is executed for all operations</span>
+<a name="l00055"></a>00055 <span class="comment"></span>    <span class="keywordtype">float</span>* <a class="code" href="classAPI.html#a4fe9da8dd6f5f9460fde1a3c07a1db9a">getBufIn</a>(CallbackResponse::Ops op);
+<a name="l00059"></a>00059     <span class="keywordtype">float</span>* <a class="code" href="classAPI.html#a691c08881e37174cb5dcafbbb6b669a2">getBufOut</a>(CallbackResponse::Ops op);
+<a name="l00063"></a>00063     <span class="keywordtype">bool</span> <a class="code" href="classAPI.html#a63c77cbcad0ed7e3e51c0ab317842b21">isBusy</a>(CallbackResponse::Ops op);
+<a name="l00067"></a>00067     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a5ffb7593cf14abcbebda3e2ff012e2e7">setDebug</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> debug);
+<a name="l00068"></a>00068 
+<a name="l00069"></a>00069     <span class="comment">/*</span>
+<a name="l00070"></a>00070 <span class="comment">     * DSP operation init helpers</span>
+<a name="l00071"></a>00071 <span class="comment">     */</span>
+<a name="l00072"></a>00072 
+<a name="l00078"></a>00078     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aff66a439ea7b3533035e7df1057d6a4b">prepareFFT</a>(<span class="keywordtype">int</span> N, <span class="keywordtype">int</span> n_min, <span class="keywordtype">int</span> n_max);
+<a name="l00082"></a>00082     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aea87f49fb7c3ae4f84127056ed069354">prepareIFFT</a>(<span class="keywordtype">int</span> N, <span class="keywordtype">int</span> n_min, <span class="keywordtype">int</span> n_max);
+<a name="l00086"></a>00086     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a6cce1f49c2bf4044c110f6362c598a65">prepareFILTER_BIQUAD</a>(<span class="keywordtype">int</span> nx);
+<a name="l00090"></a>00090     <span class="keywordtype">void</span> prepareFILTER_FIR_R2(<span class="keywordtype">int</span> nh, <span class="keywordtype">int</span> nr, <span class="keywordtype">float</span> *h);
+<a name="l00091"></a>00091     <span class="keywordtype">void</span> prepareFILTER_IIR();
+<a name="l00092"></a>00092 
+<a name="l00093"></a>00093     <span class="comment">/*</span>
+<a name="l00094"></a>00094 <span class="comment">     * DSP operation config helpers</span>
+<a name="l00095"></a>00095 <span class="comment">     */</span>
+<a name="l00096"></a>00096 
+<a name="l00102"></a>00102     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#ab54cb00cc08fb5a8e847ecfd63aac5d1">configFILTER_BIQUAD</a>(<span class="keywordtype">float</span> *b, <span class="keywordtype">float</span> *a, <span class="keywordtype">float</span> *delays);
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104     <span class="comment">/*</span>
+<a name="l00105"></a>00105 <span class="comment">     * DSP operations</span>
+<a name="l00106"></a>00106 <span class="comment">     */</span>
+<a name="l00107"></a>00107 
+<a name="l00110"></a>00110     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a62e9ed0f473af9c0f38bece16204b154">ocl_DSPF_sp_fftSPxSP</a>();
+<a name="l00113"></a>00113     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a8fdad78679cbaae85b52495e06097b14">ocl_DSPF_sp_ifftSPxSP</a>();
+<a name="l00116"></a>00116     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a7aed755ef2f52e99f88ef915c64b12cb">ocl_DSPF_sp_filter_biquad</a>();
+<a name="l00117"></a>00117     <span class="keywordtype">void</span> ocl_foo();
+<a name="l00118"></a>00118     <span class="comment">//float ocl_DSPF_sp_maxval(float *x, int nx);</span>
+<a name="l00119"></a>00119 
+<a name="l00120"></a>00120 <span class="keyword">private</span>:
+<a name="l00121"></a>00121     <span class="keywordtype">void</span>* _allocBuffer(<span class="keywordtype">size_t</span> size);
+<a name="l00122"></a>00122     <span class="keyword">static</span> <span class="keywordtype">void</span> _genTwiddles(CallbackResponse::Ops op, <span class="keywordtype">int</span> n, <span class="keywordtype">float</span> *w);
+<a name="l00123"></a>00123     <span class="keywordtype">void</span> _clean(CallbackResponse::Ops op);
+<a name="l00124"></a>00124 
+<a name="l00125"></a>00125     std::map&lt;CallbackResponse::Ops, std::unique_ptr&lt;CallbackResponse&gt;&gt; _kernelConfigs;
+<a name="l00126"></a>00126     std::map&lt;std::string, float*&gt; _buffers;
+<a name="l00127"></a>00127     std::map&lt;CallbackResponse::Ops, bool&gt; _opPrepared;
+<a name="l00128"></a>00128     <span class="keyword">static</span> std::map&lt;CallbackResponse::Ops, bool&gt; _opBusy;
+<a name="l00129"></a>00129 
+<a name="l00130"></a>00130     <span class="keyword">static</span> std::function&lt;void(CallbackResponse *clRes)&gt; _callback;
+<a name="l00131"></a>00131     std::unique_ptr&lt;APIImpl&gt; _ptrImpl;
+<a name="l00132"></a>00132     <span class="keywordtype">size_t</span> _nFFT, _nIFFT;
+<a name="l00133"></a>00133     <span class="keywordtype">size_t</span> _nxFILTER_BIQUAD;
+<a name="l00134"></a>00134     <span class="keywordtype">size_t</span> _bufSizeFFT, _bufSizeIFFT;
+<a name="l00135"></a>00135     <span class="keywordtype">bool</span> _debug;
+<a name="l00136"></a>00136 
+<a name="l00137"></a>00137 };
+<a name="l00138"></a>00138 
+<a name="l00139"></a>00139 <span class="preprocessor">#endif //API</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"

@@ -32,10 +32,11 @@ warning: ignoring unsupported tag `DIAFILE_DIRS           =' at line 309, file /
 warning: ignoring unsupported tag `PLANTUML_JAR_PATH      =' at line 310, file /home/travis/build/henrix/libdsp-x15/docs/Doxyfile
 warning: ignoring unsupported tag `PLANTUML_INCLUDE_PATH  =' at line 311, file /home/travis/build/henrix/libdsp-x15/docs/Doxyfile
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/ConfigOps.hpp:25: warning: Compound ConfigOps is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/API.hpp:91: warning: Member prepareFILTER_FIR_R2(int nh, int nr, float *h) (function) of class API is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/API.hpp:92: warning: Member prepareFILTER_IIR() (function) of class API is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/API.hpp:118: warning: Member ocl_foo() (function) of class API is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/CallbackResponse.hpp:53: warning: Member getN() const  (function) of class CallbackResponse is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/API.hpp:90: warning: Member prepareFILTER_FIR_R2(int nh, int nr, float *h) (function) of class API is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/API.hpp:91: warning: Member prepareFILTER_IIR() (function) of class API is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/API.hpp:117: warning: Member ocl_foo() (function) of class API is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/CallbackResponse.hpp:31: warning: Member Ops (enumeration) of class CallbackResponse is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/CallbackResponse.hpp:59: warning: Member getN() const  (function) of class CallbackResponse is not documented.
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/ConfigOps.hpp:27: warning: Member Ops (enumeration) of class ConfigOps is not documented.
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/ConfigOps.hpp:35: warning: Member ConfigOps(Ops op) (function) of class ConfigOps is not documented.
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/ConfigOps.hpp:36: warning: Member getOp() const  (function) of class ConfigOps is not documented.
@@ -130,6 +131,6 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-symbol cache used 56/65536 hits=1404 misses=56
-lookup cache used 65/65536 hits=258 misses=65
+symbol cache used 62/65536 hits=1780 misses=62
+lookup cache used 70/65536 hits=270 misses=70
 finished...

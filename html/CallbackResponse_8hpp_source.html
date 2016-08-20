@@ -99,28 +99,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00019"></a>00019 <span class="preprocessor"></span><span class="preprocessor">#define CALLBACKRESPONSE_HPP_</span>
 <a name="l00020"></a>00020 <span class="preprocessor"></span>
 <a name="l00021"></a>00021 <span class="preprocessor">#include &lt;cstddef&gt;</span>
-<a name="l00022"></a>00022 <span class="preprocessor">#include &quot;ConfigOps.hpp&quot;</span>
-<a name="l00023"></a>00023 
-<a name="l00029"></a><a class="code" href="classCallbackResponse.html">00029</a> <span class="keyword">class </span><a class="code" href="classCallbackResponse.html">CallbackResponse</a> {
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <span class="keyword">public</span>:
-<a name="l00037"></a>00037     <a class="code" href="classCallbackResponse.html#ada7d4d8fd44cba9ba6196941dd81549e">CallbackResponse</a>(ConfigOps::Ops op, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dataSize, <span class="keywordtype">float</span> *dataPtr);
-<a name="l00038"></a>00038     ~<a class="code" href="classCallbackResponse.html">CallbackResponse</a>();
-<a name="l00041"></a>00041     ConfigOps::Ops <a class="code" href="classCallbackResponse.html#a52ba7304f2b16d8536b02ced8346c756">getOp</a>() <span class="keyword">const</span>;
-<a name="l00045"></a>00045     <span class="keywordtype">void</span> <a class="code" href="classCallbackResponse.html#ad00f9bbaf0d513dc7884a34352bf1c10">setOp</a>(ConfigOps::Ops op);
-<a name="l00048"></a>00048     <span class="keywordtype">size_t</span> <a class="code" href="classCallbackResponse.html#aa1a74aa2f801ecde5e711717eddaf016">getDataSize</a>() <span class="keyword">const</span>;
-<a name="l00052"></a>00052     <span class="keywordtype">void</span> <a class="code" href="classCallbackResponse.html#ae4da1293f0198dc8d4c21a61073be01d">setDataSize</a>(<span class="keywordtype">size_t</span> size);
-<a name="l00053"></a>00053     <span class="keywordtype">size_t</span> getN() <span class="keyword">const</span>; <span class="comment">//Delete (only use getDataPtr)</span>
-<a name="l00056"></a>00056 <span class="comment"></span>    <span class="keywordtype">float</span>* <a class="code" href="classCallbackResponse.html#aded6bb2a8c8bc5d5b9a79d5fad1c4984">getDataPtr</a>() <span class="keyword">const</span>;
-<a name="l00060"></a>00060     <span class="keywordtype">void</span> <a class="code" href="classCallbackResponse.html#aab9225266bb4ca103f9cfc6cb1c17299">setDataPtr</a>(<span class="keywordtype">float</span> *data);
-<a name="l00061"></a>00061 
-<a name="l00062"></a>00062 <span class="keyword">private</span>:
-<a name="l00063"></a>00063     ConfigOps::Ops _op;
-<a name="l00064"></a>00064     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _dataSize;
-<a name="l00065"></a>00065     <span class="keywordtype">float</span> *_dataPtr;
-<a name="l00066"></a>00066 };
+<a name="l00022"></a>00022 
+<a name="l00028"></a><a class="code" href="classCallbackResponse.html">00028</a> <span class="keyword">class </span><a class="code" href="classCallbackResponse.html">CallbackResponse</a> {
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 <span class="keyword">public</span>:
+<a name="l00031"></a>00031     <span class="keyword">enum</span> Ops {
+<a name="l00032"></a>00032         FFT,
+<a name="l00033"></a>00033         IFFT,
+<a name="l00034"></a>00034         FILTER_BIQUAD,
+<a name="l00035"></a>00035         FILTER_FIR_R2,
+<a name="l00036"></a>00036         FILTER_IIR
+<a name="l00037"></a>00037     };
+<a name="l00043"></a>00043     <a class="code" href="classCallbackResponse.html#ae96b1b7a30e9a6804383d8311ffb04da">CallbackResponse</a>(CallbackResponse::Ops op, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dataSize, <span class="keywordtype">float</span> *dataPtr);
+<a name="l00044"></a>00044     ~<a class="code" href="classCallbackResponse.html">CallbackResponse</a>();
+<a name="l00047"></a>00047     CallbackResponse::Ops <a class="code" href="classCallbackResponse.html#a3d6be99554bd51a8ab88ff1e1fdba66d">getOp</a>() <span class="keyword">const</span>;
+<a name="l00051"></a>00051     <span class="keywordtype">void</span> <a class="code" href="classCallbackResponse.html#abf2368b311942072b44912ebe80b0c1c">setOp</a>(CallbackResponse::Ops op);
+<a name="l00054"></a>00054     <span class="keywordtype">size_t</span> <a class="code" href="classCallbackResponse.html#aa1a74aa2f801ecde5e711717eddaf016">getDataSize</a>() <span class="keyword">const</span>;
+<a name="l00058"></a>00058     <span class="keywordtype">void</span> <a class="code" href="classCallbackResponse.html#ae4da1293f0198dc8d4c21a61073be01d">setDataSize</a>(<span class="keywordtype">size_t</span> size);
+<a name="l00059"></a>00059     <span class="keywordtype">size_t</span> getN() <span class="keyword">const</span>; <span class="comment">//Delete (only use getDataPtr)</span>
+<a name="l00062"></a>00062 <span class="comment"></span>    <span class="keywordtype">float</span>* <a class="code" href="classCallbackResponse.html#aded6bb2a8c8bc5d5b9a79d5fad1c4984">getDataPtr</a>() <span class="keyword">const</span>;
+<a name="l00066"></a>00066     <span class="keywordtype">void</span> <a class="code" href="classCallbackResponse.html#aab9225266bb4ca103f9cfc6cb1c17299">setDataPtr</a>(<span class="keywordtype">float</span> *data);
 <a name="l00067"></a>00067 
-<a name="l00068"></a>00068 <span class="preprocessor">#endif //CALLBACK_RESPONSE_HPP_</span>
+<a name="l00068"></a>00068 <span class="keyword">private</span>:
+<a name="l00069"></a>00069     CallbackResponse::Ops _op;
+<a name="l00070"></a>00070     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _dataSize;
+<a name="l00071"></a>00071     <span class="keywordtype">float</span> *_dataPtr;
+<a name="l00072"></a>00072 };
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074 <span class="preprocessor">#endif //CALLBACK_RESPONSE_HPP_</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
