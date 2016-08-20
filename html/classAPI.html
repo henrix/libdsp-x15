@@ -89,9 +89,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#ae93802268ffee08b6d347543666e1f35">API</a> (std::function&lt; void(<a class="el" href="classCallbackResponse.html">CallbackResponse</a> *clbkRes)&gt; callback, bool debug=false)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#af673b62f6a0601444a6f1d4aff50046c">setCallback</a> (std::function&lt; void(<a class="el" href="classCallbackResponse.html">CallbackResponse</a> *clRes)&gt; callback)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a4fe9da8dd6f5f9460fde1a3c07a1db9a">getBufIn</a> (CallbackResponse::Ops op)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a691c08881e37174cb5dcafbbb6b669a2">getBufOut</a> (CallbackResponse::Ops op)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a63c77cbcad0ed7e3e51c0ab317842b21">isBusy</a> (CallbackResponse::Ops op)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a4fe9da8dd6f5f9460fde1a3c07a1db9a">getBufIn</a> (<a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a691c08881e37174cb5dcafbbb6b669a2">getBufOut</a> (<a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a63c77cbcad0ed7e3e51c0ab317842b21">isBusy</a> (<a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#a5ffb7593cf14abcbebda3e2ff012e2e7">setDebug</a> (const bool debug)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#aff66a439ea7b3533035e7df1057d6a4b">prepareFFT</a> (int N, int n_min, int n_max)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAPI.html#aea87f49fb7c3ae4f84127056ed069354">prepareIFFT</a> (int N, int n_min, int n_max)</td></tr>
@@ -197,7 +197,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>ocl_foo</b> ()</td></
         <tr>
           <td class="memname">float* <a class="el" href="classAPI.html#a4fe9da8dd6f5f9460fde1a3c07a1db9a">API::getBufIn</a> </td>
           <td>(</td>
-          <td class="paramtype">CallbackResponse::Ops&#160;</td>
+          <td class="paramtype"><a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a>&#160;</td>
           <td class="paramname"><em>op</em></td><td>)</td>
           <td></td>
         </tr>
@@ -221,7 +221,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>ocl_foo</b> ()</td></
         <tr>
           <td class="memname">float* <a class="el" href="classAPI.html#a691c08881e37174cb5dcafbbb6b669a2">API::getBufOut</a> </td>
           <td>(</td>
-          <td class="paramtype">CallbackResponse::Ops&#160;</td>
+          <td class="paramtype"><a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a>&#160;</td>
           <td class="paramname"><em>op</em></td><td>)</td>
           <td></td>
         </tr>
@@ -245,7 +245,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>ocl_foo</b> ()</td></
         <tr>
           <td class="memname">bool <a class="el" href="classAPI.html#a63c77cbcad0ed7e3e51c0ab317842b21">API::isBusy</a> </td>
           <td>(</td>
-          <td class="paramtype">CallbackResponse::Ops&#160;</td>
+          <td class="paramtype"><a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a>&#160;</td>
           <td class="paramname"><em>op</em></td><td>)</td>
           <td></td>
         </tr>
@@ -471,7 +471,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>ocl_foo</b> ()</td></
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
