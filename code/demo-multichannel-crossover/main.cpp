@@ -24,14 +24,17 @@
 #include <jack/jack.h>
 #include <signal.h>
 #include <fstream>
+#include <cstring>
+#include <cmath>
 
 void callbackDSP(CallbackResponse *clbkRes);
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out);
 void shutdown(int status);
 
 const int N_SAMPLES = 512;
+float audio_buf_out[N_SAMPLES];
 API api(callbackDSP);
-//JACKClient *jackClient;
+JACKClient *jackClient;
 std::mutex mtx;
 std::condition_variable cv;
 
@@ -62,13 +65,11 @@ int main(){
 
 	float freq = 1000.0; //Hz
 	float sample_rate = 48000.0;
-	float sine_test[N_SAMPLES];
-	float *buf_in = api.getBufIn(ConfigOps::FILTER_BIQUAD);
+	float *buf_in = api.getBufIn(CallbackResponse::FILTER_BIQUAD);
 	std::ofstream sinout("../../test/data/crossover/sine.txt");
 	for (int i=0; i < N_SAMPLES; i++){
-		sine_test[i] = sin(2*M_PI*freq*i / sample_rate);
-		buf_in[i] = sine_test[i];
-		sinout << sine_test[i] << std::endl;
+		buf_in[i] = sin(2*M_PI*freq*i / sample_rate);
+		sinout << buf_in[i] << std::endl;
 	}
 	sinout.close();
 
@@ -76,7 +77,6 @@ int main(){
 	//jackClient->addCallback(callbackJACK);
 
 	api.ocl_DSPF_sp_filter_biquad();
-	//api.ocl_foo();
 
 	std::unique_lock<std::mutex> lck(mtx);
     cv.wait(lck);
@@ -85,14 +85,18 @@ int main(){
 }
 
 void shutdown(int status){
-    //jackClient->stop();
-    //delete jackClient;
-    cv.notify_one(); //TODO: Unlock mutex correctly
+    jackClient->stop();
+    delete jackClient;
+    cv.notify_one();
     exit(status);
 }
 
+/**
+ * Callbacks
+ */
 void callbackDSP(CallbackResponse *clbkRes){
 	float *y = clbkRes->getDataPtr();
+	memcpy(audio_buf_out, y, N_SAMPLES);
 
 	std::ofstream filter_out("../../test/data/crossover/output.txt");
 	for (int i=0; i < N_SAMPLES; i++){
@@ -104,9 +108,8 @@ void callbackDSP(CallbackResponse *clbkRes){
 }
 
 void callbackJACK(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out){
-	float *in_buf = api.getBufIn(ConfigOps::FILTER_BIQUAD);
-	for (int i=0; i < n_frames; i++){
-		in_buf[i] = in[i];
-		out[i] = in[i];
-	}
+	memcpy(out, audio_buf_out, n_frames);
+	float *buf_in = api.getBufIn(CallbackResponse::FILTER_BIQUAD);
+	memcpy(buf_in, in, n_frames);
+	api.ocl_DSPF_sp_filter_biquad();
 }
