@@ -107,68 +107,67 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00027"></a>00027 <span class="comment">/*</span>
 <a name="l00028"></a>00028 <span class="comment">    TODO:</span>
 <a name="l00029"></a>00029 <span class="comment">    - Create more command queues for multicores</span>
-<a name="l00030"></a>00030 <span class="comment">    - Implement filter operations</span>
-<a name="l00031"></a>00031 <span class="comment">    - Create GUI for realtime plots</span>
-<a name="l00032"></a>00032 <span class="comment">*/</span>
-<a name="l00033"></a>00033 
-<a name="l00034"></a>00034 <span class="keyword">class </span>APIImpl;
-<a name="l00040"></a><a class="code" href="classAPI.html">00040</a> <span class="keyword">class </span><a class="code" href="classAPI.html">API</a> {
-<a name="l00041"></a>00041 <span class="keyword">public</span>:
-<a name="l00046"></a>00046     <a class="code" href="classAPI.html#ae93802268ffee08b6d347543666e1f35">API</a>(std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classCallbackResponse.html">CallbackResponse</a> *clbkRes)&gt; callback, <span class="keywordtype">bool</span> debug = <span class="keyword">false</span>);
-<a name="l00047"></a>00047     ~<a class="code" href="classAPI.html">API</a>();
-<a name="l00051"></a>00051     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#af673b62f6a0601444a6f1d4aff50046c">setCallback</a>(std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classCallbackResponse.html">CallbackResponse</a> *clRes)&gt; callback); <span class="comment">//Is executed for all operations</span>
-<a name="l00055"></a>00055 <span class="comment"></span>    <span class="keywordtype">float</span>* <a class="code" href="classAPI.html#a4fe9da8dd6f5f9460fde1a3c07a1db9a">getBufIn</a>(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
-<a name="l00059"></a>00059     <span class="keywordtype">float</span>* <a class="code" href="classAPI.html#a691c08881e37174cb5dcafbbb6b669a2">getBufOut</a>(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
-<a name="l00063"></a>00063     <span class="keywordtype">bool</span> <a class="code" href="classAPI.html#a63c77cbcad0ed7e3e51c0ab317842b21">isBusy</a>(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
-<a name="l00067"></a>00067     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a5ffb7593cf14abcbebda3e2ff012e2e7">setDebug</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> debug);
-<a name="l00068"></a>00068 
-<a name="l00069"></a>00069     <span class="comment">/*</span>
-<a name="l00070"></a>00070 <span class="comment">     * DSP operation init helpers</span>
-<a name="l00071"></a>00071 <span class="comment">     */</span>
-<a name="l00072"></a>00072 
-<a name="l00078"></a>00078     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aff66a439ea7b3533035e7df1057d6a4b">prepareFFT</a>(<span class="keywordtype">int</span> N, <span class="keywordtype">int</span> n_min, <span class="keywordtype">int</span> n_max);
-<a name="l00082"></a>00082     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aea87f49fb7c3ae4f84127056ed069354">prepareIFFT</a>(<span class="keywordtype">int</span> N, <span class="keywordtype">int</span> n_min, <span class="keywordtype">int</span> n_max);
-<a name="l00086"></a>00086     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a6cce1f49c2bf4044c110f6362c598a65">prepareFILTER_BIQUAD</a>(<span class="keywordtype">int</span> nx);
-<a name="l00089"></a>00089     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aad43bc6c2a2ca4dd6c87a22018b6a979">prepareFILTER_FIR_R2</a>(<span class="keywordtype">int</span> nh, <span class="keywordtype">int</span> nr, <span class="keywordtype">float</span> *h);
-<a name="l00092"></a>00092     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a02dd34789b4274a7527ada6036b65a7f">prepareFILTER_IIR</a>();
-<a name="l00093"></a>00093 
-<a name="l00094"></a>00094     <span class="comment">/*</span>
-<a name="l00095"></a>00095 <span class="comment">     * DSP operation config helpers</span>
-<a name="l00096"></a>00096 <span class="comment">     */</span>
-<a name="l00097"></a>00097 
-<a name="l00103"></a>00103     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#ab54cb00cc08fb5a8e847ecfd63aac5d1">configFILTER_BIQUAD</a>(<span class="keywordtype">float</span> *b, <span class="keywordtype">float</span> *a, <span class="keywordtype">float</span> *delays);
-<a name="l00104"></a>00104 
-<a name="l00105"></a>00105     <span class="comment">/*</span>
-<a name="l00106"></a>00106 <span class="comment">     * DSP operations</span>
-<a name="l00107"></a>00107 <span class="comment">     */</span>
-<a name="l00108"></a>00108 
-<a name="l00111"></a>00111     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a62e9ed0f473af9c0f38bece16204b154">ocl_DSPF_sp_fftSPxSP</a>();
-<a name="l00114"></a>00114     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a8fdad78679cbaae85b52495e06097b14">ocl_DSPF_sp_ifftSPxSP</a>();
-<a name="l00117"></a>00117     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a7aed755ef2f52e99f88ef915c64b12cb">ocl_DSPF_sp_filter_biquad</a>();
-<a name="l00120"></a>00120     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a9dafdbc1ba4a5883ea5945de6c3e4ee7">ocl_DSPF_sp_fir_r2</a>();
-<a name="l00123"></a>00123     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#ab5ad95af49d2276b45e94dd283b464e3">ocl_DSPF_sp_iir</a>();
-<a name="l00124"></a>00124     <span class="comment">//float ocl_DSPF_sp_maxval(float *x, int nx);</span>
-<a name="l00125"></a>00125 
-<a name="l00126"></a>00126 <span class="keyword">private</span>:
-<a name="l00127"></a>00127     <span class="keywordtype">void</span>* _allocBuffer(<span class="keywordtype">size_t</span> size);
-<a name="l00128"></a>00128     <span class="keyword">static</span> <span class="keywordtype">void</span> _genTwiddles(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op, <span class="keywordtype">int</span> n, <span class="keywordtype">float</span> *w);
-<a name="l00129"></a>00129     <span class="keywordtype">void</span> _clean(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
-<a name="l00130"></a>00130 
-<a name="l00131"></a>00131     std::map&lt;CallbackResponse::Ops, std::unique_ptr&lt;CallbackResponse&gt;&gt; _kernelConfigs;
-<a name="l00132"></a>00132     std::map&lt;std::string, float*&gt; _buffers;
-<a name="l00133"></a>00133     std::map&lt;CallbackResponse::Ops, bool&gt; _opPrepared;
-<a name="l00134"></a>00134     <span class="keyword">static</span> std::map&lt;CallbackResponse::Ops, bool&gt; _opBusy;
-<a name="l00135"></a>00135 
-<a name="l00136"></a>00136     <span class="keyword">static</span> std::function&lt;void(CallbackResponse *clRes)&gt; _callback;
-<a name="l00137"></a>00137     std::unique_ptr&lt;APIImpl&gt; _ptrImpl;
-<a name="l00138"></a>00138     <span class="keywordtype">size_t</span> _nFFT, _nIFFT;
-<a name="l00139"></a>00139     <span class="keywordtype">size_t</span> _nxFILTER_BIQUAD;
-<a name="l00140"></a>00140     <span class="keywordtype">size_t</span> _bufSizeFFT, _bufSizeIFFT;
-<a name="l00141"></a>00141     <span class="keywordtype">bool</span> _debug;
-<a name="l00142"></a>00142 
-<a name="l00143"></a>00143 };
-<a name="l00144"></a>00144 
-<a name="l00145"></a>00145 <span class="preprocessor">#endif //API</span>
+<a name="l00030"></a>00030 <span class="comment">    - Implement filter FIR_R2 and IIR operation</span>
+<a name="l00031"></a>00031 <span class="comment">*/</span>
+<a name="l00032"></a>00032 
+<a name="l00033"></a>00033 <span class="keyword">class </span>APIImpl;
+<a name="l00039"></a><a class="code" href="classAPI.html">00039</a> <span class="keyword">class </span><a class="code" href="classAPI.html" title="Class which offers API for DSP operations and helper functions.">API</a> {
+<a name="l00040"></a>00040 <span class="keyword">public</span>:
+<a name="l00045"></a>00045     <a class="code" href="classAPI.html#ae93802268ffee08b6d347543666e1f35">API</a>(std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classCallbackResponse.html">CallbackResponse</a> *clbkRes)&gt; callback, <span class="keywordtype">bool</span> debug = <span class="keyword">false</span>);
+<a name="l00046"></a>00046     ~<a class="code" href="classAPI.html" title="Class which offers API for DSP operations and helper functions.">API</a>();
+<a name="l00050"></a>00050     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#af673b62f6a0601444a6f1d4aff50046c">setCallback</a>(std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classCallbackResponse.html">CallbackResponse</a> *clRes)&gt; callback); <span class="comment">//Is executed for all operations</span>
+<a name="l00054"></a>00054 <span class="comment"></span>    <span class="keywordtype">float</span>* <a class="code" href="classAPI.html#a4fe9da8dd6f5f9460fde1a3c07a1db9a">getBufIn</a>(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
+<a name="l00058"></a>00058     <span class="keywordtype">float</span>* <a class="code" href="classAPI.html#a691c08881e37174cb5dcafbbb6b669a2">getBufOut</a>(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
+<a name="l00062"></a>00062     <span class="keywordtype">bool</span> <a class="code" href="classAPI.html#a63c77cbcad0ed7e3e51c0ab317842b21">isBusy</a>(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
+<a name="l00066"></a>00066     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a5ffb7593cf14abcbebda3e2ff012e2e7">setDebug</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> debug);
+<a name="l00067"></a>00067 
+<a name="l00068"></a>00068     <span class="comment">/*</span>
+<a name="l00069"></a>00069 <span class="comment">     * DSP operation init helpers</span>
+<a name="l00070"></a>00070 <span class="comment">     */</span>
+<a name="l00071"></a>00071 
+<a name="l00077"></a>00077     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aff66a439ea7b3533035e7df1057d6a4b">prepareFFT</a>(<span class="keywordtype">int</span> N, <span class="keywordtype">int</span> n_min, <span class="keywordtype">int</span> n_max);
+<a name="l00081"></a>00081     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aea87f49fb7c3ae4f84127056ed069354">prepareIFFT</a>(<span class="keywordtype">int</span> N, <span class="keywordtype">int</span> n_min, <span class="keywordtype">int</span> n_max);
+<a name="l00085"></a>00085     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a6cce1f49c2bf4044c110f6362c598a65">prepareFILTER_BIQUAD</a>(<span class="keywordtype">int</span> nx);
+<a name="l00088"></a>00088     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#aad43bc6c2a2ca4dd6c87a22018b6a979">prepareFILTER_FIR_R2</a>(<span class="keywordtype">int</span> nh, <span class="keywordtype">int</span> nr, <span class="keywordtype">float</span> *h);
+<a name="l00091"></a>00091     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a02dd34789b4274a7527ada6036b65a7f">prepareFILTER_IIR</a>();
+<a name="l00092"></a>00092 
+<a name="l00093"></a>00093     <span class="comment">/*</span>
+<a name="l00094"></a>00094 <span class="comment">     * DSP operation config helpers</span>
+<a name="l00095"></a>00095 <span class="comment">     */</span>
+<a name="l00096"></a>00096 
+<a name="l00102"></a>00102     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#ab54cb00cc08fb5a8e847ecfd63aac5d1">configFILTER_BIQUAD</a>(<span class="keywordtype">float</span> *b, <span class="keywordtype">float</span> *a, <span class="keywordtype">float</span> *delays);
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104     <span class="comment">/*</span>
+<a name="l00105"></a>00105 <span class="comment">     * DSP operations</span>
+<a name="l00106"></a>00106 <span class="comment">     */</span>
+<a name="l00107"></a>00107 
+<a name="l00110"></a>00110     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a62e9ed0f473af9c0f38bece16204b154">ocl_DSPF_sp_fftSPxSP</a>();
+<a name="l00113"></a>00113     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a8fdad78679cbaae85b52495e06097b14">ocl_DSPF_sp_ifftSPxSP</a>();
+<a name="l00116"></a>00116     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a7aed755ef2f52e99f88ef915c64b12cb">ocl_DSPF_sp_filter_biquad</a>();
+<a name="l00119"></a>00119     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#a9dafdbc1ba4a5883ea5945de6c3e4ee7">ocl_DSPF_sp_fir_r2</a>();
+<a name="l00122"></a>00122     <span class="keywordtype">void</span> <a class="code" href="classAPI.html#ab5ad95af49d2276b45e94dd283b464e3">ocl_DSPF_sp_iir</a>();
+<a name="l00123"></a>00123     <span class="comment">//float ocl_DSPF_sp_maxval(float *x, int nx);</span>
+<a name="l00124"></a>00124 
+<a name="l00125"></a>00125 <span class="keyword">private</span>:
+<a name="l00126"></a>00126     <span class="keywordtype">void</span>* _allocBuffer(<span class="keywordtype">size_t</span> size);
+<a name="l00127"></a>00127     <span class="keyword">static</span> <span class="keywordtype">void</span> _genTwiddles(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op, <span class="keywordtype">int</span> n, <span class="keywordtype">float</span> *w);
+<a name="l00128"></a>00128     <span class="keywordtype">void</span> _clean(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
+<a name="l00129"></a>00129 
+<a name="l00130"></a>00130     std::map&lt;CallbackResponse::Ops, std::unique_ptr&lt;CallbackResponse&gt;&gt; _kernelConfigs;
+<a name="l00131"></a>00131     std::map&lt;std::string, float*&gt; _buffers;
+<a name="l00132"></a>00132     std::map&lt;CallbackResponse::Ops, bool&gt; _opPrepared;
+<a name="l00133"></a>00133     <span class="keyword">static</span> std::map&lt;CallbackResponse::Ops, bool&gt; _opBusy;
+<a name="l00134"></a>00134 
+<a name="l00135"></a>00135     <span class="keyword">static</span> std::function&lt;void(CallbackResponse *clRes)&gt; _callback;
+<a name="l00136"></a>00136     std::unique_ptr&lt;APIImpl&gt; _ptrImpl;
+<a name="l00137"></a>00137     <span class="keywordtype">size_t</span> _nFFT, _nIFFT;
+<a name="l00138"></a>00138     <span class="keywordtype">size_t</span> _nxFILTER_BIQUAD;
+<a name="l00139"></a>00139     <span class="keywordtype">size_t</span> _bufSizeFFT, _bufSizeIFFT;
+<a name="l00140"></a>00140     <span class="keywordtype">bool</span> _debug;
+<a name="l00141"></a>00141 
+<a name="l00142"></a>00142 };
+<a name="l00143"></a>00143 
+<a name="l00144"></a>00144 <span class="preprocessor">#endif //API</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
