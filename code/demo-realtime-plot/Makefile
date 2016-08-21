@@ -1,4 +1,4 @@
-TARGET = demo-libdsp-x15
+TARGET = demo-realtime-plot
 
 CPP = g++
 CPP_FLAGS = -g -Wall -std=c++11
