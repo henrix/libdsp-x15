@@ -100,7 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00020"></a>00020 <span class="preprocessor"></span>
 <a name="l00021"></a>00021 <span class="preprocessor">#include &lt;cstddef&gt;</span>
 <a name="l00022"></a>00022 
-<a name="l00028"></a><a class="code" href="classCallbackResponse.html">00028</a> <span class="keyword">class </span><a class="code" href="classCallbackResponse.html">CallbackResponse</a> {
+<a name="l00028"></a><a class="code" href="classCallbackResponse.html">00028</a> <span class="keyword">class </span><a class="code" href="classCallbackResponse.html" title="Class which encapsulates result and settings of specific DSP operation (is parameter of DSP callback)...">CallbackResponse</a> {
 <a name="l00029"></a>00029 
 <a name="l00030"></a>00030 <span class="keyword">public</span>:
 <a name="l00034"></a><a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">00034</a>     <span class="keyword">enum</span> <a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">Ops</a> {
@@ -111,7 +111,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00039"></a>00039         FILTER_IIR
 <a name="l00040"></a>00040     };
 <a name="l00046"></a>00046     <a class="code" href="classCallbackResponse.html#ae96b1b7a30e9a6804383d8311ffb04da">CallbackResponse</a>(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dataSize, <span class="keywordtype">float</span> *dataPtr);
-<a name="l00047"></a>00047     ~<a class="code" href="classCallbackResponse.html">CallbackResponse</a>();
+<a name="l00047"></a>00047     ~<a class="code" href="classCallbackResponse.html" title="Class which encapsulates result and settings of specific DSP operation (is parameter of DSP callback)...">CallbackResponse</a>();
 <a name="l00050"></a>00050     <a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> <a class="code" href="classCallbackResponse.html#a3d6be99554bd51a8ab88ff1e1fdba66d">getOp</a>() <span class="keyword">const</span>;
 <a name="l00054"></a>00054     <span class="keywordtype">void</span> <a class="code" href="classCallbackResponse.html#abf2368b311942072b44912ebe80b0c1c">setOp</a>(<a class="code" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op);
 <a name="l00057"></a>00057     <span class="keywordtype">size_t</span> <a class="code" href="classCallbackResponse.html#aa1a74aa2f801ecde5e711717eddaf016">getDataSize</a>() <span class="keyword">const</span>;
