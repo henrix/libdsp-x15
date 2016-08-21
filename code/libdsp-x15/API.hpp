@@ -27,13 +27,12 @@
 /*
     TODO:
     - Create more command queues for multicores
-    - Implement filter operations
-    - Create GUI for realtime plots
+    - Implement filter FIR_R2 and IIR operation
 */
 
 class APIImpl;
 /**
- * Class which offers API for DSP operations and helper functions
+ * @brief Class which offers API for DSP operations and helper functions
  * @author Henrik Langer
  * @date 17.09.2016
  */
