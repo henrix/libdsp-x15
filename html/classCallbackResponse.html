@@ -104,13 +104,8 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCallbackResponse.html#ae96b1b7a30e9a6804383d8311ffb04da">CallbackResponse</a> (<a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op, unsigned int dataSize, float *dataPtr)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCallbackResponse.html#a3d6be99554bd51a8ab88ff1e1fdba66d">getOp</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCallbackResponse.html#abf2368b311942072b44912ebe80b0c1c">setOp</a> (<a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a> op)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCallbackResponse.html#aa1a74aa2f801ecde5e711717eddaf016">getDataSize</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCallbackResponse.html#ae4da1293f0198dc8d4c21a61073be01d">setDataSize</a> (size_t size)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aafd86eec0381e0688ca701f30c13bcda"></a><!-- doxytag: member="CallbackResponse::getN" ref="aafd86eec0381e0688ca701f30c13bcda" args="() const " -->
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getN</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCallbackResponse.html#aded6bb2a8c8bc5d5b9a79d5fad1c4984">getDataPtr</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCallbackResponse.html#aab9225266bb4ca103f9cfc6cb1c17299">setDataPtr</a> (float *data)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Class which encapsulates result and settings of specific DSP operation (is parameter of DSP callback) </p>
@@ -223,78 +218,6 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getN</b> () const <
 </div>
 <div class="memdoc">
 <p>Return type of DSP operation </p>
-
-</div>
-</div>
-<a class="anchor" id="aab9225266bb4ca103f9cfc6cb1c17299"></a><!-- doxytag: member="CallbackResponse::setDataPtr" ref="aab9225266bb4ca103f9cfc6cb1c17299" args="(float *data)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classCallbackResponse.html#aab9225266bb4ca103f9cfc6cb1c17299">CallbackResponse::setDataPtr</a> </td>
-          <td>(</td>
-          <td class="paramtype">float *&#160;</td>
-          <td class="paramname"><em>data</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Sets pointer to result data </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">data</td><td>Pointer to result data </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ae4da1293f0198dc8d4c21a61073be01d"></a><!-- doxytag: member="CallbackResponse::setDataSize" ref="ae4da1293f0198dc8d4c21a61073be01d" args="(size_t size)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classCallbackResponse.html#ae4da1293f0198dc8d4c21a61073be01d">CallbackResponse::setDataSize</a> </td>
-          <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>size</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Sets size of result data </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">size</td><td>Size of result data </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="abf2368b311942072b44912ebe80b0c1c"></a><!-- doxytag: member="CallbackResponse::setOp" ref="abf2368b311942072b44912ebe80b0c1c" args="(CallbackResponse::Ops op)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classCallbackResponse.html#abf2368b311942072b44912ebe80b0c1c">CallbackResponse::setOp</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classCallbackResponse.html#afa6b8bf2e6fb63f62a5fb5f9a53bb89b">CallbackResponse::Ops</a>&#160;</td>
-          <td class="paramname"><em>op</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Sets type of DSP operation </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">op</td><td>DSP operation </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
