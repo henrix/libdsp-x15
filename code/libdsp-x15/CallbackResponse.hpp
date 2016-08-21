@@ -21,7 +21,7 @@
 #include <cstddef>
 
 /** 
- * Class which encapsulates result and settings of specific DSP operation (is parameter of DSP callback)
+ * @brief Class which encapsulates result and settings of specific DSP operation (is parameter of DSP callback)
  * @author Henrik Langer
  * @date 17.09.2016
  */
