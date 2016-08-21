@@ -31,26 +31,10 @@ CallbackResponse::Ops CallbackResponse::getOp() const {
 	return _op;
 }
 
-void CallbackResponse::setOp(CallbackResponse::Ops op){
-	_op = op;
-}
-
 unsigned int CallbackResponse::getDataSize() const {
 	return _dataSize;
 }
 
-void CallbackResponse::setDataSize(unsigned int size) {
-	_dataSize = size;
-}
-
-size_t CallbackResponse::getN() const {
-	return _dataSize / 2;
-}
-
 float* CallbackResponse::getDataPtr() const {
 	return _dataPtr;
-}
-
-void CallbackResponse::setDataPtr(float *data){
-	_dataPtr = data;
 }

@@ -18,8 +18,6 @@
 #ifndef DISPLAY_HPP_
 #define DISPLAY_HPP_
 
-#define DIM 500
-
 #include <SDL/SDL.h>
 
 class Display{

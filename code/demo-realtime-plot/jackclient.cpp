@@ -100,14 +100,6 @@ void JACKClient::addCallback(void (*callback)(
     _callbacks.push_back(callback);
 }
 
-void JACKClient::writeAudio(jack_nframes_t n_frames, jack_default_audio_sample_t *samples){
-    jack_default_audio_sample_t *out;
-    //out = (jack_default_audio_sample_t*)jack_port_get_buffer (_output_port, nframes);
-
-    //TODO
-}
-
-
 /**
  * Statics
  */
@@ -117,7 +109,7 @@ int JACKClient::_process (jack_nframes_t nframes, void *arg){
     in = (jack_default_audio_sample_t*)jack_port_get_buffer (_self->_input_port, nframes);
     out = (jack_default_audio_sample_t*)jack_port_get_buffer (_self->_output_port, nframes);
 
-    for (int i=0; i < _self->_callbacks.size(); i++)
+    for (unsigned int i=0; i < _self->_callbacks.size(); i++)
         _self->_callbacks[i](nframes, in, out);
 
     return 0;

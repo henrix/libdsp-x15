@@ -58,15 +58,13 @@ void Display::drawPixels(size_t length, float *pixels){
     }
 
     /* offset pixels ([-1 1] -> [0 height]) */
-    for (int i=0; i < _width; i++){
+    for (unsigned int i=0; i < _width; i++){
         _putPixel(i, (((double)_height/2.0) * pixels[i*width_tmp]) + _height/2);
-        //std::cout << "y: " << _height * points[i*width_tmp] << std::endl;
     }
 
     if ( SDL_MUSTLOCK(_screen) ) 
         SDL_UnlockSurface(_screen);
     
-    //SDL_UpdateRect(_screen, _width/2, _height/2, 1, 1); //Update just on pixel
     SDL_UpdateRect(_screen, 0, 0, 0, 0); //Update entire screen
 }
 
@@ -84,7 +82,7 @@ void Display::drawLines(size_t length, float *lineends){
     }
 
     /* offset pixels ([-1 1] -> [0 height]) */
-    for (int i=0; i < _width; i++){
+    for (unsigned int i=0; i < _width; i++){
         float max = (((double)_height/2.0) * lineends[i*width_tmp]) + _height/2;
         for (float j=0; j < max; j+=1.0){
             _putPixel(i, j);

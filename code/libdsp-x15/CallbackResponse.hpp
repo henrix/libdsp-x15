@@ -48,25 +48,12 @@ public:
 	/** Return type of DSP operation
 	 */
 	CallbackResponse::Ops getOp() const;
-	/** Sets type of DSP operation
-	 * @param op DSP operation
-	 */
-	void setOp(CallbackResponse::Ops op);
 	/** Returns size of result data
 	 */
 	size_t getDataSize() const;
-	/** Sets size of result data
-	 * @param size Size of result data
-	 */
-	void setDataSize(size_t size);
-	size_t getN() const; //Delete (only use getDataPtr)
 	/** Returns pointer to result data
 	 */
 	float* getDataPtr() const;
-	/** Sets pointer to result data
-	 * @param data Pointer to result data
-	 */
-	void setDataPtr(float *data);
 
 private:
     CallbackResponse::Ops _op;

@@ -26,7 +26,7 @@
 #include <ocl_util.h>
 
 std::function<void(CallbackResponse *clbkRes)> API::_callback = NULL;
-/* Flags to indicate status of SDP operations */
+/* Flags to indicate status of DSP operations */
 std::map<CallbackResponse::Ops, bool> API::_opBusy = 
     {
         {CallbackResponse::FFT, false},
@@ -44,7 +44,7 @@ public:
     std::unique_ptr<cl::Context> clContext;
     std::unique_ptr<cl::CommandQueue> clCmdQueue;
     std::unique_ptr<cl::Program> clProgram;
-    std::map<std::string, std::unique_ptr<cl::Kernel>> clKernels; //TODO: Change key from string to enum
+    std::map<std::string, std::unique_ptr<cl::Kernel>> clKernels;
     std::map<std::string, std::unique_ptr<cl::Buffer>> clBuffers;
 };
 
@@ -142,6 +142,7 @@ bool API::isBusy(CallbackResponse::Ops op){
             return _opBusy.at(CallbackResponse::FILTER_IIR);
         break;
     }
+    return false;
 }
 void API::setDebug(const bool debug){
     _debug = debug;
@@ -154,11 +155,6 @@ void API::prepareFFT(int N, int n_min, int n_max){
 
         _nFFT = N;
         _bufSizeFFT = sizeof(float) * (2*_nFFT + PAD + PAD);
-        /*_kernelConfigs[CallbackResponse::FFT] = std::unique_ptr<CallbackResponse>(new CallbackResponse(CallbackResponse::FFT));
-        CallbackResponse configFFT(CallbackResponse::FFT);
-        configFFT.setParam<int>("N", N);
-        configFFT.setParam<int>("n_min", n_min);
-        configFFT.setParam<int>("n_max", n_max);*/
 
         _buffers["FFT_X"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
         _buffers["FFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
@@ -468,27 +464,3 @@ void API::ocl_DSPF_sp_filter_biquad(){
         std::cerr << "Error in filter_biquad(): " << err.what() << std::endl;
     }
 }
-/*float API::ocl_DSPF_sp_maxval(float *x, int nx){
-    try{
-        _ptrImpl->clBuffers["MAXVAL"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, nx, x));
- 
-        _ptrImpl->clKernels["MAXVAL"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "DSPF_sp_maxval"));
-        _ptrImpl->clKernels.at("MAXVAL")->setArg(0, *_ptrImpl->clBuffers.at("MAXVAL"));
-        _ptrImpl->clKernels.at("MAXVAL")->setArg(1, nx);
-
-        cl::Event eOp;
-        std::vector<cl::Event> eBuf(1);
-        _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("MAXVAL"), CL_FALSE, 0, nx, x, 0, &eBuf[0]);
-        _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("MAXVAL"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &eBuf, &eOp);
-    
-        //TODO: Return result of DSP operation
-
-        return 0.0;
-    }
-    catch(cl::Error &err){
-        std::cout << "OpenCL error in maxval(): " << err.what() << std::endl;
-    }
-    catch(const std::exception &err){
-        std::cout << "Error in maxval(): " << err.what() << std::endl;
-    }
-}*/

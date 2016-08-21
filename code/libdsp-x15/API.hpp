@@ -120,7 +120,6 @@ public:
     /** Enqueues and executes IIR
      */
     void ocl_DSPF_sp_iir();
-    //float ocl_DSPF_sp_maxval(float *x, int nx);
 
 private:
     void* _allocBuffer(size_t size);

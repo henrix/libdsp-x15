@@ -36,7 +36,6 @@ public:
     ~JACKClient();
     void stop();
     void addCallback(void (*callback)(jack_nframes_t n_frames, jack_default_audio_sample_t *in, jack_default_audio_sample_t *out));
-    void writeAudio(jack_nframes_t n_frames, jack_default_audio_sample_t *samples);
 };
 
 #endif //JACKCLIENT_HPP_
