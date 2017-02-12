@@ -18,7 +18,7 @@
 #define PAD 0
 #define __CL_ENABLE_EXCEPTIONS
 
-#include "API.hpp"
+#include "library.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -27,14 +27,14 @@
 
 std::function<void(CallbackResponse *clbkRes)> API::_callback = NULL;
 /* Flags to indicate status of DSP operations */
-std::map<CallbackResponse::Ops, bool> API::_opBusy = 
-    {
-        {CallbackResponse::FFT, false},
-        {CallbackResponse::IFFT, false},
-        {CallbackResponse::FILTER_BIQUAD, false},
-        {CallbackResponse::FILTER_FIR_R2, false},
-        {CallbackResponse::FILTER_IIR, false}
-    };
+std::map<CallbackResponse::Ops, bool> API::_opBusy =
+        {
+                {CallbackResponse::FFT, false},
+                {CallbackResponse::IFFT, false},
+                {CallbackResponse::FILTER_BIQUAD, false},
+                {CallbackResponse::FILTER_FIR_R2, false},
+                {CallbackResponse::FILTER_IIR, false}
+        };
 
 class APIImpl {
 public:
@@ -50,8 +50,8 @@ public:
 
 
 API::API(std::function<void(CallbackResponse *clbkRes)> callback, bool debug)
-    : _ptrImpl(new APIImpl(new cl::Context(CL_DEVICE_TYPE_ACCELERATOR))),
-    _nFFT(0), _nIFFT(0), _bufSizeFFT(0), _bufSizeIFFT(0), _debug(debug)
+        : _ptrImpl(new APIImpl(new cl::Context(CL_DEVICE_TYPE_ACCELERATOR))),
+          _nFFT(0), _nIFFT(0), _bufSizeFFT(0), _bufSizeIFFT(0), _debug(debug)
 {
     _callback = callback; //static
 
@@ -92,17 +92,17 @@ float* API::getBufIn(CallbackResponse::Ops op){
     switch(op){
         case CallbackResponse::FFT:
             return _buffers.at("FFT_X");
-        break;
+            break;
         case CallbackResponse::IFFT:
             return _buffers.at("IFFT_X");
-        break;
+            break;
         case CallbackResponse::FILTER_BIQUAD:
             return _buffers.at("FILTER_BIQUAD_X");
-        break;
+            break;
         case CallbackResponse::FILTER_FIR_R2:
-        break;
+            break;
         case CallbackResponse::FILTER_IIR:
-        break;
+            break;
     }
     return NULL;
 }
@@ -110,17 +110,17 @@ float* API::getBufOut(CallbackResponse::Ops op){
     switch(op){
         case CallbackResponse::FFT:
             return _buffers.at("FFT_Y");
-        break;
+            break;
         case CallbackResponse::IFFT:
             return _buffers.at("IFFT_Y");
-        break;
+            break;
         case CallbackResponse::FILTER_BIQUAD:
             return _buffers.at("FILTER_BIQUAD_Y");
-        break;
+            break;
         case CallbackResponse::FILTER_FIR_R2:
-        break;
+            break;
         case CallbackResponse::FILTER_IIR:
-        break;
+            break;
     }
     return NULL;
 }
@@ -128,19 +128,19 @@ bool API::isBusy(CallbackResponse::Ops op){
     switch(op){
         case CallbackResponse::FFT:
             return _opBusy.at(CallbackResponse::FFT);
-        break;
+            break;
         case CallbackResponse::IFFT:
             return _opBusy.at(CallbackResponse::IFFT);
-        break;
+            break;
         case CallbackResponse::FILTER_BIQUAD:
             return _opBusy.at(CallbackResponse::FILTER_BIQUAD);
-        break;
+            break;
         case CallbackResponse::FILTER_FIR_R2:
             return _opBusy.at(CallbackResponse::FILTER_FIR_R2);
-        break;
+            break;
         case CallbackResponse::FILTER_IIR:
             return _opBusy.at(CallbackResponse::FILTER_IIR);
-        break;
+            break;
     }
     return false;
 }
@@ -315,14 +315,14 @@ void API::_clean(CallbackResponse::Ops op){
             __free_ddr(_buffers.at("FFT_W"));
             __free_ddr(_buffers.at("FFT_Y"));
         }
-        break;
+            break;
         case CallbackResponse::IFFT:
         {
             __free_ddr(_buffers.at("IFFT_X"));
             __free_ddr(_buffers.at("IFFT_W"));
             __free_ddr(_buffers.at("IFFT_Y"));
         }
-        break;
+            break;
         case CallbackResponse::FILTER_BIQUAD:
         {
             __free_ddr(_buffers.at("FILTER_BIQUAD_X"));
@@ -330,17 +330,17 @@ void API::_clean(CallbackResponse::Ops op){
             __free_ddr(_buffers.at("FILTER_BIQUAD_A"));
             __free_ddr(_buffers.at("FILTER_BIQUAD_Y"));
         }
-        break;
+            break;
         case CallbackResponse::FILTER_FIR_R2:
         {
 
         }
-        break;
+            break;
         case CallbackResponse::FILTER_IIR:
         {
 
         }
-        break;
+            break;
     }
 }
 
@@ -455,7 +455,7 @@ void API::ocl_DSPF_sp_filter_biquad(){
             ocl_event_times(evs[2], "Write A");
             ocl_event_times(evss[0], "FILTER_BIQUAD");
             ocl_event_times(ev1, "Read Y");
-        }        
+        }
     }
     catch(cl::Error &err){
         std::cerr << "OpenCL error in filter_biquad(): " << err.what() << "(" << err.err() << ")" << std::endl;

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#include "CallbackResponse.hpp"
+#include "CallbackResponse.h"
 
 CallbackResponse::CallbackResponse(CallbackResponse::Ops op, unsigned int dataSize, float *dataPtr) {
-	_op = op;
-	_dataSize = dataSize;
-	_dataPtr = dataPtr;
+    _op = op;
+    _dataSize = dataSize;
+    _dataPtr = dataPtr;
 }
 
 CallbackResponse::~CallbackResponse() {
@@ -28,13 +28,13 @@ CallbackResponse::~CallbackResponse() {
 }
 
 CallbackResponse::Ops CallbackResponse::getOp() const {
-	return _op;
+    return _op;
 }
 
 unsigned int CallbackResponse::getDataSize() const {
-	return _dataSize;
+    return _dataSize;
 }
 
 float* CallbackResponse::getDataPtr() const {
-	return _dataPtr;
+    return _dataPtr;
 }

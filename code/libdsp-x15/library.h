@@ -1,24 +1,7 @@
-/***********************************************************************
- * Author: Henrik Langer (henni19790@gmail.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ***********************************************************************/
+#ifndef LIBDSP_X15_LIBRARY_H
+#define LIBDSP_X15_LIBRARY_H
 
-#ifndef API_HPP_
-#define API_HPP_
-
-#include "CallbackResponse.hpp"
+#include "CallbackResponse.h"
 #include <map>
 #include <functional>
 #include <memory>
@@ -38,10 +21,10 @@ class APIImpl;
  */
 class API {
 public:
-	/** Constructs DSP API
-	 * @param callback Function pointer to callback
-	 * @param debug Flag to enable debug outputs
-	 */
+    /** Constructs DSP API
+     * @param callback Function pointer to callback
+     * @param debug Flag to enable debug outputs
+     */
     API(std::function<void(CallbackResponse *clbkRes)> callback, bool debug = false);
     ~API();
     /** Sets new callback
@@ -49,7 +32,7 @@ public:
      */
     void setCallback(std::function<void(CallbackResponse *clRes)> callback); //Is executed for all operations
     /** Returns pointer to input buffer (x) for DSP operations
-     * @param op DSP operation 
+     * @param op DSP operation
      */
     float* getBufIn(CallbackResponse::Ops op);
     /** Returns pointer to output buffer (y) for DSP operations
@@ -110,9 +93,9 @@ public:
     void ocl_DSPF_sp_fftSPxSP();
     /** Enqueues and executes IFFT operation on DSPs
      */
-	void ocl_DSPF_sp_ifftSPxSP();
-	/** Enqueues and executes biquad filter operation on DSPs
-	 */
+    void ocl_DSPF_sp_ifftSPxSP();
+    /** Enqueues and executes biquad filter operation on DSPs
+     */
     void ocl_DSPF_sp_filter_biquad();
     /** Enqueues and executes real FIR
      */
@@ -140,4 +123,4 @@ private:
 
 };
 
-#endif //API
+#endif
