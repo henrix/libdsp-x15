@@ -107,12 +107,14 @@ public:
 private:
     void* _allocBuffer(size_t size);
     static void _genTwiddles(CallbackResponse::Ops op, int n, float *w);
+    static void _initBrev(unsigned char *brev);
     void _clean(CallbackResponse::Ops op);
 
     std::map<CallbackResponse::Ops, std::unique_ptr<CallbackResponse>> _kernelConfigs;
     std::map<std::string, float*> _buffers;
     std::map<CallbackResponse::Ops, bool> _opPrepared;
     static std::map<CallbackResponse::Ops, bool> _opBusy;
+    unsigned char *_brevFFT, *_brevIFFT;
 
     static std::function<void(CallbackResponse *clRes)> _callback;
     std::unique_ptr<APIImpl> _ptrImpl;
