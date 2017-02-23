@@ -31,12 +31,11 @@ bool DspOperationFinished = false;
 int main(){
     API api(callbackDSP);
 
-    float b[3];
-    float a[2];
-
     api.setDebug(true);
     api.prepareFILTER_BIQUAD(N_SAMPLES);
 
+    float b[3];
+    float a[2];
     /*
         Lowpass:
             - 48 kHz sample rate
@@ -49,14 +48,20 @@ int main(){
     b[2] = 0.0001682236792723621; //b2
     a[0] = -1.9629797472685724; //a1
     a[1] = 0.9636526419856617; //a2
-    api.configFILTER_BIQUAD(b, a, 0);
+    //api.configFILTER_BIQUAD(b, a, 0);
+
+    float Fc = 10000.0;
+    float Fs = 48000.0;
+    float Q = 0.707;
+    float peakGain = 6.0;
+    API::FILTER_TYPE type = API::LP;
+    api.configFILTER_BIQUAD(type, Fc, Fs, Q, peakGain);
 
     float freq = 1000.0; //Hz
-    float sample_rate = 48000.0;
     float *buf_in = api.getBufIn(CallbackResponse::FILTER_BIQUAD);
     std::ofstream sinout("../../test/data/crossover/sine.txt");
     for (int i=0; i < N_SAMPLES; i++){
-        buf_in[i] = sin(2*M_PI*freq*i / sample_rate);
+        buf_in[i] = sin(2*M_PI*freq*i / Fs);
         sinout << buf_in[i] << std::endl;
     }
     sinout.close();
