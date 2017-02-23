@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 #include <array>
+#include <vector>
 
 /*
     TODO:
@@ -21,6 +22,7 @@ class APIImpl;
  */
 class API {
 public:
+    enum FILTER_TYPE {LP, HP, BP, NOTCH};
     /** Constructs DSP API
      * @param callback Function pointer to callback
      * @param debug Flag to enable debug outputs
@@ -84,6 +86,16 @@ public:
      */
     void configFILTER_BIQUAD(float *b, float *a, float *delays);
 
+    /**
+     * Configures biquad filter with user parameters
+     * @param type
+     * @param Fc
+     * @param Fs
+     * @param Q
+     * @param peakGain
+     */
+    void configFILTER_BIQUAD(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
+
     /*
      * DSP operations
      */
@@ -108,6 +120,7 @@ private:
     void* _allocBuffer(size_t size);
     static void _genTwiddles(CallbackResponse::Ops op, int n, float *w);
     static void _initBrev(unsigned char *brev);
+    static std::vector<float> _calcBiquadCoefficients(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
     void _clean(CallbackResponse::Ops op);
 
     std::map<CallbackResponse::Ops, std::unique_ptr<CallbackResponse>> _kernelConfigs;

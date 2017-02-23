@@ -245,11 +245,9 @@ void API::prepareFILTER_BIQUAD(int nx){
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(0, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_X"));
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(1, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_B"));
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(2, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_A"));
-        //_ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(3, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_B")); //filter delays
+        _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(3, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_B")); //filter delays
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(4, *_ptrImpl->clBuffers.at("FILTER_BIQUAD_Y"));
         _ptrImpl->clKernels.at("FILTER_BIQUAD")->setArg(5, nx);
-
-        _opPrepared[CallbackResponse::FILTER_BIQUAD] = true;
     }
     catch(cl::Error &err){
         std::cout << "OpenCL error in prepareFILTER_BIQUAD: " << err.what() << "(" << err.err() << ")" << std::endl;
@@ -265,11 +263,21 @@ void API::prepareFILTER_IIR(){
 
 }
 
+void API::configFILTER_BIQUAD(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain){
+    std::vector<float> coefficents = _calcBiquadCoefficients(type, Fc, Fs, Q, peakGain);
+    for (int i=0; i < 3; i++)
+        _buffers.at("FILTER_BIQUAD_B")[i] = coefficents.at(i);
+    for (int i=0; i < 2; i++)
+        _buffers.at("FILTER_BIQUAD_A")[i] = coefficents.at(i+3);
+    _opPrepared[CallbackResponse::FILTER_BIQUAD] = true;
+}
+
 void API::configFILTER_BIQUAD(float *b, float *a, float *delays){
     for (int i=0; i < 3; i++)
         _buffers.at("FILTER_BIQUAD_B")[i] = b[i];
     for (int i=0; i < 2; i++)
         _buffers.at("FILTER_BIQUAD_A")[i] = a[i];
+    _opPrepared[CallbackResponse::FILTER_BIQUAD] = true;
 }
 
 void* API::_allocBuffer(size_t size){
@@ -278,33 +286,81 @@ void* API::_allocBuffer(size_t size){
 void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
 
     int i, j, k;
-    double x_t, y_t, theta1, theta2, theta3;
     const double PI = 3.141592654;
 
-    for (j = 1, k = 0; j <= n >> 2; j = j << 2)
-    {
-        for (i = 0; i < n >> 2; i += j)
+    if (op == CallbackResponse::FFT){
+        for (j = 1, k = 0; j <= n >> 2; j = j << 2)
         {
-            theta1 = 2 * PI * i / n;
-            x_t = cos (theta1);
-            y_t = sin (theta1);
-            w[k] = (float) x_t;
-            w[k + 1] = (float) y_t;
-
-            theta2 = 4 * PI * i / n;
-            x_t = cos (theta2);
-            y_t = sin (theta2);
-            w[k + 2] = (float) x_t;
-            w[k + 3] = (float) y_t;
-
-            theta3 = 6 * PI * i / n;
-            x_t = cos (theta3);
-            y_t = sin (theta3);
-            w[k + 4] = (float) x_t;
-            w[k + 5] = (float) y_t;
-            k += 6;
+            for (i = 0; i < n >> 2; i += j)
+            {
+                w[k]     = (float) sin (2 * PI * i / n);
+                w[k + 1] = (float) cos (2 * PI * i / n);
+                w[k + 2] = (float) sin (4 * PI * i / n);
+                w[k + 3] = (float) cos (4 * PI * i / n);
+                w[k + 4] = (float) sin (6 * PI * i / n);
+                w[k + 5] = (float) cos (6 * PI * i / n);
+                k += 6;
+            }
         }
     }
+    else if (op == CallbackResponse::IFFT){
+        for (j = 1, k = 0; j <= n >> 2; j = j << 2)
+        {
+            for (i = 0; i < n >> 2; i += j)
+            {
+                w[k]     = (float) (-1)*sin (2 * PI * i / n);
+                w[k + 1] = (float) cos (2 * PI * i / n);
+                w[k + 2] = (float) (-1)*sin (4 * PI * i / n);
+                w[k + 3] = (float) cos (4 * PI * i / n);
+                w[k + 4] = (float) (-1)*sin (6 * PI * i / n);
+                w[k + 5] = (float) cos (6 * PI * i / n);
+                k += 6;
+            }
+        }
+    }
+}
+
+std::vector<float> API::_calcBiquadCoefficients(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain){
+    float a0, a1, a2, b1, b2, norm;
+
+    float V = std::pow(10.0, std::abs(peakGain) / 20.0);
+    float K = std::tan(M_PI * Fc / Fs);
+    switch(type){
+        case LP:
+            norm = 1 / (1 + K / Q + K * K);
+            a0 = K * K * norm;
+            a1 = 2 * a0;
+            a2 = a0;
+            b1 = 2 * (K * K - 1) * norm;
+            b2 = (1 - K / Q + K * K) * norm;
+            break;
+        case HP:
+            norm = 1 / (1 + K / Q + K * K);
+            a0 = 1 * norm;
+            a1 = -2 * a0;
+            a2 = a0;
+            b1 = 2 * (K * K - 1) * norm;
+            b2 = (1 - K / Q + K * K) * norm;
+            break;
+        case BP:
+            norm = 1 / (1 + K / Q + K * K);
+            a0 = K / Q * norm;
+            a1 = 0;
+            a2 = -a0;
+            b1 = 2 * (K * K - 1) * norm;
+            b2 = (1 - K / Q + K * K) * norm;
+        case NOTCH:
+            norm = 1 / (1 + K / Q + K * K);
+            a0 = (1 + K * K) * norm;
+            a1 = 2 * (K * K - 1) * norm;
+            a2 = a0;
+            b1 = a1;
+            b2 = (1 - K / Q + K * K) * norm;
+            break;
+    }
+    std::vector<float> coefficients {a0, a1, a2, b1, b2};
+
+    return coefficients;
 }
 
 void API::_initBrev(unsigned char *brev){
@@ -373,7 +429,7 @@ void API::ocl_DSPF_sp_fftSPxSP(){
         _opBusy[CallbackResponse::FFT] = true;
 
         cl::Event ev1;
-        std::vector<cl::Event> evs(3);
+        std::vector<cl::Event> evs(2);
         std::vector<cl::Event> evss(1);
 
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FFT_X"), CL_FALSE, 0, _bufSizeFFT, _buffers.at("FFT_X"), 0, &evs[0]);
