@@ -101,9 +101,9 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = $(TRAVIS_BUILD_DIR)/code/libdsp-x15
+INPUT                  = ../../code/libdsp-x15
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.hpp
+FILE_PATTERNS          = *.h
 RECURSIVE              = NO
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
