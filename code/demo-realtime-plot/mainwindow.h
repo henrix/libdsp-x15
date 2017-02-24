@@ -29,6 +29,7 @@ private:
     JackClient *_jackClient;
     AudioProcessor *_audioProcessor;
     QVector<double> *_x;
+    int _plotRefreshCounter;
 
 public slots:
     void getAudioData(float *data);

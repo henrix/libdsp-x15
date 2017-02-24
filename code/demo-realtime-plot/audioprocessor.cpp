@@ -15,7 +15,6 @@ AudioProcessor::AudioProcessor(QObject *parent, int bufSize)
     _api->setDebug(false);
     _api->prepareFFT(bufSize, 4, bufSize);
     _instance = this;
-    _count = 0;
 }
 
 AudioProcessor::~AudioProcessor(){
@@ -38,9 +37,7 @@ void AudioProcessor::processData(float *data){
         x[PAD + 2*i + 1] = 0; //imaginary part
     }
 
-    _count += 512;
-    if (/*_count >= 1024 &&*/ !_api->isBusy(CallbackResponse::FFT)){
+    if (!_api->isBusy(CallbackResponse::FFT)){
         _api->ocl_DSPF_sp_fftSPxSP();
     }
-    _count %= 1024;
 }

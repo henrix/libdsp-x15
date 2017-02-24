@@ -11,7 +11,7 @@
 #include <cmath>
 
 MainWindow::MainWindow(QWidget *parent) : 
-    QMainWindow(parent), _ui(new Ui::MainWindow)
+    QMainWindow(parent), _ui(new Ui::MainWindow), _plotRefreshCounter(0)
 {
     _ui->setupUi(this);
  	setGeometry(400, 250, 542, 390);
@@ -76,5 +76,9 @@ void MainWindow::getAudioData(float *data){
     for (int i=0; i < _data.size(); i++)
         _data[i] = std::abs(data[i*2]); //take real part and half of spectrum
 
-    drawFunction(_data);
+    if (_plotRefreshCounter % 4 == 0){
+        drawFunction(_data);
+        _plotRefreshCounter = 0;
+    }
+    _plotRefreshCounter++;
 }

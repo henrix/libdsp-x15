@@ -14,7 +14,6 @@ public:
 private:
     API *_api;
     int _bufSize;
-    int _count;
     static AudioProcessor *_instance;
 
     static void _callbackDSP(CallbackResponse *clbkRes);
