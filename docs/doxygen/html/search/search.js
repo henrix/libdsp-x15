@@ -7,10 +7,18 @@
 
 var indexSectionsWithContent =
 {
+  0: "acgiops",
+  1: "ac",
+  2: "acgiops",
+  3: "o"
 };
 
 var indexSectionNames =
 {
+  0: "all",
+  1: "classes",
+  2: "functions",
+  3: "enums"
 };
 
 function convertToId(search)
