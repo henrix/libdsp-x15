@@ -8,12 +8,6 @@
 #include <array>
 #include <vector>
 
-/*
-    TODO:
-    - Create more command queues for multicores
-    - Implement filter FIR_R2 and IIR operation
-*/
-
 class APIImpl;
 /**
  * @brief Class which offers API for DSP operations and helper functions
@@ -22,7 +16,7 @@ class APIImpl;
  */
 class API {
 public:
-    enum FILTER_TYPE {LP, HP, BP, NOTCH};
+    enum FILTER_TYPE {LP, HP, BP, NOTCH, PEAK, LOWSHELF, HIGHSHELF};
     /** Constructs DSP API
      * @param callback Function pointer to callback
      * @param debug Flag to enable debug outputs
@@ -68,12 +62,6 @@ public:
      * @param nx Number of input/output samples
      */
     void prepareFILTER_BIQUAD(int nx);
-    /**  Prepares real FIR operation (not implemented yet)
-     */
-    void prepareFILTER_FIR_R2(int nh, int nr, float *h);
-    /** Prepares IIR operation (not implemented yet)
-     */
-    void prepareFILTER_IIR();
 
     /*
      * DSP operation config helpers
@@ -88,13 +76,28 @@ public:
 
     /**
      * Configures biquad filter with user parameters
-     * @param type
-     * @param Fc
-     * @param Fs
-     * @param Q
-     * @param peakGain
+     * @param type filter type
+     * @param Fc cutoff frequency
+     * @param Fs sample frequency
+     * @param Q quality factor
+     * @param peakGain gain
      */
     void configFILTER_BIQUAD(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
+
+    /*
+     * Utils
+     */
+
+    /**
+     *
+     * @param type filter type
+     * @param Fc cutoff frequency
+     * @param Fs sample frequency
+     * @param Q quality factor
+     * @param peakGain gain
+     * @return biquad filter coefficients [a0, a1, a2, b1, b2]
+     */
+    static std::vector<float> calcBiquadCoefficients(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
 
     /*
      * DSP operations
@@ -109,18 +112,11 @@ public:
     /** Enqueues and executes biquad filter operation on DSPs
      */
     void ocl_DSPF_sp_filter_biquad();
-    /** Enqueues and executes real FIR
-     */
-    void ocl_DSPF_sp_fir_r2();
-    /** Enqueues and executes IIR
-     */
-    void ocl_DSPF_sp_iir();
 
 private:
     void* _allocBuffer(size_t size);
     static void _genTwiddles(CallbackResponse::Ops op, int n, float *w);
     static void _initBrev(unsigned char *brev);
-    static std::vector<float> _calcBiquadCoefficients(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
     void _clean(CallbackResponse::Ops op);
 
     std::map<CallbackResponse::Ops, std::unique_ptr<CallbackResponse>> _kernelConfigs;
@@ -133,7 +129,7 @@ private:
     std::unique_ptr<APIImpl> _ptrImpl;
     size_t _nFFT, _nIFFT;
     size_t _nxFILTER_BIQUAD;
-    size_t _bufSizeFFT, _bufSizeIFFT;
+    size_t _bufSizeFFT, _bufSizeIFFT, _bufSizeFilterBiquad;
     bool _debug;
 
 };

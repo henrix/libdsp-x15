@@ -34,9 +34,7 @@ public:
     enum Ops {
         FFT,
         IFFT,
-        FILTER_BIQUAD,
-        FILTER_FIR_R2,
-        FILTER_IIR
+        FILTER_BIQUAD
     };
     /** Constructs new CallbackResponse object
      * @param op DSP operation
