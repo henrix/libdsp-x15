@@ -22,11 +22,12 @@
 #include "../libdsp-x15/library.h"
 #include <iostream>
 #include <fstream>
+#include <complex>
 #include <cmath>
 
 void callbackDSP(CallbackResponse *clbkRes);
 
-const int N = 16*1024;
+const int N = 512;
 bool fftFinished = false, ifftFinished = false;
 
 int main(int argc, char* argv[]){
@@ -38,10 +39,10 @@ int main(int argc, char* argv[]){
 	float *xFFT = api.getBufIn(CallbackResponse::FFT);
 
 	/* Generate sine */
-	std::ofstream sinout("../../test/data/sine.txt");
+	std::ofstream sinout("../../test/data/fft_ifft/sine.txt");
     if (sinout.is_open()){
         for (int i=0; i < N; i++){
-            xFFT[PAD + 2*i] = sin(2*M_PI*64*i / (double) N);
+            xFFT[PAD + 2*i] = sin(2.0*M_PI*1000.0*(float)i / (float) 48000.0);
             xFFT[PAD + 2*i + 1] = 0;
             sinout << xFFT[PAD + 2*i] << std::endl;
         }
@@ -70,11 +71,16 @@ void callbackDSP(CallbackResponse *clbkRes){
     int n = data_size / 2;
 
     if (clbkRes->getOp() == CallbackResponse::FFT){
+        std::complex<float> cmplx[N];
 
-        std::ofstream fftoutsine("../../test/data/fft_sine.txt");
+        std::ofstream fftoutsine("../../test/data/fft_ifft/spectrum_mag.txt");
+        std::ofstream fftoutsinePhase("../../test/data/fft_ifft/spectrum_phase.txt");
         if (fftoutsine.is_open()){
            	for (int i=0; i < n; i++){
-               	fftoutsine << y[PAD + 2*i + 1] << std::endl;
+                cmplx[i].real(y[PAD + 2*i]);
+                cmplx[i].imag(y[PAD + 2*i + 1]);
+               	fftoutsine << std::abs(cmplx[i]) / 256.0 << std::endl;
+                fftoutsinePhase << std::arg(cmplx[i]) << std::endl;
            	}
            	fftoutsine.close();
         }
@@ -85,7 +91,7 @@ void callbackDSP(CallbackResponse *clbkRes){
     }
     else if (clbkRes->getOp() == CallbackResponse::IFFT){
 
-    	std::ofstream ifftout("../../test/data/ifft_sine_spectrum.txt");
+    	std::ofstream ifftout("../../test/data/fft_ifft/ifft_spectrum.txt");
         if (ifftout.is_open()){
            	for (int i=0; i < n; i++){
                	ifftout << y[PAD + 2*i] << std::endl;

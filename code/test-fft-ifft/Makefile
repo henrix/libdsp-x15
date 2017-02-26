@@ -1,4 +1,4 @@
-TARGET = test-filter-biquad
+TARGET = test-fft-ifft
 
 CPP = g++
 CPP_FLAGS = -g -Wall -std=c++11
