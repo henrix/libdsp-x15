@@ -208,11 +208,11 @@ Static Public Member Functions</h2></td></tr>
 <div class="memdoc">
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">type</td><td>filter type </td></tr>
-    <tr><td class="paramname">Fc</td><td>cutoff frequency </td></tr>
-    <tr><td class="paramname">Fs</td><td>sample frequency </td></tr>
+    <tr><td class="paramname">type</td><td>filter type (LP, HP, BP, NOTCH, PEAK, LOWSHELF, HIGHSHELF </td></tr>
+    <tr><td class="paramname">Fc</td><td>cutoff frequency (Hz) </td></tr>
+    <tr><td class="paramname">Fs</td><td>sample frequency (Hz) </td></tr>
     <tr><td class="paramname">Q</td><td>quality factor </td></tr>
-    <tr><td class="paramname">peakGain</td><td>gain </td></tr>
+    <tr><td class="paramname">peakGain</td><td>gain (dB) </td></tr>
   </table>
   </dd>
 </dl>
@@ -254,8 +254,8 @@ Static Public Member Functions</h2></td></tr>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">b</td><td>Pointer to array with the 3 filter coefficients b0, b1, b2 </td></tr>
-    <tr><td class="paramname">a</td><td>Pointer to array with the 2 filter coefficients a0, a1 </td></tr>
-    <tr><td class="paramname">delays</td><td>Pointer to array with filter delays </td></tr>
+    <tr><td class="paramname">a</td><td>Pointer to array with the 3 filter coefficients a0, a1, a2 (a0 = 0) </td></tr>
+    <tr><td class="paramname">delays</td><td>Pointer to array with filter delays (two coefficients) </td></tr>
   </table>
   </dd>
 </dl>
@@ -307,11 +307,11 @@ Static Public Member Functions</h2></td></tr>
 <p>Configures biquad filter with user parameters </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">type</td><td>filter type </td></tr>
-    <tr><td class="paramname">Fc</td><td>cutoff frequency </td></tr>
-    <tr><td class="paramname">Fs</td><td>sample frequency </td></tr>
+    <tr><td class="paramname">type</td><td>filter type (LP, HP, BP, NOTCH, PEAK, LOWSHELF, HIGHSHELF </td></tr>
+    <tr><td class="paramname">Fc</td><td>cutoff frequency (Hz) </td></tr>
+    <tr><td class="paramname">Fs</td><td>sampling frequency (Hz) </td></tr>
     <tr><td class="paramname">Q</td><td>quality factor </td></tr>
-    <tr><td class="paramname">peakGain</td><td>gain </td></tr>
+    <tr><td class="paramname">peakGain</td><td>gain (dB) </td></tr>
   </table>
   </dd>
 </dl>
