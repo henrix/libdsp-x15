@@ -69,18 +69,18 @@ public:
 
     /** Configures biquad filter with normalized filter coefficients
      * @param b Pointer to array with the 3 filter coefficients b0, b1, b2
-     * @param a Pointer to array with the 2 filter coefficients a0, a1
-     * @param delays Pointer to array with filter delays
+     * @param a Pointer to array with the 3 filter coefficients a0, a1, a2 (a0 = 0)
+     * @param delays Pointer to array with filter delays (two coefficients)
      */
     void configFILTER_BIQUAD(float *b, float *a, float *delays);
 
     /**
      * Configures biquad filter with user parameters
-     * @param type filter type
-     * @param Fc cutoff frequency
-     * @param Fs sample frequency
+     * @param type filter type (LP, HP, BP, NOTCH, PEAK, LOWSHELF, HIGHSHELF
+     * @param Fc cutoff frequency (Hz)
+     * @param Fs sampling frequency (Hz)
      * @param Q quality factor
-     * @param peakGain gain
+     * @param peakGain gain (dB)
      */
     void configFILTER_BIQUAD(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
 
@@ -90,11 +90,11 @@ public:
 
     /**
      *
-     * @param type filter type
-     * @param Fc cutoff frequency
-     * @param Fs sample frequency
+     * @param type filter type (LP, HP, BP, NOTCH, PEAK, LOWSHELF, HIGHSHELF
+     * @param Fc cutoff frequency (Hz)
+     * @param Fs sample frequency (Hz)
      * @param Q quality factor
-     * @param peakGain gain
+     * @param peakGain gain (dB)
      * @return biquad filter coefficients [a0, a1, a2, b1, b2]
      */
     static std::vector<float> calcBiquadCoefficients(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
@@ -114,16 +114,19 @@ public:
     void ocl_DSPF_sp_filter_biquad();
 
 private:
-    void* _allocBuffer(size_t size);
+    /**
+     * Allocates zero copy memory (shared memory between CPU and DSP)
+     * @param size in bytes
+     * @return pointer to allocated memory
+     */
+    static void* _allocBuffer(size_t size);
     static void _genTwiddles(CallbackResponse::Ops op, int n, float *w);
-    static void _initBrev(unsigned char *brev);
     void _clean(CallbackResponse::Ops op);
 
     std::map<CallbackResponse::Ops, std::unique_ptr<CallbackResponse>> _kernelConfigs;
     std::map<std::string, float*> _buffers;
     std::map<CallbackResponse::Ops, bool> _opPrepared;
     static std::map<CallbackResponse::Ops, bool> _opBusy;
-    unsigned char *_brevFFT, *_brevIFFT;
 
     static std::function<void(CallbackResponse *clRes)> _callback;
     std::unique_ptr<APIImpl> _ptrImpl;

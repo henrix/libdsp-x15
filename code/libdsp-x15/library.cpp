@@ -144,15 +144,12 @@ void API::prepareFFT(int N, int n_min, int n_max){
         _buffers["FFT_X"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
         _buffers["FFT_W"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
         _buffers["FFT_Y"] = (float*) _allocBuffer(sizeof(float)*2*_nFFT);
-        _brevFFT = (unsigned char*) _allocBuffer(sizeof(unsigned char)*64);
 
         _genTwiddles(CallbackResponse::FFT, _nFFT, _buffers.at("FFT_W"));
-        _initBrev(_brevFFT);
 
         _ptrImpl->clBuffers["FFT_X"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_X")));
         _ptrImpl->clBuffers["FFT_W"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  _bufSizeFFT, _buffers.at("FFT_W")));
         _ptrImpl->clBuffers["FFT_Y"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY,  _bufSizeFFT, _buffers.at("FFT_Y")));
-        _ptrImpl->clBuffers["FFT_BREV"] = std::unique_ptr<cl::Buffer>(new cl::Buffer(*_ptrImpl->clContext, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,  64*sizeof(unsigned char), _brevFFT));
 
         _ptrImpl->clKernels["FFT"] = std::unique_ptr<cl::Kernel>(new cl::Kernel(*_ptrImpl->clProgram, "ocl_DSPF_sp_fftSPxSP"));
         _ptrImpl->clKernels.at("FFT")->setArg(0, _nFFT);
@@ -161,7 +158,6 @@ void API::prepareFFT(int N, int n_min, int n_max){
         _ptrImpl->clKernels.at("FFT")->setArg(3, *_ptrImpl->clBuffers.at("FFT_Y"));
         _ptrImpl->clKernels.at("FFT")->setArg(4, n_min);
         _ptrImpl->clKernels.at("FFT")->setArg(5, n_max);
-        //_ptrImpl->clKernels.at("FFT")->setArg(6, *_ptrImpl->clBuffers.at("FFT_BREV"));
 
         _opPrepared[CallbackResponse::FFT] = true;
     }
@@ -247,6 +243,8 @@ void API::prepareFILTER_BIQUAD(int nx){
 
 void API::configFILTER_BIQUAD(FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain){
     std::vector<float> coefficents = calcBiquadCoefficients(type, Fc, Fs, Q, peakGain);
+    for (int i=0; i < 2; i++)
+        _buffers.at("FILTER_BIQUAD_DELAY")[i] = 0.0;
     for (int i=0; i < 3; i++)
         _buffers.at("FILTER_BIQUAD_B")[i] = coefficents.at(i);
     for (int i=0; i < 3; i++)
@@ -258,6 +256,8 @@ void API::configFILTER_BIQUAD(FILTER_TYPE type, float Fc, float Fs, float Q, flo
 }
 
 void API::configFILTER_BIQUAD(float *b, float *a, float *delays){
+    for (int i=0; i < 2; i++)
+        _buffers.at("FILTER_BIQUAD_DELAY")[i] = 0.0;
     for (int i=0; i < 3; i++)
         _buffers.at("FILTER_BIQUAD_B")[i] = b[i];
     for (int i=0; i < 3; i++)
@@ -297,6 +297,7 @@ std::vector<float> API::calcBiquadCoefficients(FILTER_TYPE type, float Fc, float
             a2 = -a0;
             b1 = 2.0 * (K * K - 1.0) * norm;
             b2 = (1.0 - K / Q + K * K) * norm;
+            break;
         case NOTCH:
             norm = 1.0 / (1.0 + K / Q + K * K);
             a0 = (1.0 + K * K) * norm;
@@ -369,7 +370,6 @@ void* API::_allocBuffer(size_t size){
     return __malloc_ddr(size);
 }
 void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
-
     int i, j, k;
 
     if (op == CallbackResponse::FFT){
@@ -404,21 +404,6 @@ void API::_genTwiddles(CallbackResponse::Ops op, int n, float *w){
     }
 }
 
-void API::_initBrev(unsigned char *brev){
-    unsigned char tmp[64] = {
-            0x0, 0x20, 0x10, 0x30, 0x8, 0x28, 0x18, 0x38,
-            0x4, 0x24, 0x14, 0x34, 0xc, 0x2c, 0x1c, 0x3c,
-            0x2, 0x22, 0x12, 0x32, 0xa, 0x2a, 0x1a, 0x3a,
-            0x6, 0x26, 0x16, 0x36, 0xe, 0x2e, 0x1e, 0x3e,
-            0x1, 0x21, 0x11, 0x31, 0x9, 0x29, 0x19, 0x39,
-            0x5, 0x25, 0x15, 0x35, 0xd, 0x2d, 0x1d, 0x3d,
-            0x3, 0x23, 0x13, 0x33, 0xb, 0x2b, 0x1b, 0x3b,
-            0x7, 0x27, 0x17, 0x37, 0xf, 0x2f, 0x1f, 0x3f
-    };
-    for (int i=0; i < 64; i++)
-        brev[i] = tmp[i];
-}
-
 void API::_clean(CallbackResponse::Ops op){
     switch(op){
         case CallbackResponse::FFT:
@@ -426,7 +411,6 @@ void API::_clean(CallbackResponse::Ops op){
             __free_ddr(_buffers.at("FFT_X"));
             __free_ddr(_buffers.at("FFT_W"));
             __free_ddr(_buffers.at("FFT_Y"));
-            __free_ddr(_brevFFT);
         }
             break;
         case CallbackResponse::IFFT:
@@ -466,7 +450,6 @@ void API::ocl_DSPF_sp_fftSPxSP(){
 
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FFT_X"), CL_FALSE, 0, _bufSizeFFT, _buffers.at("FFT_X"), 0, &evs[0]);
         _ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FFT_W"), CL_FALSE, 0, _bufSizeFFT, _buffers.at("FFT_W"), 0, &evs[1]);
-        //_ptrImpl->clCmdQueue->enqueueWriteBuffer(*_ptrImpl->clBuffers.at("FFT_BREV"), CL_FALSE, 0, sizeof(unsigned char) * 64, _brevFFT, 0, &evs[2]);
         _ptrImpl->clCmdQueue->enqueueNDRangeKernel(*_ptrImpl->clKernels.at("FFT"), cl::NullRange, cl::NDRange(1), cl::NDRange(1), &evs, &evss[0]);
         _ptrImpl->clCmdQueue->enqueueReadBuffer(*_ptrImpl->clBuffers.at("FFT_Y"), CL_TRUE, 0, _bufSizeFFT, _buffers.at("FFT_Y"), &evss, &ev1);
 
@@ -482,7 +465,6 @@ void API::ocl_DSPF_sp_fftSPxSP(){
         if (_debug){
             ocl_event_times(evs[0], "Write X");
             ocl_event_times(evs[1], "Twiddle");
-            //ocl_event_times(evs[2], "Brev");
             ocl_event_times(evss[0], "FFT");
             ocl_event_times(ev1, "Read Y");
         }
