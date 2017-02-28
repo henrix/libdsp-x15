@@ -23,7 +23,8 @@ private:
     static void _callbackDSP(CallbackResponse *clbkRes);
 
 signals:
-    void dataReady(float *processData);
+    void audioDataReady(float *processData);
+    void spectrumDataReady(float *plotData);
 
 public slots:
     void processData(float *data);

@@ -31,7 +31,7 @@ private:
     QString _demoName;
     JackClient *_jackClient;
     AudioProcessor *_audioProcessor;
-    QVector<double> *_x;
+    QVector<double> *_x, *_xSpectrum;
     QDial *_inputFc, *_inputQ, *_inputPeakGain;
     QLabel *_labelFc, *_labelQ, *_labelPeakGain;
     int _plotRefreshCounter;
@@ -41,6 +41,7 @@ private:
 public slots:
     void getAudioData(float *data);
     void inputValueChanged(int val);
+    void plotSpectrum(float *magnitude);
 };
 
 #endif // MAINWINDOW_H

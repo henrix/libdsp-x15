@@ -9,6 +9,7 @@ AudioProcessor::AudioProcessor(QObject *parent, uint32_t bufSize)
     _api = new API(_callbackDSP);
     _api->setDebug(false);
     _api->prepareFILTER_BIQUAD(bufSize);
+    _api->prepareFFT(bufSize, 4, bufSize);
     _instance = this;
 }
 
@@ -28,7 +29,20 @@ void AudioProcessor::setFilterCoefficients(API::FILTER_TYPE type, float Fc, floa
 
 void AudioProcessor::_callbackDSP(CallbackResponse *clbkRes){
     float *processedData = clbkRes->getDataPtr();
-    emit(_instance->dataReady(processedData));
+    if (clbkRes->getOp() == CallbackResponse::FILTER_BIQUAD){
+        /*
+        if (!_instance->_api->isBusy(CallbackResponse::FFT)){
+            float *buf = _instance->_api->getBufIn(CallbackResponse::FFT);
+            for (unsigned int i=0; i < 512; i++)
+                //buf[i*2] = processedData[i];
+                buf[i*2] = sin((float)2.0*M_PI*(float)1000.0*(float)i / (float)48000.0);
+            _instance->_api->ocl_DSPF_sp_fftSPxSP();
+        }
+        */
+        emit(_instance->audioDataReady(processedData));
+    }
+    else if (clbkRes->getOp() == CallbackResponse::FFT)
+        emit(_instance->spectrumDataReady(processedData));
 }
 
 void AudioProcessor::processData(float *data){

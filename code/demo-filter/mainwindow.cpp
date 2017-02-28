@@ -33,24 +33,31 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _ui->customPlot->addGraph();
     _ui->customPlot->graph(0)->setPen(QPen(Qt::blue));
+    _ui->customPlot->addGraph();
+    _ui->customPlot->graph(1)->setPen(QPen(Qt::red));
 
     _audioProcessor = new AudioProcessor(this);
     _audioProcessor->setFilterCoefficients(API::LP, 1000.0, 48000.0, 0.707, 6);
-    //QObject::connect(_audioProcessor, SIGNAL(dataReady(float*)), this, SLOT(getAudioData(float*)));
+    //QObject::connect(_audioProcessor, SIGNAL(audioDataReady(float*)), this, SLOT(getAudioData(float*)));
     QObject::connect(_ui->inputCutoff, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
     QObject::connect(_ui->inputQ, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
     QObject::connect(_ui->inputPeakGain, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
     QObject::connect(_ui->inputFilterType, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
 
     _x = new QVector<double>(512);
-    for (int i=0; i < _x->size(); i++)
-        (*_x)[i] = 1.0/48000.0 * i;
+    for (int i=0; i < _x->size(); i++){
+        (*_x)[i] = 1.0/48000.0 * i; //time domain axis
+    }
+    _xSpectrum = new QVector<double>(256);
+    for (int i=0; i < _xSpectrum->size(); i++)
+        (*_xSpectrum)[i] = 24000.0 / 256.0 * (float)i; //frequency domain axis
 
     _jackClient = new JackClient(this);
     _jackClient->start();
 
     QObject::connect(_jackClient, SIGNAL(dataReady(float*)), _audioProcessor, SLOT(processData(float*)));
-    QObject::connect(_audioProcessor, SIGNAL(dataReady(float*)), _jackClient, SLOT(writeData(float*)));
+    QObject::connect(_audioProcessor, SIGNAL(audioDataReady(float*)), _jackClient, SLOT(writeData(float*)));
+    //QObject::connect(_audioProcessor, SIGNAL(spectrumDataReady(float*)), this, SLOT(plotSpectrum(float*)));
     inputValueChanged(0); //plot default filter setting transfer function
 }
 
@@ -64,7 +71,7 @@ MainWindow::~MainWindow(){
 void MainWindow::drawFunction(std::vector<double> &data){
     QVector<double> _data = QVector<double>::fromStdVector(data);
 
-    _ui->customPlot->graph(0)->setData(*_x, _data);
+    _ui->customPlot->graph(1)->setData(*_x, _data);
     _ui->customPlot->replot();
 }
 
@@ -123,6 +130,7 @@ void MainWindow::_plotTransferFunction(API::FILTER_TYPE type, float a0, float a1
             maxValY = 10.0;
         else if (minValY > -10.0)
             minValY = -10.0;
+        break;
     }
 
     _ui->customPlot->xAxis->setRange(minValX, maxValX);
@@ -130,16 +138,32 @@ void MainWindow::_plotTransferFunction(API::FILTER_TYPE type, float a0, float a1
     drawFunction(xPoints, yPoints);
 }
 
-void MainWindow::getAudioData(float *data){
-    std::vector<double> _data;
-    _data.assign(data, data + 512);
-    double max = *std::max_element(_data.begin(), _data.end());
-    if (max > 1.0)
-        setRangeY(-1.0*max, max);
-    else
-        setRangeY(-1.0, 1.0);
+void MainWindow::plotSpectrum(float *magnitude){
+    if (_plotRefreshCounter % 4 == 0){
+        std::vector<double> y(256);
+        for (int i=0; i < y.size(); i++)
+            y[i] = std::abs(magnitude[i * 2]);
+        QVector<double> y_ = QVector<double>::fromStdVector(y);
+        _ui->customPlot->graph(1)->setData(*_xSpectrum, y_);
+        _ui->customPlot->replot();
+        _plotRefreshCounter = 0;
+        std::cout << "Max: " << *std::max_element(y.begin(), y.end() + 256) << std::endl;
+        std::cout << "Min: " << *std::min_element(y.begin(), y.end() + 256) << std::endl;
+    }
+    _plotRefreshCounter++;
+}
 
+void MainWindow::getAudioData(float *data){
     if (_plotRefreshCounter % 10 == 0){ //refresh ~ 100ms
+        std::vector<double> _data;
+        _data.assign(data, data + 512);
+        double max = *std::max_element(_data.begin(), _data.end());
+
+        if (max > 1.0)
+            setRangeY(-1.0*max, max);
+        else
+            setRangeY(-1.0, 1.0);
+
         drawFunction(_data);
         _plotRefreshCounter = 0;
     }
