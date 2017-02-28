@@ -1,5 +1,5 @@
 #######################################################################
-# Filter biquad Test Plot
+# Filter Biquad Test Plot
 #
 # Author: Henrik Langer (henni19790@gmail.com)
 #
@@ -18,31 +18,63 @@
 #######################################################################
 
 NUM_SAMPLES = 512;
+Fs = 48000;
+t = 0:1/Fs:NUM_SAMPLES * 1/Fs - 1/Fs;
 
-t = 0:1/48000:512 * 1/48000 - 1/48000;
-length(t)
-
-sinID = fopen('data/crossover/sine.txt');
-outID = fopen('data/crossover/output.txt');
 formatSpec = '%f';
-sinData = fscanf(sinID, formatSpec);
-outData = fscanf(outID, formatSpec);
-fclose(sinID);
-fclose(outID);
+sin1kID = fopen('data/filter/sine_1kHz.txt');
+sin10kID = fopen('data/filter/sine_10kHz.txt');
+transferXID = fopen('data/filter/transferX.txt');
+transferYID = fopen('data/filter/transferY.txt');
+out1kID = fopen('data/filter/filtered_sine_1kHz.txt');
+out10kID = fopen('data/filter/filtered_sine_10kHz.txt');
+sin1kData = fscanf(sin1kID, formatSpec);
+sin10kData = fscanf(sin10kID, formatSpec);
+transferXData = fscanf(transferXID, formatSpec);
+transferYData = fscanf(transferYID, formatSpec);
+outData1k = fscanf(out1kID, formatSpec);
+outData10k = fscanf(out10kID, formatSpec);
+fclose(sin1kID);
+fclose(sin10kID);
+fclose(transferXID);
+fclose(transferYID);
+fclose(out1kID);
+fclose(out10kID);
 
-figure(1)
+hf = figure(1);
 clf()
-subplot(2,1,1)
-stem(t, sinData)
+subplot(5,1,1)
+plot(transferXData, transferYData)
 grid on
-title('Plot of generated sine')
+title('Transfer Function of Notch Filter (Fc = 10 kHz, Fs = 48 kHz, Q = 1)')
+xlabel('Frequency (Hz)')
+ylabel('Magnitude (dB)')
+subplot(5,1,2)
+stem(t, sin1kData)
+grid on
+title('Generated 1 kHz sine')
 xlabel('Time (s)')
 ylabel('Amplitude')
-subplot(2,1,2)
-stem(t, outData)
+subplot(5,1,3)
+stem(t(1:256), sin10kData(1:256))
 grid on
-title('Plot of filter output')
+title('Generated 10 kHz sine')
+xlabel('Time (s)')
+ylabel('Amplitude')
+subplot(5,1,4)
+stem(t, outData1k)
+grid on
+title('Filtered 1 kHz sine')
+xlabel('Time (s)')
+ylabel('Amplitude')
+subplot(5,1,5)
+stem(t(1:256), outData10k(1:256))
+grid on
+title('Filtered 10 kHz sine')
 xlabel('Time (s)')
 ylabel('Amplitude')
 
-print filter_biquad_test.pdf
+set(hf,'PaperOrientation','portrait');
+set(hf,'PaperUnits','normalized');
+set(hf,'PaperPosition', [0 0 1 1]);
+print (hf, '-dpdf', 'filter_biquad_test.pdf');
