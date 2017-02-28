@@ -32,7 +32,6 @@ void AudioProcessor::_callbackDSP(CallbackResponse *clbkRes){
 void AudioProcessor::processData(float *data){
     float *x = _api->getBufIn(CallbackResponse::FFT);
     for (int i=0; i < _bufSize; i++){
-        //x[PAD + 2*i] = sin((float)2*M_PI*(float)1000.0*(float)i / (float)48000.0);
         x[PAD + 2*i] = data[i]; //real part
         x[PAD + 2*i + 1] = 0; //imaginary part
     }
