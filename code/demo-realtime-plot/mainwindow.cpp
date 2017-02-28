@@ -8,25 +8,30 @@
 #include <QMetaEnum>
 #include <iostream>
 #include <algorithm>
+#include <complex>
 #include <cmath>
 
 MainWindow::MainWindow(QWidget *parent) : 
     QMainWindow(parent), _ui(new Ui::MainWindow), _plotRefreshCounter(0)
 {
     _ui->setupUi(this);
- 	setGeometry(400, 250, 542, 390);
+    setGeometry(600, 375, 813, 585);
 
-    _demoName = "Realtime Spectrum Plot";
+    _demoName = "libdsp-x15 - Realtime Spectrum Plot Demo";
     setWindowTitle(_demoName);
     statusBar()->clearMessage();
 
-    // give the axes some labels:
-    _ui->customPlot->xAxis->setLabel("frequency (Hz)");
-    _ui->customPlot->yAxis->setLabel("amplitude (dBFS)");
+    _ui->customPlot->setNoAntialiasingOnDrag(true); // more performance/responsiveness during dragging
 
-    // set axes ranges, so we see all data:
+    _ui->customPlot->xAxis->setLabel("Frequency (Hz)");
+    _ui->customPlot->yAxis->setLabel("Magnitude (dBFS)");
+
     _ui->customPlot->xAxis->setRange(10, 24000);
-    _ui->customPlot->yAxis->setRange(0, 1);
+    _ui->customPlot->yAxis->setRange(-10, 0);
+    _ui->customPlot->xAxis->setScaleType(QCPAxis::stLogarithmic);
+    _ui->customPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
+    _ui->customPlot->xAxis->grid()->setSubGridVisible(true);
+    _ui->customPlot->yAxis->grid()->setSubGridVisible(true);
 
     _ui->customPlot->addGraph();
     _ui->customPlot->graph(0)->setPen(QPen(Qt::blue));
@@ -42,21 +47,15 @@ MainWindow::MainWindow(QWidget *parent) :
     _jackClient->start();
 
     QObject::connect(_jackClient, SIGNAL(dataReady(float*)), _audioProcessor, SLOT(processData(float*)));
-    //QObject::connect(_jackClient, SIGNAL(dataReady(float*)), this, SLOT(getAudioData(float*)));
 }
 
 MainWindow::~MainWindow(){
-    //delete _ui;
     _jackClient->stop();
     delete _jackClient;
     delete _audioProcessor;
 }
 
 void MainWindow::drawFunction(std::vector<double> &data){
-    double max = *std::max_element(data.begin(), data.end());
-    for (int i=0; i < data.size(); i++){
-        data[i] = data[i] / max; //normalize
-    }
     QVector<double> _data = QVector<double>::fromStdVector(data);
 
     _ui->customPlot->graph(0)->setData(*_x, _data);
@@ -72,11 +71,26 @@ void MainWindow::setRangeY(double begin, double end){
 }
 
 void MainWindow::getAudioData(float *data){
+    std::complex<double> cmplx[512];
+    for (int i=0; i < 512; i++){
+        cmplx[i].real(data[i*2]);
+        cmplx[i].imag(data[i*2 + 1]);
+    }
     std::vector<double> _data(256);
-    for (int i=0; i < _data.size(); i++)
-        _data[i] = std::abs(data[i*2]); //take real part and half of spectrum
+    for (int i=0; i < 256; i++)
+        _data[i] = std::log10(std::abs(cmplx[i]) / 256.0); //half of magnitude spectrum and normalize
 
-    if (_plotRefreshCounter % 4 == 0){
+    if (_plotRefreshCounter % 2 == 0){
+        double min = *std::min_element(_data.begin(), _data.end());
+        double max = *std::min_element(_data.begin(), _data.end());
+        if (min < -10.0 && max > 0.0)
+            setRangeY(min, max);
+        else if (min < -10.0)
+            setRangeY(min, 0);
+        else if (max > 0.0)
+            setRangeY(-10, max);
+        else
+            setRangeY(-10, 0);
         drawFunction(_data);
         _plotRefreshCounter = 0;
     }
