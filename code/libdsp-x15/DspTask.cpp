@@ -1,5 +1,6 @@
 /***********************************************************************
  * Author: Henrik Langer (henni19790@gmail.com)
+ * Copyright: Henrik Langer
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************/
 
-#include "CallbackResponse.h"
+#include "DspTask.h"
 
-CallbackResponse::CallbackResponse(CallbackResponse::Ops op, unsigned int dataSize, float *dataPtr) {
-    _op = op;
-    _dataSize = dataSize;
-    _dataPtr = dataPtr;
+unsigned long DspTask::_id_counter = 0;
+
+DspTask::DspTask(unsigned long id, OPERATION operation, std::function<void(DspTask &task)> callback,
+                 std::shared_ptr<cl::Context> clContext, std::shared_ptr<cl::Program> clProgram) :
+        id(id), operation(operation), _callback(callback), _clContext(clContext), _clProgram(clProgram)
+{
+
 }
 
-CallbackResponse::~CallbackResponse() {
-
+unsigned long DspTask::_createId() {
+    return _id_counter++;
 }
-
-CallbackResponse::Ops CallbackResponse::getOp() const {
-    return _op;
-}
-
-unsigned int CallbackResponse::getDataSize() const {
-    return _dataSize;
-}
-
-float* CallbackResponse::getDataPtr() const {
-    return _dataPtr;
+void* DspTask::_mallocBuffer(std::size_t size){
+    return __malloc_ddr(size);
+};
+void DspTask::_freeBuffer(void *ptr){
+    __free_ddr(ptr);
 }

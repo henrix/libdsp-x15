@@ -44,14 +44,16 @@ kernel void ocl_DSPF_sp_ifftSPxSP(int N, global float *x, global float *w,
 {
 	DSPF_sp_ifftSPxSP(N, x, w, y, 0, n_min, 0, n_max);
 }
+
 kernel void ocl_DSPF_sp_biquad(global float *restrict x, global float *b,
 	global float *a, global float *delay, global float *restrict y, const int nx)
 {
+    //static float delays[2] = {0.0, 0.0};
+    //delay[0] = b[1]*x[1] + b[2]*x[2] - a[1]*y[1] - a[2]*y[2];
+    //delay[1] = b[2]*x[1] - a[2]*y[1];
+    //delay[0] = 0.0;
+    //delay[1] = 0.0;
 	DSPF_sp_biquad(x, b, a, delay, y, nx);
-}
-kernel void ocl_foo()
-{
-	printf("DSP kernel foo() executed\n");
 }
 kernel void ocl_DSPF_sp_fircirc (global const float *x, global float *h,
 	global float *restrict y, int index, int csize, int nh, int ny)
@@ -85,16 +87,3 @@ kernel void ocl_DSPF_sp_iirlat(global const float *x, int nx,
 {
 	DSPF_sp_iirlat(x, nx, k, nk, b, y);
 }
-
-/*
-kernel void ocl_DSPF_conv_reverbSPxSP(int N, global float *x, global float *impulse_res,
-	global float *wFFT, global float *wIFFT, global float *y)
-{
-	float tmp[2*N];
-	DSPF_sp_fftSPxSP(N, x, wFFT, tmp, 0, 2, 0, N);
-	for (int i=0; i < 2*N; i++){
-		tmp[i] *= impulse_res[i];
-	}
-	DSPF_sp_ifftSPxSP(N, tmp, wIFFT, y, 0, 2, 0, N);
-}
-*/
