@@ -71,6 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Data&#160;Fields</span></a></li>
     </ul>
   </div>
@@ -78,65 +79,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="functions.html"><span>All</span></a></li>
       <li class="current"><a href="functions_func.html"><span>Functions</span></a></li>
-      <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
     </ul>
   </div>
 </div>
 <div class="contents">
 &#160;<ul>
-<li>API()
-: <a class="el" href="classAPI.html#ae93802268ffee08b6d347543666e1f35">API</a>
+<li>enqueueContinuousTask()
+: <a class="el" href="classTaskProcessor.html#a561c8541eb94bdde362ae1a8ed5bcf8e">TaskProcessor</a>
 </li>
-<li>calcBiquadCoefficients()
-: <a class="el" href="classAPI.html#a8ef1df8acd7dbe23639741b2bbe616e1">API</a>
+<li>enqueueTask()
+: <a class="el" href="classTaskProcessor.html#a974deebbccc9b99472161e981436090f">TaskProcessor</a>
 </li>
-<li>CallbackResponse()
-: <a class="el" href="classCallbackResponse.html#ae96b1b7a30e9a6804383d8311ffb04da">CallbackResponse</a>
+<li>generateTwiddleFactors()
+: <a class="el" href="classFFT__SP.html#ad467ccb7d2f04230df1bbb36f0511ff8">FFT_SP</a>
+, <a class="el" href="classIFFT__SP.html#aa29a633d4a433fab70ff863b9307cdbb">IFFT_SP</a>
 </li>
-<li>configFILTER_BIQUAD()
-: <a class="el" href="classAPI.html#ab54cb00cc08fb5a8e847ecfd63aac5d1">API</a>
+<li>getBufferSize()
+: <a class="el" href="classFFT__SP.html#a65f777b3669c4589c2f70c041a1f5691">FFT_SP</a>
+, <a class="el" href="classIFFT__SP.html#a0edbd1b424fa26644c08686fe61d60fe">IFFT_SP</a>
+, <a class="el" href="classDspTask.html#a94f205ef95c26d83f9b090fbc21127fd">DspTask</a>
 </li>
-<li>getBufIn()
-: <a class="el" href="classAPI.html#a4fe9da8dd6f5f9460fde1a3c07a1db9a">API</a>
+<li>getInputBuffer()
+: <a class="el" href="classIFFT__SP.html#ac8191a97eb90fabe96553a73ddedc606">IFFT_SP</a>
+, <a class="el" href="classDspTask.html#a4b8aca3cb45ba2e636e549e75a0b8a8d">DspTask</a>
+, <a class="el" href="classFFT__SP.html#a67c3718f40e6ca956e7ef80b4eb054d1">FFT_SP</a>
 </li>
-<li>getBufOut()
-: <a class="el" href="classAPI.html#a691c08881e37174cb5dcafbbb6b669a2">API</a>
+<li>getInputBufferCopy()
+: <a class="el" href="classFFT__SP.html#ac8cdc70bd573a0fd1efeaa48c5476181">FFT_SP</a>
+, <a class="el" href="classIFFT__SP.html#aa2a5aa020b2a0942a8027aca96b69665">IFFT_SP</a>
 </li>
-<li>getDataPtr()
-: <a class="el" href="classCallbackResponse.html#aded6bb2a8c8bc5d5b9a79d5fad1c4984">CallbackResponse</a>
+<li>getInstance()
+: <a class="el" href="classDspTaskFactory.html#acc92edcedc54091e60bcd97360087f81">DspTaskFactory</a>
 </li>
-<li>getDataSize()
-: <a class="el" href="classCallbackResponse.html#aa1a74aa2f801ecde5e711717eddaf016">CallbackResponse</a>
+<li>getOutputBuffer()
+: <a class="el" href="classDspTask.html#a0f5231646a852f3843833f812ef6479f">DspTask</a>
+, <a class="el" href="classIFFT__SP.html#a3fa21a9f45487af30e81592c5b41b8c5">IFFT_SP</a>
+, <a class="el" href="classFFT__SP.html#a855a77678a8ccb605cd9e44e7b4d4ecc">FFT_SP</a>
 </li>
-<li>getOp()
-: <a class="el" href="classCallbackResponse.html#a3d6be99554bd51a8ab88ff1e1fdba66d">CallbackResponse</a>
+<li>getOutputBufferCopy()
+: <a class="el" href="classIFFT__SP.html#a8536a6a339378ae40d29e6f79dbe00ae">IFFT_SP</a>
+, <a class="el" href="classFFT__SP.html#a6c6d11f2ef2cafae189fefff906b7c4d">FFT_SP</a>
 </li>
-<li>isBusy()
-: <a class="el" href="classAPI.html#a63c77cbcad0ed7e3e51c0ab317842b21">API</a>
-</li>
-<li>ocl_DSPF_sp_fftSPxSP()
-: <a class="el" href="classAPI.html#a62e9ed0f473af9c0f38bece16204b154">API</a>
-</li>
-<li>ocl_DSPF_sp_filter_biquad()
-: <a class="el" href="classAPI.html#a7aed755ef2f52e99f88ef915c64b12cb">API</a>
-</li>
-<li>ocl_DSPF_sp_ifftSPxSP()
-: <a class="el" href="classAPI.html#a8fdad78679cbaae85b52495e06097b14">API</a>
-</li>
-<li>prepareFFT()
-: <a class="el" href="classAPI.html#aff66a439ea7b3533035e7df1057d6a4b">API</a>
-</li>
-<li>prepareFILTER_BIQUAD()
-: <a class="el" href="classAPI.html#a6cce1f49c2bf4044c110f6362c598a65">API</a>
-</li>
-<li>prepareIFFT()
-: <a class="el" href="classAPI.html#aea87f49fb7c3ae4f84127056ed069354">API</a>
-</li>
-<li>setCallback()
-: <a class="el" href="classAPI.html#af673b62f6a0601444a6f1d4aff50046c">API</a>
-</li>
-<li>setDebug()
-: <a class="el" href="classAPI.html#a5ffb7593cf14abcbebda3e2ff012e2e7">API</a>
+<li>setInputBuffer()
+: <a class="el" href="classFFT__SP.html#af9ee102229ad98e67e73f144bdad2d08">FFT_SP</a>
+, <a class="el" href="classIFFT__SP.html#a991ab346001e70ecdd56c86d522d2cdf">IFFT_SP</a>
 </li>
 </ul>
 </div><!-- contents -->
@@ -145,7 +131,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

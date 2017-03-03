@@ -1,8 +1,10 @@
 var searchData=
 [
-  ['getbufin',['getBufIn',['../classAPI.html#a4fe9da8dd6f5f9460fde1a3c07a1db9a',1,'API']]],
-  ['getbufout',['getBufOut',['../classAPI.html#a691c08881e37174cb5dcafbbb6b669a2',1,'API']]],
-  ['getdataptr',['getDataPtr',['../classCallbackResponse.html#aded6bb2a8c8bc5d5b9a79d5fad1c4984',1,'CallbackResponse']]],
-  ['getdatasize',['getDataSize',['../classCallbackResponse.html#aa1a74aa2f801ecde5e711717eddaf016',1,'CallbackResponse']]],
-  ['getop',['getOp',['../classCallbackResponse.html#a3d6be99554bd51a8ab88ff1e1fdba66d',1,'CallbackResponse']]]
+  ['generatetwiddlefactors',['generateTwiddleFactors',['../classFFT__SP.html#ad467ccb7d2f04230df1bbb36f0511ff8',1,'FFT_SP::generateTwiddleFactors()'],['../classIFFT__SP.html#aa29a633d4a433fab70ff863b9307cdbb',1,'IFFT_SP::generateTwiddleFactors()']]],
+  ['getbuffersize',['getBufferSize',['../classDspTask.html#a94f205ef95c26d83f9b090fbc21127fd',1,'DspTask::getBufferSize()'],['../classFFT__SP.html#a65f777b3669c4589c2f70c041a1f5691',1,'FFT_SP::getBufferSize()'],['../classIFFT__SP.html#a0edbd1b424fa26644c08686fe61d60fe',1,'IFFT_SP::getBufferSize()']]],
+  ['getinputbuffer',['getInputBuffer',['../classDspTask.html#a4b8aca3cb45ba2e636e549e75a0b8a8d',1,'DspTask::getInputBuffer()'],['../classFFT__SP.html#a67c3718f40e6ca956e7ef80b4eb054d1',1,'FFT_SP::getInputBuffer()'],['../classIFFT__SP.html#ac8191a97eb90fabe96553a73ddedc606',1,'IFFT_SP::getInputBuffer()']]],
+  ['getinputbuffercopy',['getInputBufferCopy',['../classFFT__SP.html#ac8cdc70bd573a0fd1efeaa48c5476181',1,'FFT_SP::getInputBufferCopy()'],['../classIFFT__SP.html#aa2a5aa020b2a0942a8027aca96b69665',1,'IFFT_SP::getInputBufferCopy()']]],
+  ['getinstance',['getInstance',['../classDspTaskFactory.html#acc92edcedc54091e60bcd97360087f81',1,'DspTaskFactory']]],
+  ['getoutputbuffer',['getOutputBuffer',['../classDspTask.html#a0f5231646a852f3843833f812ef6479f',1,'DspTask::getOutputBuffer()'],['../classFFT__SP.html#a855a77678a8ccb605cd9e44e7b4d4ecc',1,'FFT_SP::getOutputBuffer()'],['../classIFFT__SP.html#a3fa21a9f45487af30e81592c5b41b8c5',1,'IFFT_SP::getOutputBuffer()']]],
+  ['getoutputbuffercopy',['getOutputBufferCopy',['../classFFT__SP.html#a6c6d11f2ef2cafae189fefff906b7c4d',1,'FFT_SP::getOutputBufferCopy()'],['../classIFFT__SP.html#a8536a6a339378ae40d29e6f79dbe00ae',1,'IFFT_SP::getOutputBufferCopy()']]]
 ];

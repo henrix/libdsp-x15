@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['setcallback',['setCallback',['../classAPI.html#af673b62f6a0601444a6f1d4aff50046c',1,'API']]],
-  ['setdebug',['setDebug',['../classAPI.html#a5ffb7593cf14abcbebda3e2ff012e2e7',1,'API']]]
+  ['setinputbuffer',['setInputBuffer',['../classFFT__SP.html#af9ee102229ad98e67e73f144bdad2d08',1,'FFT_SP::setInputBuffer()'],['../classIFFT__SP.html#a991ab346001e70ecdd56c86d522d2cdf',1,'IFFT_SP::setInputBuffer()']]]
 ];
