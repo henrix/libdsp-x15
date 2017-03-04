@@ -25,20 +25,20 @@
 #include <complex>
 #include <cmath>
 
-void callbackDSP(CallbackResponse *clbkRes);
-
 const int N = 512;
 bool fftFinished = false, ifftFinished = false;
 
+void callback(DspTask& task);
+
 int main(int argc, char* argv[]){
-	API api(callbackDSP);
-	api.setDebug(true);
-	api.prepareFFT(N, 4, N);
-	api.prepareIFFT(N, 4, N);
+    DspTaskFactory& factory = DspTaskFactory::getInstance();
+    TaskProcessor processor(true);
 
-	float *xFFT = api.getBufIn(CallbackResponse::FFT);
+    FFT_SP* fft = factory.createFFT_SP(N, callback, processor);
+    IFFT_SP* ifft = factory.createIFFT_SP(N, callback, processor);
 
-	/* Generate sine */
+    float* xFFT = fft->getInputBuffer();
+
 	std::ofstream sinout("../../test/data/fft_ifft/sine.txt");
     if (sinout.is_open()){
         for (int i=0; i < N; i++){
@@ -49,60 +49,66 @@ int main(int argc, char* argv[]){
         sinout.close();
     }
     else{
-        std::cout << "Couldn't write sine test output" << std::endl;
+        std::cout << "couldn't write sine test output" << std::endl;
     }
 
-    api.ocl_DSPF_sp_fftSPxSP();
+    processor.enqueueTask(*fft);
     while(!fftFinished){}
-    float *yFFT = api.getBufOut(CallbackResponse::FFT);
-    float *xIFFT = api.getBufIn(CallbackResponse::IFFT);
+    
+    float *yFFT = fft->getOutputBuffer();
+    float *xIFFT = ifft->getInputBuffer();
     for (int i=0; i < 2*N; i++){
         xIFFT[i] = yFFT[i];
     }
-    api.ocl_DSPF_sp_ifftSPxSP();
+    processor.enqueueTask(*ifft);
     while(!ifftFinished){}
+
+    delete fft;
+    delete ifft;
     
     return 0;
 }
 
-void callbackDSP(CallbackResponse *clbkRes){
-	float *y = clbkRes->getDataPtr();
-    int data_size = clbkRes->getDataSize();
-    int n = data_size / 2;
+void callback(DspTask& task){
 
-    if (clbkRes->getOp() == CallbackResponse::FFT){
-        std::complex<float> cmplx[N];
+    if (task.operation == DspTask::FFT){
+        FFT_SP& fft = (FFT_SP&) task;
 
-        std::ofstream fftoutsine("../../test/data/fft_ifft/spectrum_mag.txt");
-        std::ofstream fftoutsinePhase("../../test/data/fft_ifft/spectrum_phase.txt");
-        if (fftoutsine.is_open()){
-           	for (int i=0; i < n; i++){
-                cmplx[i].real(y[PAD + 2*i]);
-                cmplx[i].imag(y[PAD + 2*i + 1]);
-               	fftoutsine << std::abs(cmplx[i]) / 256.0 << std::endl;
-                fftoutsinePhase << std::arg(cmplx[i]) << std::endl;
-           	}
-           	fftoutsine.close();
+        std::shared_ptr<std::vector<std::complex<float>>> output = fft.getOutputBufferCopy();
+
+        std::ofstream magSpectrum("../../test/data/fft_ifft/spectrum_mag.txt");
+        std::ofstream phaseSpectrum("../../test/data/fft_ifft/spectrum_phase.txt");
+        if (magSpectrum.is_open()){
+            for (unsigned int i=0; i < fft.getN(); i++){
+                magSpectrum << std::abs((*output)[i]) / 256.0 << std::endl;
+                phaseSpectrum << std::arg((*output)[i]) << std::endl;
+            }
+            magSpectrum.close();
+            phaseSpectrum.close();
         }
         else{
-           	std::cout << "Couldn't write FFT sine test output" << std::endl;
+            std::cout << "couldn't write FFT sine test output" << std::endl;
         }
+        std::cout << "FFT operation finished" << std::endl;
         fftFinished = true;
     }
-    else if (clbkRes->getOp() == CallbackResponse::IFFT){
+    else if (task.operation == DspTask::IFFT){
+        IFFT_SP& ifft = (IFFT_SP&) task;
+        
+        std::shared_ptr<std::vector<std::complex<float>>> output = ifft.getOutputBufferCopy();
 
-    	std::ofstream ifftout("../../test/data/fft_ifft/ifft_spectrum.txt");
+        std::ofstream ifftout("../../test/data/fft_ifft/ifft_spectrum.txt");
         if (ifftout.is_open()){
-           	for (int i=0; i < n; i++){
-               	ifftout << y[PAD + 2*i] << std::endl;
-           	}
-           	ifftout.close();
+            for (unsigned int i=0; i < ifft.getN(); i++){
+                ifftout << (*output)[i].real() << std::endl;
+            }
+            ifftout.close();
         }
         else{
-           	std::cout << "Couldn't write IFFT sine spectrum test output" << std::endl;
+            std::cout << "couldn't write IFFT sine spectrum test output" << std::endl;
         }
+        std::cout << "IFFT operation finished" << std::endl;
         ifftFinished = true;
     }
-
-    delete clbkRes;
+    
 }
