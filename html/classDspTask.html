@@ -89,15 +89,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">DspTask Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<!-- doxytag: class="DspTask" --><div class="dynheader">
+<!-- doxytag: class="DspTask" -->
+<p>represents abstract DSP task. all task implementations must inherit from this class.  
+ <a href="classDspTask.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="DspTask_8h_source.html">DspTask.h</a>&gt;</code></p>
+<div class="dynheader">
 Inheritance diagram for DspTask:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classDspTask.png" usemap="#DspTask_map" alt=""/>
   <map id="DspTask_map" name="DspTask_map">
-<area href="classFFT__SP.html" alt="FFT_SP" shape="rect" coords="0,56,95,80"/>
-<area href="classFilterBiquadSP.html" alt="FilterBiquadSP" shape="rect" coords="105,56,200,80"/>
-<area href="classIFFT__SP.html" alt="IFFT_SP" shape="rect" coords="210,56,305,80"/>
+<area href="classFFT__SP.html" title="implements single precision FFT operation" alt="FFT_SP" shape="rect" coords="0,56,95,80"/>
+<area href="classFilterBiquadSP.html" title="implements single precision filter biquad operation" alt="FilterBiquadSP" shape="rect" coords="105,56,200,80"/>
+<area href="classIFFT__SP.html" title="implements single precision IFFT operation" alt="IFFT_SP" shape="rect" coords="210,56,305,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -118,20 +123,14 @@ Data Fields</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8e8ca0ec895e1179a626ad299f07136"></a><!-- doxytag: member="DspTask::DspTask" ref="ac8e8ca0ec895e1179a626ad299f07136" args="(unsigned long id, OPERATION operation, std::function&lt; void(DspTask &amp;task)&gt; callback, std::shared_ptr&lt; cl::Context &gt; clContext, std::shared_ptr&lt; cl::Program &gt; clProgram)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><b>DspTask</b> (unsigned long <a class="el" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">id</a>, <a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> <a class="el" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a>, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, std::shared_ptr&lt; cl::Context &gt; clContext, std::shared_ptr&lt; cl::Program &gt; clProgram)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03acf4eb8e8625da434e8553250ecd85"></a><!-- doxytag: member="DspTask::_assignClInputBuffersToQueue" ref="a03acf4eb8e8625da434e8553250ecd85" args="(std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue)=0" -->
-virtual std::vector&lt; cl::Event &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_assignClInputBuffersToQueue</b> (std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue)=0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a514ad466cbd423e606171d399a875075"></a><!-- doxytag: member="DspTask::_assignClOutputBuffersToQueue" ref="a514ad466cbd423e606171d399a875075" args="(std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue, std::vector&lt; cl::Event &gt; &amp;preEvents)=0" -->
-virtual std::vector&lt; cl::Event &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_assignClOutputBuffersToQueue</b> (std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue, std::vector&lt; cl::Event &gt; &amp;preEvents)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#ac8e8ca0ec895e1179a626ad299f07136">DspTask</a> (unsigned long <a class="el" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">id</a>, <a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> <a class="el" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a>, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, std::shared_ptr&lt; cl::Context &gt; clContext, std::shared_ptr&lt; cl::Program &gt; clProgram)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cl::Event &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#a03acf4eb8e8625da434e8553250ecd85">_assignClInputBuffersToQueue</a> (std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; cl::Event &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#a514ad466cbd423e606171d399a875075">_assignClOutputBuffersToQueue</a> (std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue, std::vector&lt; cl::Event &gt; &amp;preEvents)=0</td></tr>
 <tr><td colspan="2"><h2><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac5ef041dda3e299636a250b719246518"></a><!-- doxytag: member="DspTask::_createId" ref="ac5ef041dda3e299636a250b719246518" args="()" -->
-static unsigned long&#160;</td><td class="memItemRight" valign="bottom"><b>_createId</b> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1553148d7a70c7525f56ae66116ea8c8"></a><!-- doxytag: member="DspTask::_mallocBuffer" ref="a1553148d7a70c7525f56ae66116ea8c8" args="(std::size_t size)" -->
-static void *&#160;</td><td class="memItemRight" valign="bottom"><b>_mallocBuffer</b> (std::size_t size)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a68669b59909da882060d55844965bd68"></a><!-- doxytag: member="DspTask::_freeBuffer" ref="a68669b59909da882060d55844965bd68" args="(void *ptr)" -->
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>_freeBuffer</b> (void *ptr)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#ac5ef041dda3e299636a250b719246518">_createId</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#a1553148d7a70c7525f56ae66116ea8c8">_mallocBuffer</a> (std::size_t size)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#a68669b59909da882060d55844965bd68">_freeBuffer</a> (void *ptr)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1468e3a902ce8a04c5c7855309e2df4d"></a><!-- doxytag: member="DspTask::_callback" ref="a1468e3a902ce8a04c5c7855309e2df4d" args="" -->
@@ -149,7 +148,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>TaskProcessor</b></t
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05cd8106958d1d2eaf14797d163703cc"></a><!-- doxytag: member="DspTask::DspTaskFactory" ref="a05cd8106958d1d2eaf14797d163703cc" args="" -->
 class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></td></tr>
 </table>
-<hr/><h2>Member Enumeration Documentation</h2>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>represents abstract DSP task. all task implementations must inherit from this class. </p>
+</div><hr/><h2>Member Enumeration Documentation</h2>
 <a class="anchor" id="a22e7b22b520891c83176c4c93f9d7de5"></a><!-- doxytag: member="DspTask::OPERATION" ref="a22e7b22b520891c83176c4c93f9d7de5" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -164,7 +165,191 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></
 
 </div>
 </div>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ac8e8ca0ec895e1179a626ad299f07136"></a><!-- doxytag: member="DspTask::DspTask" ref="ac8e8ca0ec895e1179a626ad299f07136" args="(unsigned long id, OPERATION operation, std::function&lt; void(DspTask &amp;task)&gt; callback, std::shared_ptr&lt; cl::Context &gt; clContext, std::shared_ptr&lt; cl::Program &gt; clProgram)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classDspTask.html#ac8e8ca0ec895e1179a626ad299f07136">DspTask::DspTask</a> </td>
+          <td>(</td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a>&#160;</td>
+          <td class="paramname"><em>operation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; cl::Context &gt;&#160;</td>
+          <td class="paramname"><em>clContext</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; cl::Program &gt;&#160;</td>
+          <td class="paramname"><em>clProgram</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [explicit, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>abstract constructor (is only called by factory) </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>unique task id </td></tr>
+    <tr><td class="paramname">operation</td><td>DSP operation </td></tr>
+    <tr><td class="paramname">callback</td><td>callback function </td></tr>
+    <tr><td class="paramname">clContext</td><td>OpenCL context (dependency) </td></tr>
+    <tr><td class="paramname">clProgram</td><td>OpenCL program (dependency) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a03acf4eb8e8625da434e8553250ecd85"></a><!-- doxytag: member="DspTask::_assignClInputBuffersToQueue" ref="a03acf4eb8e8625da434e8553250ecd85" args="(std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue)=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt;cl::Event&gt; <a class="el" href="classDspTask.html#a03acf4eb8e8625da434e8553250ecd85">DspTask::_assignClInputBuffersToQueue</a> </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; cl::CommandQueue &gt;&#160;</td>
+          <td class="paramname"><em>clCmdQueue</em></td><td>)</td>
+          <td><code> [protected, pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>assigns OpenCL input buffers to command queue. all derived DSP tasks must implement this method. tasks are responsible for data. task processor is responsible for execution. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">clCmdQueue</td><td>OpenCL command queue </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>vector with events (triggered when buffers has been assigned to command queue) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a514ad466cbd423e606171d399a875075"></a><!-- doxytag: member="DspTask::_assignClOutputBuffersToQueue" ref="a514ad466cbd423e606171d399a875075" args="(std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue, std::vector&lt; cl::Event &gt; &amp;preEvents)=0" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt;cl::Event&gt; <a class="el" href="classDspTask.html#a514ad466cbd423e606171d399a875075">DspTask::_assignClOutputBuffersToQueue</a> </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; cl::CommandQueue &gt;&#160;</td>
+          <td class="paramname"><em>clCmdQueue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; cl::Event &gt; &amp;&#160;</td>
+          <td class="paramname"><em>preEvents</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [protected, pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>assigns OpenCL output buffers to command queue. all derived DSP tasks must implement this method. tasks are responsible for data. task processor is responsible for execution. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">clCmdQueue</td><td>OpenCL command queue </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>vector with events (triggered when buffers has been assigned to command queue) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac5ef041dda3e299636a250b719246518"></a><!-- doxytag: member="DspTask::_createId" ref="ac5ef041dda3e299636a250b719246518" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">static unsigned long <a class="el" href="classDspTask.html#ac5ef041dda3e299636a250b719246518">DspTask::_createId</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [static, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>generates a unique task id </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd></dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a68669b59909da882060d55844965bd68"></a><!-- doxytag: member="DspTask::_freeBuffer" ref="a68669b59909da882060d55844965bd68" args="(void *ptr)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void <a class="el" href="classDspTask.html#a68669b59909da882060d55844965bd68">DspTask::_freeBuffer</a> </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td><code> [static, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>frees buffer in contiguous memory </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pointer</td><td>to allocated memory </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a1553148d7a70c7525f56ae66116ea8c8"></a><!-- doxytag: member="DspTask::_mallocBuffer" ref="a1553148d7a70c7525f56ae66116ea8c8" args="(std::size_t size)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void* <a class="el" href="classDspTask.html#a1553148d7a70c7525f56ae66116ea8c8">DspTask::_mallocBuffer</a> </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>size</em></td><td>)</td>
+          <td><code> [static, protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>allocates buffer in contiguous memory </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">size</td><td>size in bytes </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>pointer to allocated memory </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a94f205ef95c26d83f9b090fbc21127fd"></a><!-- doxytag: member="DspTask::getBufferSize" ref="a94f205ef95c26d83f9b090fbc21127fd" args="()=0" -->
 <div class="memitem">
 <div class="memproto">

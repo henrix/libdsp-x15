@@ -82,12 +82,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock">Here are the data structures with brief descriptions:</div><table>
-  <tr><td class="indexkey"><a class="el" href="classDspTask.html">DspTask</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classDspTaskFactory.html">DspTaskFactory</a></td><td class="indexvalue">Factory (singleton) to construct DspTasks. factory injects required OpenCL runtime objects </td></tr>
-  <tr><td class="indexkey"><a class="el" href="classFFT__SP.html">FFT_SP</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classFilterBiquadSP.html">FilterBiquadSP</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classIFFT__SP.html">IFFT_SP</a></td><td class="indexvalue"></td></tr>
-  <tr><td class="indexkey"><a class="el" href="classTaskProcessor.html">TaskProcessor</a></td><td class="indexvalue"></td></tr>
+  <tr><td class="indexkey"><a class="el" href="classDspTask.html">DspTask</a></td><td class="indexvalue">Abstract DSP task. all task implementations must inherit from this class </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classDspTaskFactory.html">DspTaskFactory</a></td><td class="indexvalue">Factory to construct DSP tasks. injects required OpenCL runtime objects </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classFFT__SP.html">FFT_SP</a></td><td class="indexvalue">Implements single precision FFT operation </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classFilterBiquadSP.html">FilterBiquadSP</a></td><td class="indexvalue">Implements single precision filter biquad operation </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classIFFT__SP.html">IFFT_SP</a></td><td class="indexvalue">Implements single precision IFFT operation </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classTaskProcessor.html">TaskProcessor</a></td><td class="indexvalue">Manages command queue and is responsible for correct DSP task execution </td></tr>
 </table>
 </div><!-- contents -->
 <!-- window showing the filter options -->

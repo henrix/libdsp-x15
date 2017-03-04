@@ -103,53 +103,55 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00023"></a>00023 <span class="preprocessor">#include &lt;functional&gt;</span>
 <a name="l00024"></a>00024 <span class="preprocessor">#include &lt;ocl_util.h&gt;</span>
 <a name="l00025"></a>00025 
-<a name="l00026"></a><a class="code" href="classDspTask.html">00026</a> <span class="keyword">class </span><a class="code" href="classDspTask.html">DspTask</a> {
-<a name="l00027"></a>00027     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classTaskProcessor.html">TaskProcessor</a>;
-<a name="l00028"></a>00028     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classDspTaskFactory.html" title="factory (singleton) to construct DspTasks. factory injects required OpenCL runtime objects...">DspTaskFactory</a>;
-<a name="l00029"></a>00029 <span class="keyword">public</span>:
-<a name="l00031"></a><a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">00031</a>     <span class="keyword">enum</span> <a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> {FFT, IFFT, FILTER_BIQUAD};
-<a name="l00032"></a>00032 
-<a name="l00034"></a><a class="code" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">00034</a>     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">id</a>;
-<a name="l00035"></a>00035 
-<a name="l00037"></a><a class="code" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">00037</a>     <span class="keyword">const</span> <a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> <a class="code" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a>;
-<a name="l00038"></a>00038 
-<a name="l00044"></a>00044     <span class="keyword">virtual</span> std::size_t <a class="code" href="classDspTask.html#a94f205ef95c26d83f9b090fbc21127fd">getBufferSize</a>() = 0;
-<a name="l00045"></a>00045 
-<a name="l00052"></a>00052     <span class="keyword">virtual</span> <span class="keywordtype">float</span>* <a class="code" href="classDspTask.html#a4b8aca3cb45ba2e636e549e75a0b8a8d">getInputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0) = 0;
-<a name="l00059"></a>00059     <span class="keyword">virtual</span> <span class="keywordtype">float</span>* <a class="code" href="classDspTask.html#a0f5231646a852f3843833f812ef6479f">getOutputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0) = 0;
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061 <span class="keyword">protected</span>:
-<a name="l00062"></a>00062     <span class="keyword">explicit</span> <a class="code" href="classDspTask.html">DspTask</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">id</span>, <a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> <a class="code" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a>, std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback,
-<a name="l00063"></a>00063                      std::shared_ptr&lt;cl::Context&gt; clContext, std::shared_ptr&lt;cl::Program&gt; clProgram);
+<a name="l00030"></a><a class="code" href="classDspTask.html">00030</a> <span class="keyword">class </span><a class="code" href="classDspTask.html" title="represents abstract DSP task. all task implementations must inherit from this class.">DspTask</a> {
+<a name="l00031"></a>00031     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classTaskProcessor.html" title="manages command queue and is responsible for correct DSP task execution.">TaskProcessor</a>;
+<a name="l00032"></a>00032     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classDspTaskFactory.html" title="factory to construct DSP tasks. injects required OpenCL runtime objects.">DspTaskFactory</a>;
+<a name="l00033"></a>00033 <span class="keyword">public</span>:
+<a name="l00035"></a><a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">00035</a>     <span class="keyword">enum</span> <a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> {FFT, IFFT, FILTER_BIQUAD};
+<a name="l00036"></a>00036 
+<a name="l00038"></a><a class="code" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">00038</a>     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">id</a>;
+<a name="l00039"></a>00039 
+<a name="l00041"></a><a class="code" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">00041</a>     <span class="keyword">const</span> <a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> <a class="code" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a>;
+<a name="l00042"></a>00042 
+<a name="l00048"></a>00048     <span class="keyword">virtual</span> std::size_t <a class="code" href="classDspTask.html#a94f205ef95c26d83f9b090fbc21127fd">getBufferSize</a>() = 0;
+<a name="l00049"></a>00049 
+<a name="l00056"></a>00056     <span class="keyword">virtual</span> <span class="keywordtype">float</span>* <a class="code" href="classDspTask.html#a4b8aca3cb45ba2e636e549e75a0b8a8d">getInputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0) = 0;
+<a name="l00063"></a>00063     <span class="keyword">virtual</span> <span class="keywordtype">float</span>* <a class="code" href="classDspTask.html#a0f5231646a852f3843833f812ef6479f">getOutputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0) = 0;
 <a name="l00064"></a>00064 
-<a name="l00065"></a>00065     <span class="comment">/*</span>
-<a name="l00066"></a>00066 <span class="comment">     * all derived DSP tasks must implement these methods to add its buffers to OpenCL</span>
-<a name="l00067"></a>00067 <span class="comment">     * command queue. tasks are responsible for data. task processor is responsible</span>
-<a name="l00068"></a>00068 <span class="comment">     * for execution.</span>
-<a name="l00069"></a>00069 <span class="comment">     */</span>
-<a name="l00070"></a>00070     <span class="keyword">virtual</span> std::vector&lt;cl::Event&gt; _assignClInputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue) = 0;
-<a name="l00071"></a>00071     <span class="keyword">virtual</span> std::vector&lt;cl::Event&gt; _assignClOutputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue,
-<a name="l00072"></a>00072                                                                   std::vector&lt;cl::Event&gt;&amp; preEvents) = 0;
-<a name="l00073"></a>00073 
-<a name="l00074"></a>00074     std::function&lt;void(DspTask &amp;task)&gt; _callback;
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076     <span class="comment">/* OpenCL kernel */</span>
-<a name="l00077"></a>00077     std::shared_ptr&lt;cl::Kernel&gt; _clKernel;
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079     <span class="comment">/* OpenCL dependencies */</span>
-<a name="l00080"></a>00080     std::shared_ptr&lt;cl::Context&gt; _clContext;
-<a name="l00081"></a>00081     std::shared_ptr&lt;cl::Program&gt; _clProgram;
-<a name="l00082"></a>00082 
-<a name="l00083"></a>00083     <span class="comment">/* some helpers */</span>
-<a name="l00084"></a>00084     <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> _createId();
-<a name="l00085"></a>00085     <span class="keyword">static</span> <span class="keywordtype">void</span>* _mallocBuffer(std::size_t size);
-<a name="l00086"></a>00086     <span class="keyword">static</span> <span class="keywordtype">void</span> _freeBuffer(<span class="keywordtype">void</span> *ptr);
-<a name="l00087"></a>00087 
-<a name="l00088"></a>00088 <span class="keyword">private</span>:
-<a name="l00089"></a>00089     <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> _id_counter;
-<a name="l00090"></a>00090 };
+<a name="l00065"></a>00065 <span class="keyword">protected</span>:
+<a name="l00074"></a>00074     <span class="keyword">explicit</span> <a class="code" href="classDspTask.html#ac8e8ca0ec895e1179a626ad299f07136">DspTask</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">id</span>, <a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> <a class="code" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a>, std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classDspTask.html" title="represents abstract DSP task. all task implementations must inherit from this class.">DspTask</a> &amp;task)&gt; callback,
+<a name="l00075"></a>00075                      std::shared_ptr&lt;cl::Context&gt; clContext, std::shared_ptr&lt;cl::Program&gt; clProgram);
+<a name="l00076"></a>00076 
+<a name="l00077"></a>00077     <span class="comment">/*</span>
+<a name="l00078"></a>00078 <span class="comment">     * all derived DSP tasks must implement these methods to add its buffers to OpenCL</span>
+<a name="l00079"></a>00079 <span class="comment">     * command queue. tasks are responsible for data. task processor is responsible</span>
+<a name="l00080"></a>00080 <span class="comment">     * for execution.</span>
+<a name="l00081"></a>00081 <span class="comment">     */</span>
+<a name="l00090"></a>00090     <span class="keyword">virtual</span> std::vector&lt;cl::Event&gt; <a class="code" href="classDspTask.html#a03acf4eb8e8625da434e8553250ecd85">_assignClInputBuffersToQueue</a>(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue) = 0;
 <a name="l00091"></a>00091 
-<a name="l00092"></a>00092 <span class="preprocessor">#endif //LIBDSP_X15_DSPTASK_H</span>
+<a name="l00100"></a>00100     <span class="keyword">virtual</span> std::vector&lt;cl::Event&gt; <a class="code" href="classDspTask.html#a514ad466cbd423e606171d399a875075">_assignClOutputBuffersToQueue</a>(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue,
+<a name="l00101"></a>00101                                                                   std::vector&lt;cl::Event&gt;&amp; preEvents) = 0;
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103     std::function&lt;void(DspTask &amp;task)&gt; _callback;
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105     <span class="comment">/* OpenCL kernel */</span>
+<a name="l00106"></a>00106     std::shared_ptr&lt;cl::Kernel&gt; _clKernel;
+<a name="l00107"></a>00107 
+<a name="l00108"></a>00108     <span class="comment">/* OpenCL dependencies */</span>
+<a name="l00109"></a>00109     std::shared_ptr&lt;cl::Context&gt; _clContext;
+<a name="l00110"></a>00110     std::shared_ptr&lt;cl::Program&gt; _clProgram;
+<a name="l00111"></a>00111 
+<a name="l00116"></a>00116     <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code" href="classDspTask.html#ac5ef041dda3e299636a250b719246518">_createId</a>();
+<a name="l00117"></a>00117 
+<a name="l00123"></a>00123     <span class="keyword">static</span> <span class="keywordtype">void</span>* <a class="code" href="classDspTask.html#a1553148d7a70c7525f56ae66116ea8c8">_mallocBuffer</a>(std::size_t size);
+<a name="l00124"></a>00124 
+<a name="l00129"></a>00129     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classDspTask.html#a68669b59909da882060d55844965bd68">_freeBuffer</a>(<span class="keywordtype">void</span> *ptr);
+<a name="l00130"></a>00130 
+<a name="l00131"></a>00131 <span class="keyword">private</span>:
+<a name="l00132"></a>00132     <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> _id_counter;
+<a name="l00133"></a>00133 };
+<a name="l00134"></a>00134 
+<a name="l00135"></a>00135 <span class="preprocessor">#endif //LIBDSP_X15_DSPTASK_H</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"

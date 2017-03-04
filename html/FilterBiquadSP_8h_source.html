@@ -101,53 +101,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00021"></a>00021 <span class="preprocessor"></span>
 <a name="l00022"></a>00022 <span class="preprocessor">#include &quot;DspTask.h&quot;</span>
 <a name="l00023"></a>00023 
-<a name="l00024"></a><a class="code" href="classFilterBiquadSP.html">00024</a> <span class="keyword">class </span><a class="code" href="classFilterBiquadSP.html">FilterBiquadSP</a> : <span class="keyword">public</span> <a class="code" href="classDspTask.html">DspTask</a> {
-<a name="l00025"></a>00025     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classDspTaskFactory.html" title="factory (singleton) to construct DspTasks. factory injects required OpenCL runtime objects...">DspTaskFactory</a>;
-<a name="l00026"></a>00026 <span class="keyword">public</span>:
-<a name="l00028"></a><a class="code" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">00028</a>     <span class="keyword">enum</span> <a class="code" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> {LOWPASS, HIGHPASS, BANDPASS, NOTCH, PEAK, LOWSHELF, HIGHSHELF};
-<a name="l00029"></a>00029 
-<a name="l00030"></a>00030     <span class="keyword">virtual</span> ~<a class="code" href="classFilterBiquadSP.html">FilterBiquadSP</a>();
-<a name="l00031"></a>00031 
-<a name="l00032"></a>00032     <span class="comment">/* implementation of abstract base class */</span>
-<a name="l00033"></a>00033     std::size_t <a class="code" href="classFilterBiquadSP.html#a69dacabeb7c42c66a4b7c968d4336a95">getBufferSize</a>();
-<a name="l00034"></a>00034     <span class="keywordtype">float</span>* <a class="code" href="classFilterBiquadSP.html#a5313aeaa76817ad89c6b74743211890d">getInputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0);
-<a name="l00035"></a>00035     <span class="keywordtype">float</span>* <a class="code" href="classFilterBiquadSP.html#a9a42eba7140f2923814499a403d5dffd">getOutputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0);
-<a name="l00036"></a>00036 
-<a name="l00041"></a>00041     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classFilterBiquadSP.html#a87b09236068ddba5a4ebb1bed4500998">getLength</a>();
-<a name="l00042"></a>00042 
-<a name="l00051"></a>00051     <span class="keywordtype">void</span> <a class="code" href="classFilterBiquadSP.html#acda62078efd25ae6ba402e14f5f00ec8">configFilter</a>(<a class="code" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> type, <span class="keywordtype">float</span> Fc, <span class="keywordtype">float</span> Fs, <span class="keywordtype">float</span> Q, <span class="keywordtype">float</span> peakGain);
-<a name="l00052"></a>00052 
-<a name="l00058"></a>00058     <span class="keywordtype">void</span> <a class="code" href="classFilterBiquadSP.html#acda62078efd25ae6ba402e14f5f00ec8">configFilter</a>(std::vector&lt;float&gt;&amp; b, std::vector&lt;float&gt;&amp; a);
-<a name="l00059"></a>00059 
-<a name="l00069"></a>00069     <span class="keyword">static</span> std::vector&lt;float&gt; <a class="code" href="classFilterBiquadSP.html#a32a5c77e4093b2abd0b55596f1d88aae">calcCoefficients</a>(<a class="code" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> type, <span class="keywordtype">float</span> Fc, <span class="keywordtype">float</span> Fs, <span class="keywordtype">float</span> Q, <span class="keywordtype">float</span> peakGain);
-<a name="l00070"></a>00070 <span class="keyword">private</span>:
-<a name="l00071"></a>00071     <a class="code" href="classFilterBiquadSP.html">FilterBiquadSP</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> length, std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback,
-<a name="l00072"></a>00072                    std::shared_ptr&lt;cl::Context&gt; clContext, std::shared_ptr&lt;cl::Program&gt; clProgram);
-<a name="l00073"></a>00073 
-<a name="l00074"></a>00074     std::vector&lt;cl::Event&gt; _assignClInputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue);
-<a name="l00075"></a>00075     std::vector&lt;cl::Event&gt; _assignClOutputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue,
-<a name="l00076"></a>00076                                                          std::vector&lt;cl::Event&gt;&amp; preEvents);
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078     <span class="comment">/* properties of DSP operation */</span>
-<a name="l00079"></a>00079     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _length;
-<a name="l00080"></a>00080     <span class="keyword">const</span> std::size_t _buffer_size;
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082     <span class="comment">/* zero copy buffers in contiguous memory (cmem) */</span>
-<a name="l00083"></a>00083     <span class="keywordtype">float</span> *_bufferInput;
-<a name="l00084"></a>00084     <span class="keywordtype">float</span> *_bufferB; <span class="comment">//forward coefficients</span>
-<a name="l00085"></a>00085     <span class="keywordtype">float</span> *_bufferA; <span class="comment">//feedback coefficients</span>
-<a name="l00086"></a>00086     <span class="keywordtype">float</span> *_bufferDelay; <span class="comment">//delay coefficients</span>
-<a name="l00087"></a>00087     <span class="keywordtype">float</span> *_bufferOutput;
-<a name="l00088"></a>00088 
-<a name="l00089"></a>00089     <span class="comment">/* OpenCL buffers (abstraction layer for low level zero copy buffers) */</span>
-<a name="l00090"></a>00090     std::unique_ptr&lt;cl::Buffer&gt; _clBufferInput;
-<a name="l00091"></a>00091     std::unique_ptr&lt;cl::Buffer&gt; _clBufferB;
-<a name="l00092"></a>00092     std::unique_ptr&lt;cl::Buffer&gt; _clBufferA;
-<a name="l00093"></a>00093     std::unique_ptr&lt;cl::Buffer&gt; _clBufferDelay;
-<a name="l00094"></a>00094     std::unique_ptr&lt;cl::Buffer&gt; _clBufferOutput;
-<a name="l00095"></a>00095 };
-<a name="l00096"></a>00096 
-<a name="l00097"></a>00097 <span class="preprocessor">#endif //LIBDSP_X15_FILTERBIQUADSP_H</span>
+<a name="l00027"></a><a class="code" href="classFilterBiquadSP.html">00027</a> <span class="keyword">class </span><a class="code" href="classFilterBiquadSP.html" title="implements single precision filter biquad operation">FilterBiquadSP</a> : <span class="keyword">public</span> <a class="code" href="classDspTask.html" title="represents abstract DSP task. all task implementations must inherit from this class.">DspTask</a> {
+<a name="l00028"></a>00028     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classDspTaskFactory.html" title="factory to construct DSP tasks. injects required OpenCL runtime objects.">DspTaskFactory</a>;
+<a name="l00029"></a>00029 <span class="keyword">public</span>:
+<a name="l00031"></a><a class="code" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">00031</a>     <span class="keyword">enum</span> <a class="code" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> {LOWPASS, HIGHPASS, BANDPASS, NOTCH, PEAK, LOWSHELF, HIGHSHELF};
+<a name="l00032"></a>00032 
+<a name="l00033"></a>00033     <span class="comment">/* implementation of abstract base class */</span>
+<a name="l00034"></a>00034     std::size_t <a class="code" href="classFilterBiquadSP.html#a69dacabeb7c42c66a4b7c968d4336a95">getBufferSize</a>();
+<a name="l00035"></a>00035     <span class="keywordtype">float</span>* <a class="code" href="classFilterBiquadSP.html#a5313aeaa76817ad89c6b74743211890d">getInputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0);
+<a name="l00036"></a>00036     <span class="keywordtype">float</span>* <a class="code" href="classFilterBiquadSP.html#a9a42eba7140f2923814499a403d5dffd">getOutputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0);
+<a name="l00037"></a>00037 
+<a name="l00042"></a>00042     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classFilterBiquadSP.html#a87b09236068ddba5a4ebb1bed4500998">getLength</a>();
+<a name="l00043"></a>00043 
+<a name="l00052"></a>00052     <span class="keywordtype">void</span> <a class="code" href="classFilterBiquadSP.html#acda62078efd25ae6ba402e14f5f00ec8">configFilter</a>(<a class="code" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> type, <span class="keywordtype">float</span> Fc, <span class="keywordtype">float</span> Fs, <span class="keywordtype">float</span> Q, <span class="keywordtype">float</span> peakGain);
+<a name="l00053"></a>00053 
+<a name="l00059"></a>00059     <span class="keywordtype">void</span> <a class="code" href="classFilterBiquadSP.html#acda62078efd25ae6ba402e14f5f00ec8">configFilter</a>(std::vector&lt;float&gt;&amp; b, std::vector&lt;float&gt;&amp; a);
+<a name="l00060"></a>00060 
+<a name="l00070"></a>00070     <span class="keyword">static</span> std::vector&lt;float&gt; <a class="code" href="classFilterBiquadSP.html#a32a5c77e4093b2abd0b55596f1d88aae">calcCoefficients</a>(<a class="code" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> type, <span class="keywordtype">float</span> Fc, <span class="keywordtype">float</span> Fs, <span class="keywordtype">float</span> Q, <span class="keywordtype">float</span> peakGain);
+<a name="l00071"></a>00071 <span class="keyword">private</span>:
+<a name="l00072"></a>00072     <a class="code" href="classFilterBiquadSP.html" title="implements single precision filter biquad operation">FilterBiquadSP</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> length, std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classDspTask.html" title="represents abstract DSP task. all task implementations must inherit from this class.">DspTask</a> &amp;task)&gt; callback,
+<a name="l00073"></a>00073                    std::shared_ptr&lt;cl::Context&gt; clContext, std::shared_ptr&lt;cl::Program&gt; clProgram);
+<a name="l00074"></a>00074     <span class="keyword">virtual</span> ~<a class="code" href="classFilterBiquadSP.html" title="implements single precision filter biquad operation">FilterBiquadSP</a>();
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076     std::vector&lt;cl::Event&gt; _assignClInputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue);
+<a name="l00077"></a>00077     std::vector&lt;cl::Event&gt; _assignClOutputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue,
+<a name="l00078"></a>00078                                                          std::vector&lt;cl::Event&gt;&amp; preEvents);
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080     <span class="comment">/* properties of DSP operation */</span>
+<a name="l00081"></a>00081     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _length;
+<a name="l00082"></a>00082     <span class="keyword">const</span> std::size_t _buffer_size;
+<a name="l00083"></a>00083 
+<a name="l00084"></a>00084     <span class="comment">/* zero copy buffers in contiguous memory (cmem) */</span>
+<a name="l00085"></a>00085     <span class="keywordtype">float</span> *_bufferInput;
+<a name="l00086"></a>00086     <span class="keywordtype">float</span> *_bufferB; <span class="comment">//forward coefficients</span>
+<a name="l00087"></a>00087     <span class="keywordtype">float</span> *_bufferA; <span class="comment">//feedback coefficients</span>
+<a name="l00088"></a>00088     <span class="keywordtype">float</span> *_bufferDelay; <span class="comment">//delay coefficients</span>
+<a name="l00089"></a>00089     <span class="keywordtype">float</span> *_bufferOutput;
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091     <span class="comment">/* OpenCL buffers (abstraction layer for low level zero copy buffers) */</span>
+<a name="l00092"></a>00092     std::unique_ptr&lt;cl::Buffer&gt; _clBufferInput;
+<a name="l00093"></a>00093     std::unique_ptr&lt;cl::Buffer&gt; _clBufferB;
+<a name="l00094"></a>00094     std::unique_ptr&lt;cl::Buffer&gt; _clBufferA;
+<a name="l00095"></a>00095     std::unique_ptr&lt;cl::Buffer&gt; _clBufferDelay;
+<a name="l00096"></a>00096     std::unique_ptr&lt;cl::Buffer&gt; _clBufferOutput;
+<a name="l00097"></a>00097 };
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099 <span class="preprocessor">#endif //LIBDSP_X15_FILTERBIQUADSP_H</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"

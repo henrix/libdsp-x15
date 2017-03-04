@@ -105,50 +105,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00025"></a>00025 <span class="preprocessor">#include &lt;vector&gt;</span>
 <a name="l00026"></a>00026 <span class="preprocessor">#include &lt;CL/cl.hpp&gt;</span>
 <a name="l00027"></a>00027 
-<a name="l00028"></a><a class="code" href="classIFFT__SP.html">00028</a> <span class="keyword">class </span><a class="code" href="classIFFT__SP.html">IFFT_SP</a> : <span class="keyword">public</span> <a class="code" href="classDspTask.html">DspTask</a>{
-<a name="l00029"></a>00029     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classDspTaskFactory.html" title="factory (singleton) to construct DspTasks. factory injects required OpenCL runtime objects...">DspTaskFactory</a>;
-<a name="l00030"></a>00030 <span class="keyword">public</span>:
-<a name="l00031"></a>00031     <span class="keyword">virtual</span> ~<a class="code" href="classIFFT__SP.html">IFFT_SP</a>();
-<a name="l00032"></a>00032 
-<a name="l00033"></a>00033     <span class="comment">/* implementation of abstract base class */</span>
-<a name="l00034"></a>00034     std::size_t <a class="code" href="classIFFT__SP.html#a0edbd1b424fa26644c08686fe61d60fe">getBufferSize</a>();
-<a name="l00035"></a>00035     <span class="keywordtype">float</span>* <a class="code" href="classIFFT__SP.html#ac8191a97eb90fabe96553a73ddedc606">getInputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0);
-<a name="l00036"></a>00036     <span class="keywordtype">float</span>* <a class="code" href="classIFFT__SP.html#a3fa21a9f45487af30e81592c5b41b8c5">getOutputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0);
-<a name="l00037"></a>00037 
-<a name="l00042"></a>00042     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classIFFT__SP.html#a0f85ef8873b487867917c003a8ea3c01">getN</a>();
-<a name="l00043"></a>00043 
-<a name="l00048"></a>00048     <span class="keywordtype">void</span> <a class="code" href="classIFFT__SP.html#a991ab346001e70ecdd56c86d522d2cdf">setInputBuffer</a>(std::vector&lt;std::complex&lt;float&gt;&gt;&amp; values);
-<a name="l00049"></a>00049 
-<a name="l00054"></a>00054     std::shared_ptr&lt;std::vector&lt;std::complex&lt;float&gt;&gt;&gt; <a class="code" href="classIFFT__SP.html#aa2a5aa020b2a0942a8027aca96b69665">getInputBufferCopy</a>();
-<a name="l00055"></a>00055 
-<a name="l00060"></a>00060     std::shared_ptr&lt;std::vector&lt;std::complex&lt;float&gt;&gt;&gt; <a class="code" href="classIFFT__SP.html#a8536a6a339378ae40d29e6f79dbe00ae">getOutputBufferCopy</a>();
-<a name="l00061"></a>00061 
-<a name="l00068"></a>00068     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classIFFT__SP.html#aa29a633d4a433fab70ff863b9307cdbb">generateTwiddleFactors</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> N, <span class="keywordtype">float</span> *buffer);
-<a name="l00069"></a>00069 
-<a name="l00070"></a>00070 <span class="keyword">private</span>:
-<a name="l00071"></a>00071     <a class="code" href="classIFFT__SP.html">IFFT_SP</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> N, std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback,
-<a name="l00072"></a>00072             std::shared_ptr&lt;cl::Context&gt; clContext, std::shared_ptr&lt;cl::Program&gt; clProgram);
-<a name="l00073"></a>00073 
-<a name="l00074"></a>00074     std::vector&lt;cl::Event&gt; _assignClInputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue);
-<a name="l00075"></a>00075     std::vector&lt;cl::Event&gt; _assignClOutputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue,
-<a name="l00076"></a>00076                                        std::vector&lt;cl::Event&gt;&amp; preEvents);
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078     <span class="comment">/* properties of DSP operation */</span>
-<a name="l00079"></a>00079     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _N;
-<a name="l00080"></a>00080     <span class="keyword">const</span> std::size_t _buffer_size;
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082     <span class="comment">/* zero copy buffers in contiguous memory (cmem) */</span>
-<a name="l00083"></a>00083     <span class="keywordtype">float</span> *_bufferInput;
-<a name="l00084"></a>00084     <span class="keywordtype">float</span> *_bufferTwiddle; <span class="comment">//twiddle factors</span>
-<a name="l00085"></a>00085     <span class="keywordtype">float</span> *_bufferOutput;
-<a name="l00086"></a>00086 
-<a name="l00087"></a>00087     <span class="comment">/* OpenCL buffers (abstraction layer for low level zero copy buffers) */</span>
-<a name="l00088"></a>00088     std::unique_ptr&lt;cl::Buffer&gt; _clBufferInput;
-<a name="l00089"></a>00089     std::unique_ptr&lt;cl::Buffer&gt; _clBufferTwiddle;
-<a name="l00090"></a>00090     std::unique_ptr&lt;cl::Buffer&gt; _clBufferOutput;
-<a name="l00091"></a>00091 };
-<a name="l00092"></a>00092 
-<a name="l00093"></a>00093 <span class="preprocessor">#endif //LIBDSP_X15_IFFT_SP_H</span>
+<a name="l00031"></a><a class="code" href="classIFFT__SP.html">00031</a> <span class="keyword">class </span><a class="code" href="classIFFT__SP.html" title="implements single precision IFFT operation">IFFT_SP</a> : <span class="keyword">public</span> <a class="code" href="classDspTask.html" title="represents abstract DSP task. all task implementations must inherit from this class.">DspTask</a>{
+<a name="l00032"></a>00032     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classDspTaskFactory.html" title="factory to construct DSP tasks. injects required OpenCL runtime objects.">DspTaskFactory</a>;
+<a name="l00033"></a>00033 <span class="keyword">public</span>:
+<a name="l00034"></a>00034 
+<a name="l00035"></a>00035     <span class="comment">/* implementation of abstract base class */</span>
+<a name="l00036"></a>00036     std::size_t <a class="code" href="classIFFT__SP.html#a0edbd1b424fa26644c08686fe61d60fe">getBufferSize</a>();
+<a name="l00037"></a>00037     <span class="keywordtype">float</span>* <a class="code" href="classIFFT__SP.html#ac8191a97eb90fabe96553a73ddedc606">getInputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0);
+<a name="l00038"></a>00038     <span class="keywordtype">float</span>* <a class="code" href="classIFFT__SP.html#a3fa21a9f45487af30e81592c5b41b8c5">getOutputBuffer</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> index = 0);
+<a name="l00039"></a>00039 
+<a name="l00044"></a>00044     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classIFFT__SP.html#a0f85ef8873b487867917c003a8ea3c01">getN</a>();
+<a name="l00045"></a>00045 
+<a name="l00050"></a>00050     <span class="keywordtype">void</span> <a class="code" href="classIFFT__SP.html#a991ab346001e70ecdd56c86d522d2cdf">setInputBuffer</a>(std::vector&lt;std::complex&lt;float&gt;&gt;&amp; values);
+<a name="l00051"></a>00051 
+<a name="l00056"></a>00056     std::shared_ptr&lt;std::vector&lt;std::complex&lt;float&gt;&gt;&gt; <a class="code" href="classIFFT__SP.html#aa2a5aa020b2a0942a8027aca96b69665">getInputBufferCopy</a>();
+<a name="l00057"></a>00057 
+<a name="l00062"></a>00062     std::shared_ptr&lt;std::vector&lt;std::complex&lt;float&gt;&gt;&gt; <a class="code" href="classIFFT__SP.html#a8536a6a339378ae40d29e6f79dbe00ae">getOutputBufferCopy</a>();
+<a name="l00063"></a>00063 
+<a name="l00070"></a>00070     <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classIFFT__SP.html#aa29a633d4a433fab70ff863b9307cdbb">generateTwiddleFactors</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> N, <span class="keywordtype">float</span> *buffer);
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072 <span class="keyword">private</span>:
+<a name="l00073"></a>00073     <a class="code" href="classIFFT__SP.html" title="implements single precision IFFT operation">IFFT_SP</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> N, std::function&lt;<span class="keywordtype">void</span>(<a class="code" href="classDspTask.html" title="represents abstract DSP task. all task implementations must inherit from this class.">DspTask</a> &amp;task)&gt; callback,
+<a name="l00074"></a>00074             std::shared_ptr&lt;cl::Context&gt; clContext, std::shared_ptr&lt;cl::Program&gt; clProgram);
+<a name="l00075"></a>00075     <span class="keyword">virtual</span> ~<a class="code" href="classIFFT__SP.html" title="implements single precision IFFT operation">IFFT_SP</a>();
+<a name="l00076"></a>00076 
+<a name="l00077"></a>00077     std::vector&lt;cl::Event&gt; _assignClInputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue);
+<a name="l00078"></a>00078     std::vector&lt;cl::Event&gt; _assignClOutputBuffersToQueue(std::shared_ptr&lt;cl::CommandQueue&gt; clCmdQueue,
+<a name="l00079"></a>00079                                        std::vector&lt;cl::Event&gt;&amp; preEvents);
+<a name="l00080"></a>00080 
+<a name="l00081"></a>00081     <span class="comment">/* properties of DSP operation */</span>
+<a name="l00082"></a>00082     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> _N;
+<a name="l00083"></a>00083     <span class="keyword">const</span> std::size_t _buffer_size;
+<a name="l00084"></a>00084 
+<a name="l00085"></a>00085     <span class="comment">/* zero copy buffers in contiguous memory (cmem) */</span>
+<a name="l00086"></a>00086     <span class="keywordtype">float</span> *_bufferInput;
+<a name="l00087"></a>00087     <span class="keywordtype">float</span> *_bufferTwiddle; <span class="comment">//twiddle factors</span>
+<a name="l00088"></a>00088     <span class="keywordtype">float</span> *_bufferOutput;
+<a name="l00089"></a>00089 
+<a name="l00090"></a>00090     <span class="comment">/* OpenCL buffers (abstraction layer for low level zero copy buffers) */</span>
+<a name="l00091"></a>00091     std::unique_ptr&lt;cl::Buffer&gt; _clBufferInput;
+<a name="l00092"></a>00092     std::unique_ptr&lt;cl::Buffer&gt; _clBufferTwiddle;
+<a name="l00093"></a>00093     std::unique_ptr&lt;cl::Buffer&gt; _clBufferOutput;
+<a name="l00094"></a>00094 };
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096 <span class="preprocessor">#endif //LIBDSP_X15_IFFT_SP_H</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"

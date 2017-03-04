@@ -84,11 +84,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">TaskProcessor Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<!-- doxytag: class="TaskProcessor" --><table class="memberdecls">
+<!-- doxytag: class="TaskProcessor" -->
+<p>manages command queue and is responsible for correct DSP task execution.  
+ <a href="classTaskProcessor.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="TaskProcessor_8h_source.html">TaskProcessor.h</a>&gt;</code></p>
+<table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6a075f60f597896c9c8b7f8aa7a62aa8"></a><!-- doxytag: member="TaskProcessor::TaskProcessor" ref="a6a075f60f597896c9c8b7f8aa7a62aa8" args="(bool debug=0)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><b>TaskProcessor</b> (bool debug=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTaskProcessor.html#a6a075f60f597896c9c8b7f8aa7a62aa8">TaskProcessor</a> (bool debug=0)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTaskProcessor.html#a974deebbccc9b99472161e981436090f">enqueueTask</a> (<a class="el" href="classDspTask.html">DspTask</a> &amp;task)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTaskProcessor.html#a561c8541eb94bdde362ae1a8ed5bcf8e">enqueueContinuousTask</a> (<a class="el" href="classDspTask.html">DspTask</a> &amp;task, unsigned int num_cycles)</td></tr>
 <tr><td colspan="2"><h2><a name="friends"></a>
@@ -96,6 +100,33 @@ Friends</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05cd8106958d1d2eaf14797d163703cc"></a><!-- doxytag: member="TaskProcessor::DspTaskFactory" ref="a05cd8106958d1d2eaf14797d163703cc" args="" -->
 class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></td></tr>
 </table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>manages command queue and is responsible for correct DSP task execution. </p>
+</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a6a075f60f597896c9c8b7f8aa7a62aa8"></a><!-- doxytag: member="TaskProcessor::TaskProcessor" ref="a6a075f60f597896c9c8b7f8aa7a62aa8" args="(bool debug=0)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classTaskProcessor.html#a6a075f60f597896c9c8b7f8aa7a62aa8">TaskProcessor::TaskProcessor</a> </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>debug</em> = <code>0</code></td><td>)</td>
+          <td><code> [explicit]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>constructs task processor </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">debug</td><td>enables benchmark results and more verbose output </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a561c8541eb94bdde362ae1a8ed5bcf8e"></a><!-- doxytag: member="TaskProcessor::enqueueContinuousTask" ref="a561c8541eb94bdde362ae1a8ed5bcf8e" args="(DspTask &amp;task, unsigned int num_cycles)" -->
 <div class="memitem">
