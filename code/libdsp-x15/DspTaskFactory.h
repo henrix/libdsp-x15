@@ -38,9 +38,33 @@ public:
      * @return
      */
     static DspTaskFactory& getInstance();
+
+    /**
+     * creates FFT DSP task
+     * @param N block size of FFT
+     * @param callback is called after DSP operation has been finished
+     * @param processor
+     * @return
+     */
     FFT_SP* createFFT_SP(unsigned int N, std::function<void(DspTask &task)> callback, TaskProcessor& processor);
+
+    /**
+     * creates IFFT DSP task
+     * @param N block size of IFFT
+     * @param callback is called after DSP operation has been finished
+     * @param processor
+     * @return
+     */
     IFFT_SP* createIFFT_SP(unsigned int N, std::function<void(DspTask &task)> callback, TaskProcessor& processor);
-    FilterBiquadSP* createFilterBiquadSP(unsigned int N, std::function<void(DspTask &task)> callback, TaskProcessor& processor);
+
+    /**
+     * creates biquad filter DSP task
+     * @param length length of filter
+     * @param callback is called after DSP operation has been finished
+     * @param processor
+     * @return
+     */
+    FilterBiquadSP* createFilterBiquadSP(unsigned int length, std::function<void(DspTask &task)> callback, TaskProcessor& processor);
 
 private:
     DspTaskFactory();

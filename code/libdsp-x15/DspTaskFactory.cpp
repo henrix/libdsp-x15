@@ -37,8 +37,8 @@ IFFT_SP* DspTaskFactory::createIFFT_SP(unsigned int N, std::function<void(DspTas
     return new IFFT_SP(N, callback, processor._clContext, processor._clProgram);
 }
 
-FilterBiquadSP* DspTaskFactory::createFilterBiquadSP(unsigned int N, std::function<void(DspTask &task)> callback, TaskProcessor& processor){
-
+FilterBiquadSP* DspTaskFactory::createFilterBiquadSP(unsigned int length, std::function<void(DspTask &task)> callback, TaskProcessor& processor){
+    return new FilterBiquadSP(length, callback, processor._clContext, processor._clProgram);
 }
 
 DspTaskFactory::DspTaskFactory()
