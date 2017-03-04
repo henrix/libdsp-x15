@@ -78,6 +78,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#friends">Friends</a>  </div>
   <div class="headertitle">
 <div class="title">FilterBiquadSP Class Reference</div>  </div>
@@ -93,11 +96,291 @@ Inheritance diagram for FilterBiquadSP:</div>
 </map>
  </div></div>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> { <br/>
+&#160;&#160;<b>LOWPASS</b>, 
+<b>HIGHPASS</b>, 
+<b>BANDPASS</b>, 
+<b>NOTCH</b>, 
+<br/>
+&#160;&#160;<b>PEAK</b>, 
+<b>LOWSHELF</b>, 
+<b>HIGHSHELF</b>
+<br/>
+ }</td></tr>
+<tr><td colspan="2"><h2><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFilterBiquadSP.html#a69dacabeb7c42c66a4b7c968d4336a95">getBufferSize</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFilterBiquadSP.html#a5313aeaa76817ad89c6b74743211890d">getInputBuffer</a> (unsigned int index=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFilterBiquadSP.html#a9a42eba7140f2923814499a403d5dffd">getOutputBuffer</a> (unsigned int index=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFilterBiquadSP.html#a87b09236068ddba5a4ebb1bed4500998">getLength</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFilterBiquadSP.html#acda62078efd25ae6ba402e14f5f00ec8">configFilter</a> (<a class="el" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> type, float Fc, float Fs, float Q, float peakGain)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFilterBiquadSP.html#ae4b686c3cfe1e838a040821bb34e63ba">configFilter</a> (std::vector&lt; float &gt; &amp;b, std::vector&lt; float &gt; &amp;a)</td></tr>
+<tr><td colspan="2"><h2><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFilterBiquadSP.html#a32a5c77e4093b2abd0b55596f1d88aae">calcCoefficients</a> (<a class="el" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a> type, float Fc, float Fs, float Q, float peakGain)</td></tr>
 <tr><td colspan="2"><h2><a name="friends"></a>
 Friends</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05cd8106958d1d2eaf14797d163703cc"></a><!-- doxytag: member="FilterBiquadSP::DspTaskFactory" ref="a05cd8106958d1d2eaf14797d163703cc" args="" -->
 class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></td></tr>
 </table>
+<hr/><h2>Member Enumeration Documentation</h2>
+<a class="anchor" id="a12b3db19abdb6d596f909cf2bd10f1a2"></a><!-- doxytag: member="FilterBiquadSP::TYPE" ref="a12b3db19abdb6d596f909cf2bd10f1a2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">FilterBiquadSP::TYPE</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>all available filter types </p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a32a5c77e4093b2abd0b55596f1d88aae"></a><!-- doxytag: member="FilterBiquadSP::calcCoefficients" ref="a32a5c77e4093b2abd0b55596f1d88aae" args="(TYPE type, float Fc, float Fs, float Q, float peakGain)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::vector&lt;float&gt; <a class="el" href="classFilterBiquadSP.html#a32a5c77e4093b2abd0b55596f1d88aae">FilterBiquadSP::calcCoefficients</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a>&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>Fc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>Fs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>Q</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>peakGain</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [static]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>calculates normalized coefficients from user defined parameters </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>filter type </td></tr>
+    <tr><td class="paramname">Fc</td><td>cutoff frequency </td></tr>
+    <tr><td class="paramname">Fs</td><td>sample rate </td></tr>
+    <tr><td class="paramname">Q</td><td>quality factor </td></tr>
+    <tr><td class="paramname">peakGain</td><td>gain </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>vector with coefficients (b0, b1, b2, a0, a1, a2) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="acda62078efd25ae6ba402e14f5f00ec8"></a><!-- doxytag: member="FilterBiquadSP::configFilter" ref="acda62078efd25ae6ba402e14f5f00ec8" args="(TYPE type, float Fc, float Fs, float Q, float peakGain)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classFilterBiquadSP.html#acda62078efd25ae6ba402e14f5f00ec8">FilterBiquadSP::configFilter</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classFilterBiquadSP.html#a12b3db19abdb6d596f909cf2bd10f1a2">TYPE</a>&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>Fc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>Fs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>Q</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>peakGain</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>configures filter using user defined parameters </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>filter type </td></tr>
+    <tr><td class="paramname">Fc</td><td>cutoff frequency </td></tr>
+    <tr><td class="paramname">Fs</td><td>sample rate </td></tr>
+    <tr><td class="paramname">Q</td><td>quality factor </td></tr>
+    <tr><td class="paramname">peakGain</td><td>gain </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ae4b686c3cfe1e838a040821bb34e63ba"></a><!-- doxytag: member="FilterBiquadSP::configFilter" ref="ae4b686c3cfe1e838a040821bb34e63ba" args="(std::vector&lt; float &gt; &amp;b, std::vector&lt; float &gt; &amp;a)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classFilterBiquadSP.html#acda62078efd25ae6ba402e14f5f00ec8">FilterBiquadSP::configFilter</a> </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; float &gt; &amp;&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; float &gt; &amp;&#160;</td>
+          <td class="paramname"><em>a</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>configures filter using normalized forward and feedback coefficients </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">b</td><td>forward coefficients (b0, b1, b2) </td></tr>
+    <tr><td class="paramname">a</td><td>feedback coefficients (a0, a1, a2). a0 is not used. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a69dacabeb7c42c66a4b7c968d4336a95"></a><!-- doxytag: member="FilterBiquadSP::getBufferSize" ref="a69dacabeb7c42c66a4b7c968d4336a95" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="classFilterBiquadSP.html#a69dacabeb7c42c66a4b7c968d4336a95">FilterBiquadSP::getBufferSize</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>returns the actual buffer size of DSP operation (assumed that input, output and internal buffers have equal size) </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>buffer size in bytes </dd></dl>
+
+<p>Implements <a class="el" href="classDspTask.html#a94f205ef95c26d83f9b090fbc21127fd">DspTask</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5313aeaa76817ad89c6b74743211890d"></a><!-- doxytag: member="FilterBiquadSP::getInputBuffer" ref="a5313aeaa76817ad89c6b74743211890d" args="(unsigned int index=0)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float* <a class="el" href="classFilterBiquadSP.html#a5313aeaa76817ad89c6b74743211890d">FilterBiquadSP::getInputBuffer</a> </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>index</em> = <code>0</code></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>returns zero copy input buffer of DSP operation in contiguous memory (DDR) ATTENTION: every DSP operation buffer has its own data layout. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>specific input buffer index of DSP operation </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>pointer to allocated memory </dd></dl>
+
+<p>Implements <a class="el" href="classDspTask.html#a4b8aca3cb45ba2e636e549e75a0b8a8d">DspTask</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a87b09236068ddba5a4ebb1bed4500998"></a><!-- doxytag: member="FilterBiquadSP::getLength" ref="a87b09236068ddba5a4ebb1bed4500998" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int <a class="el" href="classFilterBiquadSP.html#a87b09236068ddba5a4ebb1bed4500998">FilterBiquadSP::getLength</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>returns the biquad filter length </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd></dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9a42eba7140f2923814499a403d5dffd"></a><!-- doxytag: member="FilterBiquadSP::getOutputBuffer" ref="a9a42eba7140f2923814499a403d5dffd" args="(unsigned int index=0)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float* <a class="el" href="classFilterBiquadSP.html#a9a42eba7140f2923814499a403d5dffd">FilterBiquadSP::getOutputBuffer</a> </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>index</em> = <code>0</code></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>returns zero copy output buffer of DSP operation in contiguous memory (DDR) ATTENTION: every DSP operation buffer has its own data layout. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>specific output buffer index of DSP operation </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd></dd></dl>
+
+<p>Implements <a class="el" href="classDspTask.html#a0f5231646a852f3843833f812ef6479f">DspTask</a>.</p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/<a class="el" href="FilterBiquadSP_8h_source.html">FilterBiquadSP.h</a></li>
 </ul>
@@ -107,7 +390,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

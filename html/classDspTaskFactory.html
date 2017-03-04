@@ -92,12 +92,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa308a60dd78a1c06ef8f9f120964f9b2"></a><!-- doxytag: member="DspTaskFactory::createFFT_SP" ref="aa308a60dd78a1c06ef8f9f120964f9b2" args="(unsigned int N, std::function&lt; void(DspTask &amp;task)&gt; callback, TaskProcessor &amp;processor)" -->
-<a class="el" href="classFFT__SP.html">FFT_SP</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>createFFT_SP</b> (unsigned int N, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, <a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;processor)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a230b6dd09d8d5599867f40fa3b2f0349"></a><!-- doxytag: member="DspTaskFactory::createIFFT_SP" ref="a230b6dd09d8d5599867f40fa3b2f0349" args="(unsigned int N, std::function&lt; void(DspTask &amp;task)&gt; callback, TaskProcessor &amp;processor)" -->
-<a class="el" href="classIFFT__SP.html">IFFT_SP</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>createIFFT_SP</b> (unsigned int N, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, <a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;processor)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af84a90638497bdce95c6867142f73ca2"></a><!-- doxytag: member="DspTaskFactory::createFilterBiquadSP" ref="af84a90638497bdce95c6867142f73ca2" args="(unsigned int N, std::function&lt; void(DspTask &amp;task)&gt; callback, TaskProcessor &amp;processor)" -->
-<a class="el" href="classFilterBiquadSP.html">FilterBiquadSP</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>createFilterBiquadSP</b> (unsigned int N, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, <a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;processor)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classFFT__SP.html">FFT_SP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTaskFactory.html#aa308a60dd78a1c06ef8f9f120964f9b2">createFFT_SP</a> (unsigned int N, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, <a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;processor)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classIFFT__SP.html">IFFT_SP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTaskFactory.html#a230b6dd09d8d5599867f40fa3b2f0349">createIFFT_SP</a> (unsigned int N, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, <a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;processor)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classFilterBiquadSP.html">FilterBiquadSP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTaskFactory.html#a17308b5280a2393da711a037ab9c4854">createFilterBiquadSP</a> (unsigned int length, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, <a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;processor)</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classDspTaskFactory.html">DspTaskFactory</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTaskFactory.html#acc92edcedc54091e60bcd97360087f81">getInstance</a> ()</td></tr>
@@ -105,6 +102,135 @@ Static Public Member Functions</h2></td></tr>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>factory (singleton) to construct DspTasks. factory injects required OpenCL runtime objects. </p>
 </div><hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="aa308a60dd78a1c06ef8f9f120964f9b2"></a><!-- doxytag: member="DspTaskFactory::createFFT_SP" ref="aa308a60dd78a1c06ef8f9f120964f9b2" args="(unsigned int N, std::function&lt; void(DspTask &amp;task)&gt; callback, TaskProcessor &amp;processor)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classFFT__SP.html">FFT_SP</a>* <a class="el" href="classDspTaskFactory.html#aa308a60dd78a1c06ef8f9f120964f9b2">DspTaskFactory::createFFT_SP</a> </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>N</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;&#160;</td>
+          <td class="paramname"><em>processor</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>creates FFT DSP task </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">N</td><td>block size of FFT </td></tr>
+    <tr><td class="paramname">callback</td><td>is called after DSP operation has been finished </td></tr>
+    <tr><td class="paramname">processor</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd></dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a17308b5280a2393da711a037ab9c4854"></a><!-- doxytag: member="DspTaskFactory::createFilterBiquadSP" ref="a17308b5280a2393da711a037ab9c4854" args="(unsigned int length, std::function&lt; void(DspTask &amp;task)&gt; callback, TaskProcessor &amp;processor)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classFilterBiquadSP.html">FilterBiquadSP</a>* <a class="el" href="classDspTaskFactory.html#a17308b5280a2393da711a037ab9c4854">DspTaskFactory::createFilterBiquadSP</a> </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;&#160;</td>
+          <td class="paramname"><em>processor</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>creates biquad filter DSP task </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">length</td><td>length of filter </td></tr>
+    <tr><td class="paramname">callback</td><td>is called after DSP operation has been finished </td></tr>
+    <tr><td class="paramname">processor</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd></dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a230b6dd09d8d5599867f40fa3b2f0349"></a><!-- doxytag: member="DspTaskFactory::createIFFT_SP" ref="a230b6dd09d8d5599867f40fa3b2f0349" args="(unsigned int N, std::function&lt; void(DspTask &amp;task)&gt; callback, TaskProcessor &amp;processor)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classIFFT__SP.html">IFFT_SP</a>* <a class="el" href="classDspTaskFactory.html#a230b6dd09d8d5599867f40fa3b2f0349">DspTaskFactory::createIFFT_SP</a> </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>N</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt;&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classTaskProcessor.html">TaskProcessor</a> &amp;&#160;</td>
+          <td class="paramname"><em>processor</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>creates IFFT DSP task </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">N</td><td>block size of IFFT </td></tr>
+    <tr><td class="paramname">callback</td><td>is called after DSP operation has been finished </td></tr>
+    <tr><td class="paramname">processor</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd></dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="acc92edcedc54091e60bcd97360087f81"></a><!-- doxytag: member="DspTaskFactory::getInstance" ref="acc92edcedc54091e60bcd97360087f81" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -132,7 +258,7 @@ Static Public Member Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

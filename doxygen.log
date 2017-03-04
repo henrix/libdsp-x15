@@ -36,29 +36,21 @@ warning: ignoring unsupported tag `PLANTUML_INCLUDE_PATH  =' at line 311, file /
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/FFT_SP.h:29: warning: Compound FFT_SP is not documented.
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/IFFT_SP.h:28: warning: Compound IFFT_SP is not documented.
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/TaskProcessor.h:33: warning: Compound TaskProcessor is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:31: warning: Member OPERATION (enumeration) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:33: warning: Member id (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:34: warning: Member operation (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:60: warning: Member DspTask(unsigned long id, OPERATION operation, std::function< void(DspTask &task)> callback, std::shared_ptr< cl::Context > clContext, std::shared_ptr< cl::Program > clProgram) (function) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:67: warning: Member _assignClInputBuffersToQueue(std::shared_ptr< cl::CommandQueue > clCmdQueue)=0 (function) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:69: warning: Member _assignClOutputBuffersToQueue(std::shared_ptr< cl::CommandQueue > clCmdQueue, std::vector< cl::Event > &preEvents)=0 (function) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:81: warning: Member _createId() (function) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:82: warning: Member _mallocBuffer(std::size_t size) (function) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:83: warning: Member _freeBuffer(void *ptr) (function) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:71: warning: Member _callback (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:74: warning: Member _clKernel (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:77: warning: Member _clContext (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:78: warning: Member _clProgram (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTaskFactory.h:41: warning: Member createFFT_SP(unsigned int N, std::function< void(DspTask &task)> callback, TaskProcessor &processor) (function) of class DspTaskFactory is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTaskFactory.h:42: warning: Member createIFFT_SP(unsigned int N, std::function< void(DspTask &task)> callback, TaskProcessor &processor) (function) of class DspTaskFactory is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTaskFactory.h:43: warning: Member createFilterBiquadSP(unsigned int N, std::function< void(DspTask &task)> callback, TaskProcessor &processor) (function) of class DspTaskFactory is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/FFT_SP.h:39: warning: Member getN() (function) of class FFT_SP is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/FFT_SP.h:59: warning: argument 'pointer' of command @param is not found in the argument list of FFT_SP::generateTwiddleFactors(unsigned int N, float *buffer)
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/FFT_SP.h:59: warning: The following parameters of FFT_SP::generateTwiddleFactors(unsigned int N, float *buffer) are not documented:
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:63: warning: Member DspTask(unsigned long id, OPERATION operation, std::function< void(DspTask &task)> callback, std::shared_ptr< cl::Context > clContext, std::shared_ptr< cl::Program > clProgram) (function) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:70: warning: Member _assignClInputBuffersToQueue(std::shared_ptr< cl::CommandQueue > clCmdQueue)=0 (function) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:72: warning: Member _assignClOutputBuffersToQueue(std::shared_ptr< cl::CommandQueue > clCmdQueue, std::vector< cl::Event > &preEvents)=0 (function) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:84: warning: Member _createId() (function) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:85: warning: Member _mallocBuffer(std::size_t size) (function) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:86: warning: Member _freeBuffer(void *ptr) (function) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:74: warning: Member _callback (variable) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:77: warning: Member _clKernel (variable) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:80: warning: Member _clContext (variable) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:81: warning: Member _clProgram (variable) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/FFT_SP.h:63: warning: argument 'pointer' of command @param is not found in the argument list of FFT_SP::generateTwiddleFactors(unsigned int N, float *buffer)
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/FFT_SP.h:63: warning: The following parameters of FFT_SP::generateTwiddleFactors(unsigned int N, float *buffer) are not documented:
   parameter 'buffer'
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/IFFT_SP.h:38: warning: Member getN() (function) of class IFFT_SP is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/IFFT_SP.h:58: warning: argument 'pointer' of command @param is not found in the argument list of IFFT_SP::generateTwiddleFactors(unsigned int N, float *buffer)
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/IFFT_SP.h:58: warning: The following parameters of IFFT_SP::generateTwiddleFactors(unsigned int N, float *buffer) are not documented:
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/IFFT_SP.h:62: warning: argument 'pointer' of command @param is not found in the argument list of IFFT_SP::generateTwiddleFactors(unsigned int N, float *buffer)
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/IFFT_SP.h:62: warning: The following parameters of IFFT_SP::generateTwiddleFactors(unsigned int N, float *buffer) are not documented:
   parameter 'buffer'
 Searching for include files...
 Searching for example files...
@@ -165,6 +157,6 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-symbol cache used 90/65536 hits=3065 misses=90
-lookup cache used 110/65536 hits=547 misses=112
+symbol cache used 119/65536 hits=4577 misses=119
+lookup cache used 142/65536 hits=712 misses=144
 finished...

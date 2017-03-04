@@ -103,7 +103,7 @@ Inheritance diagram for DspTask:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><b>OPERATION</b> { <b>FFT</b>, 
+<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> { <b>FFT</b>, 
 <b>IFFT</b>, 
 <b>FILTER_BIQUAD</b>
  }</td></tr>
@@ -114,14 +114,12 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#a0f5231646a852f3843833f812ef6479f">getOutputBuffer</a> (unsigned int index=0)=0</td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a76ca8731cf73011e9cd62310f18f7b30"></a><!-- doxytag: member="DspTask::id" ref="a76ca8731cf73011e9cd62310f18f7b30" args="" -->
-const unsigned long&#160;</td><td class="memItemRight" valign="bottom"><b>id</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa7aeb52504ec04bdd8e6cb04b0d1f5b"></a><!-- doxytag: member="DspTask::operation" ref="aaa7aeb52504ec04bdd8e6cb04b0d1f5b" args="" -->
-const OPERATION&#160;</td><td class="memItemRight" valign="bottom"><b>operation</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">id</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8e8ca0ec895e1179a626ad299f07136"></a><!-- doxytag: member="DspTask::DspTask" ref="ac8e8ca0ec895e1179a626ad299f07136" args="(unsigned long id, OPERATION operation, std::function&lt; void(DspTask &amp;task)&gt; callback, std::shared_ptr&lt; cl::Context &gt; clContext, std::shared_ptr&lt; cl::Program &gt; clProgram)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><b>DspTask</b> (unsigned long id, OPERATION operation, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, std::shared_ptr&lt; cl::Context &gt; clContext, std::shared_ptr&lt; cl::Program &gt; clProgram)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><b>DspTask</b> (unsigned long <a class="el" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">id</a>, <a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> <a class="el" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">operation</a>, std::function&lt; void(<a class="el" href="classDspTask.html">DspTask</a> &amp;task)&gt; callback, std::shared_ptr&lt; cl::Context &gt; clContext, std::shared_ptr&lt; cl::Program &gt; clProgram)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03acf4eb8e8625da434e8553250ecd85"></a><!-- doxytag: member="DspTask::_assignClInputBuffersToQueue" ref="a03acf4eb8e8625da434e8553250ecd85" args="(std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue)=0" -->
 virtual std::vector&lt; cl::Event &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_assignClInputBuffersToQueue</b> (std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue)=0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a514ad466cbd423e606171d399a875075"></a><!-- doxytag: member="DspTask::_assignClOutputBuffersToQueue" ref="a514ad466cbd423e606171d399a875075" args="(std::shared_ptr&lt; cl::CommandQueue &gt; clCmdQueue, std::vector&lt; cl::Event &gt; &amp;preEvents)=0" -->
@@ -151,6 +149,21 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>TaskProcessor</b></t
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05cd8106958d1d2eaf14797d163703cc"></a><!-- doxytag: member="DspTask::DspTaskFactory" ref="a05cd8106958d1d2eaf14797d163703cc" args="" -->
 class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></td></tr>
 </table>
+<hr/><h2>Member Enumeration Documentation</h2>
+<a class="anchor" id="a22e7b22b520891c83176c4c93f9d7de5"></a><!-- doxytag: member="DspTask::OPERATION" ref="a22e7b22b520891c83176c4c93f9d7de5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">DspTask::OPERATION</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>all available DSP operations. new operations must be added here. </p>
+
+</div>
+</div>
 <hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a94f205ef95c26d83f9b090fbc21127fd"></a><!-- doxytag: member="DspTask::getBufferSize" ref="a94f205ef95c26d83f9b090fbc21127fd" args="()=0" -->
 <div class="memitem">
@@ -168,7 +181,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></
 <p>returns the actual buffer size of DSP operation (assumed that input, output and internal buffers have equal size) </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>buffer size in bytes </dd></dl>
 
-<p>Implemented in <a class="el" href="classFFT__SP.html#a65f777b3669c4589c2f70c041a1f5691">FFT_SP</a>, and <a class="el" href="classIFFT__SP.html#a0edbd1b424fa26644c08686fe61d60fe">IFFT_SP</a>.</p>
+<p>Implemented in <a class="el" href="classFFT__SP.html#a65f777b3669c4589c2f70c041a1f5691">FFT_SP</a>, <a class="el" href="classIFFT__SP.html#a0edbd1b424fa26644c08686fe61d60fe">IFFT_SP</a>, and <a class="el" href="classFilterBiquadSP.html#a69dacabeb7c42c66a4b7c968d4336a95">FilterBiquadSP</a>.</p>
 
 </div>
 </div>
@@ -195,7 +208,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>pointer to allocated memory </dd></dl>
 
-<p>Implemented in <a class="el" href="classFFT__SP.html#a67c3718f40e6ca956e7ef80b4eb054d1">FFT_SP</a>, and <a class="el" href="classIFFT__SP.html#ac8191a97eb90fabe96553a73ddedc606">IFFT_SP</a>.</p>
+<p>Implemented in <a class="el" href="classFFT__SP.html#a67c3718f40e6ca956e7ef80b4eb054d1">FFT_SP</a>, <a class="el" href="classIFFT__SP.html#ac8191a97eb90fabe96553a73ddedc606">IFFT_SP</a>, and <a class="el" href="classFilterBiquadSP.html#a5313aeaa76817ad89c6b74743211890d">FilterBiquadSP</a>.</p>
 
 </div>
 </div>
@@ -222,7 +235,36 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd></dd></dl>
 
-<p>Implemented in <a class="el" href="classFFT__SP.html#a855a77678a8ccb605cd9e44e7b4d4ecc">FFT_SP</a>, and <a class="el" href="classIFFT__SP.html#a3fa21a9f45487af30e81592c5b41b8c5">IFFT_SP</a>.</p>
+<p>Implemented in <a class="el" href="classFFT__SP.html#a855a77678a8ccb605cd9e44e7b4d4ecc">FFT_SP</a>, <a class="el" href="classIFFT__SP.html#a3fa21a9f45487af30e81592c5b41b8c5">IFFT_SP</a>, and <a class="el" href="classFilterBiquadSP.html#a9a42eba7140f2923814499a403d5dffd">FilterBiquadSP</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Field Documentation</h2>
+<a class="anchor" id="a76ca8731cf73011e9cd62310f18f7b30"></a><!-- doxytag: member="DspTask::id" ref="a76ca8731cf73011e9cd62310f18f7b30" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const unsigned long <a class="el" href="classDspTask.html#a76ca8731cf73011e9cd62310f18f7b30">DspTask::id</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>unique DSP task id </p>
+
+</div>
+</div>
+<a class="anchor" id="aaa7aeb52504ec04bdd8e6cb04b0d1f5b"></a><!-- doxytag: member="DspTask::operation" ref="aaa7aeb52504ec04bdd8e6cb04b0d1f5b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> <a class="el" href="classDspTask.html#aaa7aeb52504ec04bdd8e6cb04b0d1f5b">DspTask::operation</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>type of DSP operation </p>
 
 </div>
 </div>
@@ -235,7 +277,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
