@@ -36,6 +36,10 @@ public:
     float* getInputBuffer(unsigned int index = 0);
     float* getOutputBuffer(unsigned int index = 0);
 
+    /**
+     * returns N of FFT operation
+     * @return
+     */
     unsigned int getN();
 
     /**

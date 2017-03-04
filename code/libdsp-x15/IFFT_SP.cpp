@@ -100,7 +100,7 @@ std::vector<cl::Event> IFFT_SP::_assignClInputBuffersToQueue(std::shared_ptr<cl:
         return finished;
     }
     catch(const cl::Error& err){
-        std::cerr << "Error in fft(): " << err.what() << "(" << err.err() << ")" << std::endl;
+        std::cerr << "Error in ifft(): " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 }
 
@@ -113,13 +113,13 @@ std::vector<cl::Event> IFFT_SP::_assignClOutputBuffersToQueue(std::shared_ptr<cl
         return finished;
     }
     catch(const cl::Error& err){
-        std::cerr << "Error in fft(): " << err.what() << "(" << err.err() << ")" << std::endl;
+        std::cerr << "Error in ifft(): " << err.what() << "(" << err.err() << ")" << std::endl;
     }
 }
 
 void IFFT_SP::setInputBuffer(std::vector<std::complex<float>>& values){
     if (values.size() != _N){
-        std::cout << "WARNING: size of FFT input value vector does not match N. aborting" << std::endl;
+        std::cout << "WARNING: size of IFFT input value vector does not match N. aborting" << std::endl;
         return;
     }
 

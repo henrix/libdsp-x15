@@ -35,6 +35,10 @@ public:
     float* getInputBuffer(unsigned int index = 0);
     float* getOutputBuffer(unsigned int index = 0);
 
+    /**
+     * returns N of IFFT operation
+     * @return
+     */
     unsigned int getN();
 
     /**
@@ -71,6 +75,7 @@ private:
     std::vector<cl::Event> _assignClOutputBuffersToQueue(std::shared_ptr<cl::CommandQueue> clCmdQueue,
                                        std::vector<cl::Event>& preEvents);
 
+    /* properties of DSP operation */
     const unsigned int _N;
     const std::size_t _buffer_size;
 

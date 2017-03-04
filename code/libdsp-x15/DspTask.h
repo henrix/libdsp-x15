@@ -27,10 +27,13 @@ class DspTask {
     friend class TaskProcessor;
     friend class DspTaskFactory;
 public:
-    /* all available DSP operations. new operations must be added here. */
+    /** all available DSP operations. new operations must be added here. */
     enum OPERATION {FFT, IFFT, FILTER_BIQUAD};
 
+    /** unique DSP task id */
     const unsigned long id;
+
+    /** type of DSP operation */
     const OPERATION operation;
 
     /**
