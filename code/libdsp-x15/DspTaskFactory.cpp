@@ -30,15 +30,27 @@ DspTaskFactory& DspTaskFactory::getInstance(){
 }
 
 FFT_SP* DspTaskFactory::createFFT_SP(unsigned int N, std::function<void(DspTask &task)> callback, TaskProcessor& processor){
-    return new FFT_SP(N, callback, processor._clContext, processor._clProgram);
+    FFT_SP* fft = new FFT_SP(N, callback, processor._clContext, processor._clProgram);
+    DspTask* task = fft;
+    _tasks.push_back(task);
+
+    return fft;
 }
 
 IFFT_SP* DspTaskFactory::createIFFT_SP(unsigned int N, std::function<void(DspTask &task)> callback, TaskProcessor& processor){
-    return new IFFT_SP(N, callback, processor._clContext, processor._clProgram);
+    IFFT_SP* ifft = new IFFT_SP(N, callback, processor._clContext, processor._clProgram);
+    DspTask* task = ifft;
+    _tasks.push_back(task);
+
+    return ifft;
 }
 
 FilterBiquadSP* DspTaskFactory::createFilterBiquadSP(unsigned int length, std::function<void(DspTask &task)> callback, TaskProcessor& processor){
-    return new FilterBiquadSP(length, callback, processor._clContext, processor._clProgram);
+    FilterBiquadSP* filter = new FilterBiquadSP(length, callback, processor._clContext, processor._clProgram);
+    DspTask* task = filter;
+    _tasks.push_back(task);
+
+    return filter;
 }
 
 DspTaskFactory::DspTaskFactory()
@@ -48,5 +60,6 @@ DspTaskFactory::DspTaskFactory()
 
 DspTaskFactory::~DspTaskFactory()
 {
-
+    for (unsigned int i=0; i < _tasks.size(); i++)
+        delete _tasks.at(i);
 }

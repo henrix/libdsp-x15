@@ -27,8 +27,8 @@
 #include <memory>
 
 /**
- * @brief factory (singleton) to construct DspTasks.
- * factory injects required OpenCL runtime objects.
+ * @brief factory to construct DSP tasks.
+ * injects required OpenCL runtime objects.
  */
 class DspTaskFactory {
 public:
@@ -71,6 +71,8 @@ private:
     ~DspTaskFactory();
 
     static DspTaskFactory* _instance;
+
+    std::vector<DspTask*> _tasks;
 };
 
 

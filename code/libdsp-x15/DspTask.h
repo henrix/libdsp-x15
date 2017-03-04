@@ -23,6 +23,10 @@
 #include <functional>
 #include <ocl_util.h>
 
+/**
+ * @brief represents abstract DSP task. all task implementations
+ * must inherit from this class.
+ */
 class DspTask {
     friend class TaskProcessor;
     friend class DspTaskFactory;
@@ -59,6 +63,14 @@ public:
     virtual float* getOutputBuffer(unsigned int index = 0) = 0;
 
 protected:
+    /**
+     * abstract constructor (is only called by factory)
+     * @param id unique task id
+     * @param operation DSP operation
+     * @param callback callback function
+     * @param clContext OpenCL context (dependency)
+     * @param clProgram OpenCL program (dependency)
+     */
     explicit DspTask(unsigned long id, OPERATION operation, std::function<void(DspTask &task)> callback,
                      std::shared_ptr<cl::Context> clContext, std::shared_ptr<cl::Program> clProgram);
 
@@ -67,7 +79,24 @@ protected:
      * command queue. tasks are responsible for data. task processor is responsible
      * for execution.
      */
+    /**
+     * assigns OpenCL input buffers to command queue.
+     * all derived DSP tasks must implement this method.
+     * tasks are responsible for data.
+     * task processor is responsible for execution.
+     * @param clCmdQueue OpenCL command queue
+     * @return vector with events (triggered when buffers has been assigned to command queue)
+     */
     virtual std::vector<cl::Event> _assignClInputBuffersToQueue(std::shared_ptr<cl::CommandQueue> clCmdQueue) = 0;
+
+    /**
+     * assigns OpenCL output buffers to command queue.
+     * all derived DSP tasks must implement this method.
+     * tasks are responsible for data.
+     * task processor is responsible for execution.
+     * @param clCmdQueue OpenCL command queue
+     * @return vector with events (triggered when buffers has been assigned to command queue)
+     */
     virtual std::vector<cl::Event> _assignClOutputBuffersToQueue(std::shared_ptr<cl::CommandQueue> clCmdQueue,
                                                                   std::vector<cl::Event>& preEvents) = 0;
 
@@ -80,9 +109,23 @@ protected:
     std::shared_ptr<cl::Context> _clContext;
     std::shared_ptr<cl::Program> _clProgram;
 
-    /* some helpers */
+    /**
+     * generates a unique task id
+     * @return
+     */
     static unsigned long _createId();
+
+    /**
+     * allocates buffer in contiguous memory
+     * @param size size in bytes
+     * @return pointer to allocated memory
+     */
     static void* _mallocBuffer(std::size_t size);
+
+    /**
+     * frees buffer in contiguous memory
+     * @param pointer to allocated memory
+     */
     static void _freeBuffer(void *ptr);
 
 private:

@@ -62,9 +62,6 @@ int main(int argc, char* argv[]){
     }
     processor.enqueueTask(*ifft);
     while(!ifftFinished){}
-
-    delete fft;
-    delete ifft;
     
     return 0;
 }

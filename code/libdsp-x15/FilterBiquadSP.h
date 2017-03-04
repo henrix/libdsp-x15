@@ -21,13 +21,14 @@
 
 #include "DspTask.h"
 
+/**
+ * @brief implements single precision filter biquad operation
+ */
 class FilterBiquadSP : public DspTask {
     friend class DspTaskFactory;
 public:
     /** all available filter types */
     enum TYPE {LOWPASS, HIGHPASS, BANDPASS, NOTCH, PEAK, LOWSHELF, HIGHSHELF};
-
-    virtual ~FilterBiquadSP();
 
     /* implementation of abstract base class */
     std::size_t getBufferSize();
@@ -70,6 +71,7 @@ public:
 private:
     FilterBiquadSP(unsigned int length, std::function<void(DspTask &task)> callback,
                    std::shared_ptr<cl::Context> clContext, std::shared_ptr<cl::Program> clProgram);
+    virtual ~FilterBiquadSP();
 
     std::vector<cl::Event> _assignClInputBuffersToQueue(std::shared_ptr<cl::CommandQueue> clCmdQueue);
     std::vector<cl::Event> _assignClOutputBuffersToQueue(std::shared_ptr<cl::CommandQueue> clCmdQueue,

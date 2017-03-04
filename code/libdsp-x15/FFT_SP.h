@@ -26,10 +26,12 @@
 #include <vector>
 #include <CL/cl.hpp>
 
+/**
+ * @brief implements single precision FFT operation
+ */
 class FFT_SP : public DspTask {
     friend class DspTaskFactory;
 public:
-    virtual ~FFT_SP();
 
     /* implementation of abstract base class */
     std::size_t getBufferSize();
@@ -71,6 +73,7 @@ public:
 private:
     FFT_SP(unsigned int N, std::function<void(DspTask &task)> callback,
            std::shared_ptr<cl::Context> clContext, std::shared_ptr<cl::Program> clProgram);
+    virtual ~FFT_SP();
 
     std::vector<cl::Event> _assignClInputBuffersToQueue(std::shared_ptr<cl::CommandQueue> clCmdQueue);
     std::vector<cl::Event> _assignClOutputBuffersToQueue(std::shared_ptr<cl::CommandQueue> clCmdQueue,

@@ -30,9 +30,17 @@
 const std::string DSPLIB_PATH = "../libdsp-x15/dsplib.ae66";
 const std::string CL_PROGRAM_PATH = "../libdsp-x15/audiokernel.cl";
 
+/**
+ * @brief manages command queue and is responsible for
+ * correct DSP task execution.
+ */
 class TaskProcessor {
     friend class DspTaskFactory;
 public:
+    /**
+     * constructs task processor
+     * @param debug enables benchmark results and more verbose output
+     */
     explicit TaskProcessor(bool debug = 0);
     ~TaskProcessor();
 
