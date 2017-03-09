@@ -36,7 +36,7 @@ private:
     QLabel *_labelFc, *_labelQ, *_labelPeakGain;
     int _plotRefreshCounter;
 
-    void _plotTransferFunction(API::FILTER_TYPE type, float a0, float a1, float a2, float b1, float b2);
+    void _plotTransferFunction(FilterBiquadSP::TYPE type, float a0, float a1, float a2, float b1, float b2);
 
 public slots:
     void getAudioData(float *data);

@@ -23,6 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle(_demoName);
     statusBar()->clearMessage();
 
+    _ui->customPlot->setNoAntialiasingOnDrag(true); // more performance/responsiveness during dragging
+    _ui->customPlot->setNotAntialiasedElements(QCP::aeAll);
+    QFont font;
+    font.setStyleStrategy(QFont::NoAntialias);
+    _ui->customPlot->xAxis->setTickLabelFont(font);
+    _ui->customPlot->yAxis->setTickLabelFont(font);
+    _ui->customPlot->legend->setFont(font);
+
     // give the axes some labels:
     _ui->customPlot->xAxis->setLabel("Frequency (Hz)");
     _ui->customPlot->yAxis->setLabel("Magnitude (dB)");
@@ -37,8 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->customPlot->graph(1)->setPen(QPen(Qt::red));
 
     _audioProcessor = new AudioProcessor(this);
-    _audioProcessor->setFilterCoefficients(API::LP, 1000.0, 48000.0, 0.707, 6);
-    //QObject::connect(_audioProcessor, SIGNAL(audioDataReady(float*)), this, SLOT(getAudioData(float*)));
+    _audioProcessor->setFilterCoefficients(FilterBiquadSP::LOWPASS, 1000.0, 48000.0, 0.707, 6);
     QObject::connect(_ui->inputCutoff, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
     QObject::connect(_ui->inputQ, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
     QObject::connect(_ui->inputPeakGain, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
@@ -57,12 +64,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(_jackClient, SIGNAL(dataReady(float*)), _audioProcessor, SLOT(processData(float*)));
     QObject::connect(_audioProcessor, SIGNAL(audioDataReady(float*)), _jackClient, SLOT(writeData(float*)));
-    //QObject::connect(_audioProcessor, SIGNAL(spectrumDataReady(float*)), this, SLOT(plotSpectrum(float*)));
     inputValueChanged(0); //plot default filter setting transfer function
 }
 
 MainWindow::~MainWindow(){
-    //delete _ui;
     _jackClient->stop();
     delete _jackClient;
     delete _audioProcessor;
@@ -91,20 +96,18 @@ void MainWindow::setRangeY(double begin, double end){
     _ui->customPlot->yAxis->setRange(begin,end);
 }
 
-void MainWindow::_plotTransferFunction(API::FILTER_TYPE type, float a0, float a1, float a2, float b1, float b2){
+void MainWindow::_plotTransferFunction(FilterBiquadSP::TYPE type, float a0, float a1, float a2, float b1, float b2){
     const int len = 512;
     std::vector<double> xPoints(512), yPoints(512);
 
     for (int idx=0; idx < 512; idx++){
         double w = idx / ((double)len - 1.0) * M_PI; //lin scale
-        //double w = std::exp(std::log(1.0 / 0.001) * idx / ((double)len - 1.0)) * 0.001 * M_PI;	// 0.001 to 1, times pi, log scale
         double phi = std::pow(sin(w/2.0), 2);
         double y = std::log(std::pow(a0+a1+a2, 2.0) - 4.0*(a0*a1 + 4.0*a0*a2 + a1*a2)*phi + 16.0*a0*a2*phi*phi) - std::log(std::pow(1+b1+b2, 2.0) - 4.0*(b1 + 4*b2 + b1*b2)*phi + 16.0*b2*phi*phi);
         y = y * 10.0 / std::log(10.0);
         if (y < -200.0)
             y = -200.0;
         xPoints.push_back(idx / ((double)len - 1.0) * 48000.0 / 2.0); //lin scale
-        //xPoints.push_back(idx / (double)(len - 1.0) / 2.0); //log scale
         yPoints.push_back(y);
     }
     float minValY = *std::min_element(yPoints.begin(), yPoints.end());
@@ -114,17 +117,17 @@ void MainWindow::_plotTransferFunction(API::FILTER_TYPE type, float a0, float a1
 
     switch(type){
     default:
-    case API::LP:
-    case API::HP:
-    case API::BP:
-    case API::NOTCH:
+    case FilterBiquadSP::LOWPASS:
+    case FilterBiquadSP::HIGHPASS:
+    case FilterBiquadSP::BANDPASS:
+    case FilterBiquadSP::NOTCH:
         minValY = -100.0;
         if (maxValY < 0.0)
            maxValY = 0.0;
         break;
-    case API::PEAK:
-    case API::LOWSHELF:
-    case API::HIGHSHELF:
+    case FilterBiquadSP::PEAK:
+    case FilterBiquadSP::LOWSHELF:
+    case FilterBiquadSP::HIGHSHELF:
         minValY = -10.0;
         if (maxValY < 10.0)
             maxValY = 10.0;
@@ -141,7 +144,7 @@ void MainWindow::_plotTransferFunction(API::FILTER_TYPE type, float a0, float a1
 void MainWindow::plotSpectrum(float *magnitude){
     if (_plotRefreshCounter % 4 == 0){
         std::vector<double> y(256);
-        for (int i=0; i < y.size(); i++)
+        for (unsigned int i=0; i < y.size(); i++)
             y[i] = std::abs(magnitude[i * 2]);
         QVector<double> y_ = QVector<double>::fromStdVector(y);
         _ui->customPlot->graph(1)->setData(*_xSpectrum, y_);
@@ -158,9 +161,14 @@ void MainWindow::getAudioData(float *data){
         std::vector<double> _data;
         _data.assign(data, data + 512);
         double max = *std::max_element(_data.begin(), _data.end());
+        double min = *std::min_element(_data.begin(), _data.end());
 
-        if (max > 1.0)
-            setRangeY(-1.0*max, max);
+        if (min < -1.0 && max > 1.0)
+            setRangeY(min, max);
+        else if (min < -1.0)
+            setRangeY(min, 1.0);
+        else if (max > 1.0)
+            setRangeY(-1.0, max);
         else
             setRangeY(-1.0, 1.0);
 
@@ -175,38 +183,38 @@ void MainWindow::inputValueChanged(int val){
     float Q = (float) _ui->inputQ->value() / 1000.0;
     float peakGain = _ui->inputPeakGain->value();
     float Fs = 48000.0;
-    API::FILTER_TYPE type = API::LP;
+    FilterBiquadSP::TYPE type = FilterBiquadSP::LOWPASS;
     switch(_ui->inputFilterType->value()){
-    case 0: //LP
-        type = API::LP;
+    case 0: //Lowpass
+        type = FilterBiquadSP::LOWPASS;
         _ui->labelFilterType->setText(QString("Type: Lowpass"));
         break;
-    case 1: //HP
-        type = API::HP;
+    case 1: //Highpass
+        type = FilterBiquadSP::HIGHPASS;
         _ui->labelFilterType->setText(QString("Type: Highpass"));
         break;
-    case 2: //BP
-        type = API::BP;
+    case 2: //Bandpass
+        type = FilterBiquadSP::BANDPASS;
         _ui->labelFilterType->setText(QString("Type: Bandpass"));
         break;
     case 3: //Notch
-        type = API::NOTCH;
+        type = FilterBiquadSP::NOTCH;
         _ui->labelFilterType->setText(QString("Type: Notch"));
         break;
     case 4: //Peak
-        type = API::PEAK;
+        type = FilterBiquadSP::PEAK;
         _ui->labelFilterType->setText(QString("Type: Peak"));
         break;
     case 5: //Lowshelf
-        type = API::LOWSHELF;
+        type = FilterBiquadSP::LOWSHELF;
         _ui->labelFilterType->setText(QString("Type: Lowshelf"));
         break;
     case 6: //Highshelf
-        type = API::HIGHSHELF;
+        type = FilterBiquadSP::HIGHSHELF;
         _ui->labelFilterType->setText(QString("Type: Highself"));
         break;
     default:
-        type = API::LP;
+        type = FilterBiquadSP::LOWPASS;
         _ui->labelFilterType->setText(QString("Filter Type: Lowpass"));
     }
     std::string cutoffString("Cutoff: " + std::to_string((int)Fc) + " Hz");
@@ -220,5 +228,5 @@ void MainWindow::inputValueChanged(int val){
 
     _audioProcessor->setFilterCoefficients(type, Fc, Fs, Q, peakGain);
     std::vector<float> filterCoeffs = AudioProcessor::calcBiquadCoefficients(type, Fc, Fs, Q, peakGain);
-    _plotTransferFunction(type, filterCoeffs.at(0), filterCoeffs.at(1), filterCoeffs.at(2), filterCoeffs.at(3), filterCoeffs.at(4));
+    _plotTransferFunction(type, filterCoeffs.at(0), filterCoeffs.at(1), filterCoeffs.at(2), filterCoeffs.at(4), filterCoeffs.at(5));
 }

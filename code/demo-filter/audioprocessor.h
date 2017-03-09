@@ -2,6 +2,7 @@
 #define AUDIOPROCESSOR_H
 
 #include <QtCore/QObject>
+#include <QtCore/QThread>
 #include "../libdsp-x15/library.h"
 
 class AudioProcessor : public QObject
@@ -10,17 +11,19 @@ class AudioProcessor : public QObject
 public:
     explicit AudioProcessor(QObject *parent = 0, uint32_t bufSize = 512);
     ~AudioProcessor();
-    void setFilterCoefficients(API::FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
-    static std::vector<float> calcBiquadCoefficients(API::FILTER_TYPE type, float Fc, float Fs, float Q, float peakGain);
+    void setFilterCoefficients(FilterBiquadSP::TYPE type, float Fc, float Fs, float Q, float peakGain);
+    static std::vector<float> calcBiquadCoefficients(FilterBiquadSP::TYPE type, float Fc, float Fs, float Q, float peakGain);
 
 private:
     float _b[3], _a[2];
     bool _filterIsReady;
     uint32_t _bufSize;
-    API *_api;
     static AudioProcessor *_instance;
+    DspTaskFactory& _dspTaskFactory;
+    TaskProcessor& _taskProcessor;
+    FilterBiquadSP* _filter;
 
-    static void _callbackDSP(CallbackResponse *clbkRes);
+    static void _callbackDSP(DspTask& task);
 
 signals:
     void audioDataReady(float *processData);
