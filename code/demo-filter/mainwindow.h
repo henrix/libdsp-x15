@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "jackclient.h"
 #include "audioprocessor.h"
 #include "../qcustomplot/qcustomplot.h" // the header file of QCustomPlot. Don't forget to add it to your project, if you use an IDE, so it gets compiled.
 #include <vector>
@@ -29,7 +28,6 @@ public:
 private:
     Ui::MainWindow *_ui;
     QString _demoName;
-    JackClient *_jackClient;
     AudioProcessor *_audioProcessor;
     QVector<double> *_x, *_xSpectrum;
     QDial *_inputFc, *_inputQ, *_inputPeakGain;
@@ -42,6 +40,9 @@ public slots:
     void getAudioData(float *data);
     void inputValueChanged(int val);
     void plotSpectrum(float *magnitude);
+
+signals:
+    void newFilterParameter(FilterBiquadSP::TYPE type, float Fc, float Fs, float Q, float peakGain);
 };
 
 #endif // MAINWINDOW_H

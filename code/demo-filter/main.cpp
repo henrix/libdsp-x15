@@ -1,7 +1,6 @@
 #include <QApplication>
 #include <QObject>
 #include "mainwindow.h"
-#include "jackclient.h"
 #include "audioprocessor.h"
 #include "../libdsp-x15/library.h"
 

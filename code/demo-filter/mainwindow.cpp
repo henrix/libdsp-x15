@@ -44,13 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->customPlot->addGraph();
     _ui->customPlot->graph(1)->setPen(QPen(Qt::red));
 
-    _audioProcessor = new AudioProcessor(this);
-    _audioProcessor->setFilterCoefficients(FilterBiquadSP::LOWPASS, 1000.0, 48000.0, 0.707, 6);
-    QObject::connect(_ui->inputCutoff, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
-    QObject::connect(_ui->inputQ, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
-    QObject::connect(_ui->inputPeakGain, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
-    QObject::connect(_ui->inputFilterType, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
-
     _x = new QVector<double>(512);
     for (int i=0; i < _x->size(); i++){
         (*_x)[i] = 1.0/48000.0 * i; //time domain axis
@@ -59,17 +52,20 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i=0; i < _xSpectrum->size(); i++)
         (*_xSpectrum)[i] = 24000.0 / 256.0 * (float)i; //frequency domain axis
 
-    _jackClient = new JackClient(this);
-    _jackClient->start();
+    QObject::connect(_ui->inputCutoff, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
+    QObject::connect(_ui->inputQ, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
+    QObject::connect(_ui->inputPeakGain, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
+    QObject::connect(_ui->inputFilterType, SIGNAL(valueChanged(int)), this, SLOT(inputValueChanged(int)));
 
-    QObject::connect(_jackClient, SIGNAL(dataReady(float*)), _audioProcessor, SLOT(processData(float*)));
-    QObject::connect(_audioProcessor, SIGNAL(audioDataReady(float*)), _jackClient, SLOT(writeData(float*)));
     inputValueChanged(0); //plot default filter setting transfer function
+
+    _audioProcessor = new AudioProcessor(this, 512, FilterBiquadSP::LOWPASS, 1000.0, 48000.0, 0.707, 6);
+    _audioProcessor->startJack();
+
+    QObject::connect(this, SIGNAL(newFilterParameter(FilterBiquadSP::TYPE,float,float,float,float)), _audioProcessor, SLOT(setFilterParameter(FilterBiquadSP::TYPE,float,float,float,float)));
 }
 
 MainWindow::~MainWindow(){
-    _jackClient->stop();
-    delete _jackClient;
     delete _audioProcessor;
 }
 
@@ -139,21 +135,6 @@ void MainWindow::_plotTransferFunction(FilterBiquadSP::TYPE type, float a0, floa
     _ui->customPlot->xAxis->setRange(minValX, maxValX);
     _ui->customPlot->yAxis->setRange(minValY, maxValY);
     drawFunction(xPoints, yPoints);
-}
-
-void MainWindow::plotSpectrum(float *magnitude){
-    if (_plotRefreshCounter % 4 == 0){
-        std::vector<double> y(256);
-        for (unsigned int i=0; i < y.size(); i++)
-            y[i] = std::abs(magnitude[i * 2]);
-        QVector<double> y_ = QVector<double>::fromStdVector(y);
-        _ui->customPlot->graph(1)->setData(*_xSpectrum, y_);
-        _ui->customPlot->replot();
-        _plotRefreshCounter = 0;
-        std::cout << "Max: " << *std::max_element(y.begin(), y.end() + 256) << std::endl;
-        std::cout << "Min: " << *std::min_element(y.begin(), y.end() + 256) << std::endl;
-    }
-    _plotRefreshCounter++;
 }
 
 void MainWindow::getAudioData(float *data){
@@ -226,7 +207,23 @@ void MainWindow::inputValueChanged(int val){
     std::string peakGainString("Peak Gain: " + std::to_string((int)peakGain) + " dB");
     _ui->labelPeakGain->setText(QString(peakGainString.c_str()));
 
-    _audioProcessor->setFilterCoefficients(type, Fc, Fs, Q, peakGain);
     std::vector<float> filterCoeffs = AudioProcessor::calcBiquadCoefficients(type, Fc, Fs, Q, peakGain);
     _plotTransferFunction(type, filterCoeffs.at(0), filterCoeffs.at(1), filterCoeffs.at(2), filterCoeffs.at(4), filterCoeffs.at(5));
+
+    emit(newFilterParameter(type, Fc, Fs, Q, peakGain));
+}
+
+void MainWindow::plotSpectrum(float *magnitude){
+    if (_plotRefreshCounter % 4 == 0){
+        std::vector<double> y(256);
+        for (unsigned int i=0; i < y.size(); i++)
+            y[i] = std::abs(magnitude[i * 2]);
+        QVector<double> y_ = QVector<double>::fromStdVector(y);
+        _ui->customPlot->graph(1)->setData(*_xSpectrum, y_);
+        _ui->customPlot->replot();
+        _plotRefreshCounter = 0;
+        std::cout << "Max: " << *std::max_element(y.begin(), y.end() + 256) << std::endl;
+        std::cout << "Min: " << *std::min_element(y.begin(), y.end() + 256) << std::endl;
+    }
+    _plotRefreshCounter++;
 }
