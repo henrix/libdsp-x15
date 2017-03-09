@@ -9,34 +9,30 @@
 AudioProcessor* AudioProcessor::_instance = nullptr;
 
 AudioProcessor::AudioProcessor(QObject *parent, int bufSize)
-    : QObject(parent), _bufSize(bufSize)
+    : QObject(parent), _bufSize(bufSize),
+      _dspTaskFactory(DspTaskFactory::getInstance()),
+      _taskProcessor(*(new TaskProcessor()))
 {
-    _api = new API(_callbackDSP);
-    _api->setDebug(false);
-    _api->prepareFFT(bufSize, 4, bufSize);
+    _fftTask = _dspTaskFactory.createFFT_SP(bufSize, _callbackDSP, _taskProcessor);
     _instance = this;
 }
 
 AudioProcessor::~AudioProcessor(){
-    delete _api;
+
 }
 
-void AudioProcessor::_callbackDSP(CallbackResponse *clbkRes){
-    float *outBuf = clbkRes->getDataPtr();
-
+void AudioProcessor::_callbackDSP(DspTask& task){
+    FFT_SP& fftTask = (FFT_SP&) task;
+    float *outBuf = fftTask.getOutputBuffer();
     emit(_instance->processedDataReady(outBuf));
-
-    delete clbkRes;
 }
 
 void AudioProcessor::processData(float *data){
-    float *x = _api->getBufIn(CallbackResponse::FFT);
+    float *x = _fftTask->getInputBuffer();
     for (int i=0; i < _bufSize; i++){
         x[PAD + 2*i] = data[i]; //real part
         x[PAD + 2*i + 1] = 0; //imaginary part
     }
 
-    if (!_api->isBusy(CallbackResponse::FFT)){
-        _api->ocl_DSPF_sp_fftSPxSP();
-    }
+    _taskProcessor.enqueueTask(*_fftTask);
 }

@@ -12,11 +12,13 @@ public:
     ~AudioProcessor();
 
 private:
-    API *_api;
     int _bufSize;
     static AudioProcessor *_instance;
+    DspTaskFactory& _dspTaskFactory;
+    TaskProcessor& _taskProcessor;
+    FFT_SP* _fftTask;
 
-    static void _callbackDSP(CallbackResponse *clbkRes);
+    static void _callbackDSP(DspTask& task);
 
 signals:
     void processedDataReady(float *data);

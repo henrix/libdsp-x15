@@ -15,13 +15,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), _ui(new Ui::MainWindow), _plotRefreshCounter(0)
 {
     _ui->setupUi(this);
-    setGeometry(600, 375, 813, 585);
+    setGeometry(400, 250, 542, 390);
 
     _demoName = "libdsp-x15 - Realtime Spectrum Plot Demo";
     setWindowTitle(_demoName);
     statusBar()->clearMessage();
 
-    _ui->customPlot->setNoAntialiasingOnDrag(true); // more performance/responsiveness during dragging
+    _ui->customPlot->setNotAntialiasedElements(QCP::aeAll);
+    QFont font;
+    font.setStyleStrategy(QFont::NoAntialias);
+    _ui->customPlot->xAxis->setTickLabelFont(font);
+    _ui->customPlot->yAxis->setTickLabelFont(font);
+    _ui->customPlot->legend->setFont(font);
 
     _ui->customPlot->xAxis->setLabel("Frequency (Hz)");
     _ui->customPlot->yAxis->setLabel("Magnitude (dBFS)");
@@ -80,7 +85,7 @@ void MainWindow::getAudioData(float *data){
     for (int i=0; i < 256; i++)
         _data[i] = std::log10(std::abs(cmplx[i]) / 256.0); //half of magnitude spectrum and normalize
 
-    if (_plotRefreshCounter % 2 == 0){
+    //if (_plotRefreshCounter % 2 == 0){
         double min = *std::min_element(_data.begin(), _data.end());
         double max = *std::min_element(_data.begin(), _data.end());
         if (min < -10.0 && max > 0.0)
@@ -93,6 +98,6 @@ void MainWindow::getAudioData(float *data){
             setRangeY(-10, 0);
         drawFunction(_data);
         _plotRefreshCounter = 0;
-    }
+    //}
     _plotRefreshCounter++;
 }
