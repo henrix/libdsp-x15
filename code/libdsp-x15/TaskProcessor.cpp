@@ -45,7 +45,10 @@ TaskProcessor::TaskProcessor(bool debug) : _debug(debug){
 
     /* create command queue for every compute unit */
     for (unsigned int i=0; i < _num_devices; i++)
-        _clCommandQueue.push_back(std::make_shared<cl::CommandQueue>(*_clContext, _clDevices[i], CL_QUEUE_PROFILING_ENABLE));
+        if (_debug)
+            _clCommandQueue.push_back(std::make_shared<cl::CommandQueue>(*_clContext, _clDevices[i], CL_QUEUE_PROFILING_ENABLE));
+        else
+            _clCommandQueue.push_back(std::make_shared<cl::CommandQueue>(*_clContext, _clDevices[i]));
 }
 
 TaskProcessor::~TaskProcessor(){
@@ -92,9 +95,6 @@ void TaskProcessor::enqueueTask(DspTask &task){
                 task_->_callback(*task_);
             };
             finishedEvent[0].setCallback(CL_COMPLETE, callbackHelper, &task);
-
-            if (_debug)
-                ocl_event_times(finishedEvent[0], task.getOperationName().c_str());
         }
     }
     catch(const cl::Error& err){
