@@ -50,13 +50,6 @@ public:
      */
     void enqueueTask(DspTask &task);
 
-    /**
-     * Enqueue a continuous DSP task to command queue
-     * @param task
-     * @param num_cycles number of task iterations (OpenCL work groups)
-     */
-    void enqueueContinuousTask(DspTask &task, unsigned int num_cycles);
-
 private:
     const bool _debug;
     std::map<unsigned long, bool> _taskBuffersEnqueued;

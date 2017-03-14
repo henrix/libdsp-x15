@@ -56,36 +56,48 @@ TaskProcessor::~TaskProcessor(){
 void TaskProcessor::enqueueTask(DspTask &task){
     try {
         /* TODO: check if buffers are already enqueued => optimize runtime */
+        // check if buffers has been assigned to command queue already
         if (!_taskBuffersEnqueued[task.id]){
+            // assign input buffers to queue
             std::vector<cl::Event> inputEvents = task._assignClInputBuffersToQueue(_clCommandQueue);
 
+            // enqueue OpenCL kernel to command queue
             std::vector<cl::Event> operationEvent(1);
             _clCommandQueue->enqueueNDRangeKernel(*task._clKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &inputEvents, &operationEvent[0]);
 
+            // assign output buffers to queue
             std::vector<cl::Event> finished = task._assignClOutputBuffersToQueue(_clCommandQueue, operationEvent);
 
+            // create callback as lambda and bind to finished event
             auto callbackHelper = [](cl_event ev, cl_int e_status, void *user_data) {
-                DspTask* task = (DspTask*) user_data;
-                task->_callback(*task);
+                DspTask* task_ = (DspTask*) user_data;
+                task_->_callback(*task_);
             };
-
             finished[0].setCallback(CL_COMPLETE, callbackHelper, &task);
 
+            // output operation benchmark if debug is enabled
             if (_debug){
+                //TODO: specify for each operation or make more abstract
                 ocl_event_times(inputEvents[0], "Write X");
                 ocl_event_times(inputEvents[1], "Twiddle");
                 ocl_event_times(operationEvent[0], "FFT");
                 ocl_event_times(finished[0], "Read Y");
             }
 
-            //_taskBuffersEnqueued[task.id] = true;
+            _taskBuffersEnqueued[task.id] = true;
+        }
+        else {
+            std::vector<cl::Event> operationEvent(1);
+            _clCommandQueue->enqueueNDRangeKernel(*task._clKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), 0, &operationEvent[0]);
+
+            auto callbackHelper = [](cl_event ev, cl_int e_status, void *user_data) {
+                DspTask* task_ = (DspTask*) user_data;
+                task_->_callback(*task_);
+            };
+            operationEvent[0].setCallback(CL_COMPLETE, callbackHelper, &task);
         }
     }
     catch(const cl::Error& err){
         std::cerr << "Error in taskprocessor(): " << err.what() << "(" << err.err() << ")" << std::endl;
     }
-}
-
-void TaskProcessor::enqueueContinuousTask(DspTask &task, unsigned int num_cycles){
-
 }
