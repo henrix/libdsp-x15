@@ -62,6 +62,12 @@ public:
      */
     virtual float* getOutputBuffer(unsigned int index = 0) = 0;
 
+    /**
+     * returns operation name (enum to string)
+     * @return
+     */
+    virtual std::string getOperationName();
+
 protected:
     /**
      * abstract constructor (is only called by factory)

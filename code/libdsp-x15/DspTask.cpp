@@ -27,6 +27,27 @@ DspTask::DspTask(unsigned long id, OPERATION operation, std::function<void(DspTa
 
 }
 
+std::string DspTask::getOperationName(){
+    std::string enumAsString;
+
+    switch(operation){
+        case DspTask::FFT:
+            enumAsString = "FFT";
+            break;
+        case DspTask::IFFT:
+            enumAsString = "IFFT";
+            break;
+        case DspTask::FILTER_BIQUAD:
+            enumAsString = "Biquad Filter";
+            break;
+        default:
+            enumAsString = "Unknown operation";
+            break;
+    }
+
+    return enumAsString;
+}
+
 unsigned long DspTask::_createId() {
     return _id_counter++;
 }
