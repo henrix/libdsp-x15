@@ -85,7 +85,7 @@ void MainWindow::getAudioData(float *data){
     for (int i=0; i < 256; i++)
         _data[i] = std::log10(std::abs(cmplx[i]) / 256.0); //half of magnitude spectrum and normalize
 
-    //if (_plotRefreshCounter % 2 == 0){
+    if (_plotRefreshCounter % 2 == 0){
         double min = *std::min_element(_data.begin(), _data.end());
         double max = *std::min_element(_data.begin(), _data.end());
         if (min < -10.0 && max > 0.0)
@@ -98,6 +98,6 @@ void MainWindow::getAudioData(float *data){
             setRangeY(-10, 0);
         drawFunction(_data);
         _plotRefreshCounter = 0;
-    //}
+    }
     _plotRefreshCounter++;
 }
