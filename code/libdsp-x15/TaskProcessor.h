@@ -52,10 +52,12 @@ public:
 
 private:
     const bool _debug;
+    unsigned long _num_devices;
+    int _num_compute_cores;
     std::map<unsigned long, bool> _taskBuffersEnqueued;
     std::deque<DspTask*> _queue;
     std::vector<cl::Device> _clDevices;
-    std::shared_ptr<cl::CommandQueue> _clCommandQueue;
+    std::vector<std::shared_ptr<cl::CommandQueue>> _clCommandQueue;
     std::shared_ptr<cl::Context> _clContext;
     std::shared_ptr<cl::Program> _clProgram;
     std::vector<cl::Kernel> _clKernels;

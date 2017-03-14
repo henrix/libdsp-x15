@@ -23,11 +23,12 @@
 TaskProcessor::TaskProcessor(bool debug) : _debug(debug){
     _clContext = std::make_shared<cl::Context>(CL_DEVICE_TYPE_ACCELERATOR);
 
-    /* discover OpenCL compute units */
+    /* discover OpenCL devices and its compute cores */
     _clDevices = _clContext->getInfo<CL_CONTEXT_DEVICES>();
-    int num;
-    _clDevices[0].getInfo(CL_DEVICE_MAX_COMPUTE_UNITS, &num);
-    std::cout << "found " << num << " DSP compute cores." << std::endl;
+    _clDevices[0].getInfo(CL_DEVICE_MAX_COMPUTE_UNITS, &_num_compute_cores);
+    _num_devices = _clDevices.size();
+    std::cout << "found " << _num_devices << " devices and " << _num_compute_cores
+              << " compute cores." << std::endl;
 
     /* load OpenCL program */
     std::ifstream clProgPathStr(CL_PROGRAM_PATH);
@@ -42,11 +43,9 @@ TaskProcessor::TaskProcessor(bool debug) : _debug(debug){
     /* link TI DSPLIB and build OpenCL program */
     _clProgram->build(_clDevices, DSPLIB_PATH.c_str());
 
-    /*
-     * create command queue
-     * TODO: create command queue for every core or task to execute several tasks in parallel
-     */
-    _clCommandQueue = std::make_shared<cl::CommandQueue>(*_clContext, _clDevices[0], CL_QUEUE_PROFILING_ENABLE);
+    /* create command queue for every compute unit */
+    for (unsigned int i=0; i < _num_devices; i++)
+        _clCommandQueue.push_back(std::make_shared<cl::CommandQueue>(*_clContext, _clDevices[i], CL_QUEUE_PROFILING_ENABLE));
 }
 
 TaskProcessor::~TaskProcessor(){
@@ -55,46 +54,47 @@ TaskProcessor::~TaskProcessor(){
 
 void TaskProcessor::enqueueTask(DspTask &task){
     try {
-        /* TODO: check if buffers are already enqueued => optimize runtime */
-        // check if buffers has been assigned to command queue already
+        /* get specific command queue for task */
+        std::shared_ptr<cl::CommandQueue> clCmdQueue = _clCommandQueue[task.id % _num_devices];
+
+        /* check if buffers has been assigned to command queue already */
         if (!_taskBuffersEnqueued[task.id]){
-            // assign input buffers to queue
-            std::vector<cl::Event> inputEvents = task._assignClInputBuffersToQueue(_clCommandQueue);
 
-            // enqueue OpenCL kernel to command queue
+            /* assign input buffers to queue */
+            std::vector<cl::Event> inputEvents = task._assignClInputBuffersToQueue(clCmdQueue);
+
+            /* enqueue OpenCL kernel to command queue */
             std::vector<cl::Event> operationEvent(1);
-            _clCommandQueue->enqueueNDRangeKernel(*task._clKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &inputEvents, &operationEvent[0]);
+            clCmdQueue->enqueueNDRangeKernel(*task._clKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), &inputEvents, &operationEvent[0]);
 
-            // assign output buffers to queue
-            std::vector<cl::Event> finished = task._assignClOutputBuffersToQueue(_clCommandQueue, operationEvent);
+            /* assign output buffers to queue */
+            std::vector<cl::Event> finishedEvent = task._assignClOutputBuffersToQueue(clCmdQueue, operationEvent);
 
-            // create callback as lambda and bind to finished event
+            /* create callback as lambda and bind to finished event */
             auto callbackHelper = [](cl_event ev, cl_int e_status, void *user_data) {
                 DspTask* task_ = (DspTask*) user_data;
                 task_->_callback(*task_);
             };
-            finished[0].setCallback(CL_COMPLETE, callbackHelper, &task);
+            finishedEvent[0].setCallback(CL_COMPLETE, callbackHelper, &task);
 
-            // output operation benchmark if debug is enabled
-            if (_debug){
-                //TODO: specify for each operation or make more abstract
-                ocl_event_times(inputEvents[0], "Write X");
-                ocl_event_times(inputEvents[1], "Twiddle");
-                ocl_event_times(operationEvent[0], "FFT");
-                ocl_event_times(finished[0], "Read Y");
-            }
+            /* output operation benchmark if debug is enabled */
+            if (_debug)
+                ocl_event_times(finishedEvent[0], task.getOperationName().c_str());
 
             _taskBuffersEnqueued[task.id] = true;
         }
         else {
-            std::vector<cl::Event> operationEvent(1);
-            _clCommandQueue->enqueueNDRangeKernel(*task._clKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), 0, &operationEvent[0]);
+            std::vector<cl::Event> finishedEvent(1);
+            clCmdQueue->enqueueNDRangeKernel(*task._clKernel, cl::NullRange, cl::NDRange(1), cl::NDRange(1), 0, &finishedEvent[0]);
 
             auto callbackHelper = [](cl_event ev, cl_int e_status, void *user_data) {
                 DspTask* task_ = (DspTask*) user_data;
                 task_->_callback(*task_);
             };
-            operationEvent[0].setCallback(CL_COMPLETE, callbackHelper, &task);
+            finishedEvent[0].setCallback(CL_COMPLETE, callbackHelper, &task);
+
+            if (_debug)
+                ocl_event_times(finishedEvent[0], task.getOperationName().c_str());
         }
     }
     catch(const cl::Error& err){
