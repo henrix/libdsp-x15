@@ -31,14 +31,14 @@ warning: ignoring unsupported tag `UML_LIMIT_NUM_FIELDS   =' at line 296, file /
 warning: ignoring unsupported tag `DIAFILE_DIRS           =' at line 309, file /home/travis/build/henrix/libdsp-x15/docs/Doxyfile
 warning: ignoring unsupported tag `PLANTUML_JAR_PATH      =' at line 310, file /home/travis/build/henrix/libdsp-x15/docs/Doxyfile
 warning: ignoring unsupported tag `PLANTUML_INCLUDE_PATH  =' at line 311, file /home/travis/build/henrix/libdsp-x15/docs/Doxyfile
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:103: warning: Member _callback (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:106: warning: Member _clKernel (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:109: warning: Member _clContext (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:110: warning: Member _clProgram (variable) of class DspTask is not documented.
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:92: warning: The following parameters of DspTask::_assignClOutputBuffersToQueue(std::shared_ptr< cl::CommandQueue > clCmdQueue, std::vector< cl::Event > &preEvents) are not documented:
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:109: warning: Member _callback (variable) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:112: warning: Member _clKernel (variable) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:115: warning: Member _clContext (variable) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:116: warning: Member _clProgram (variable) of class DspTask is not documented.
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:98: warning: The following parameters of DspTask::_assignClOutputBuffersToQueue(std::shared_ptr< cl::CommandQueue > clCmdQueue, std::vector< cl::Event > &preEvents) are not documented:
   parameter 'preEvents'
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:125: warning: argument 'pointer' of command @param is not found in the argument list of DspTask::_freeBuffer(void *ptr)
-/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:125: warning: The following parameters of DspTask::_freeBuffer(void *ptr) are not documented:
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:131: warning: argument 'pointer' of command @param is not found in the argument list of DspTask::_freeBuffer(void *ptr)
+/home/travis/build/henrix/libdsp-x15/code/libdsp-x15/DspTask.h:131: warning: The following parameters of DspTask::_freeBuffer(void *ptr) are not documented:
   parameter 'ptr'
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/FFT_SP.h:65: warning: argument 'pointer' of command @param is not found in the argument list of FFT_SP::generateTwiddleFactors(unsigned int N, float *buffer)
 /home/travis/build/henrix/libdsp-x15/code/libdsp-x15/FFT_SP.h:65: warning: The following parameters of FFT_SP::generateTwiddleFactors(unsigned int N, float *buffer) are not documented:
@@ -150,6 +150,6 @@ Generating file index...
 Generating file member index...
 Generating example index...
 finalizing index lists...
-symbol cache used 119/65536 hits=4647 misses=119
-lookup cache used 144/65536 hits=688 misses=146
+symbol cache used 122/65536 hits=4719 misses=122
+lookup cache used 147/65536 hits=705 misses=149
 finished...

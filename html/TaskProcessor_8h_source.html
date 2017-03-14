@@ -120,17 +120,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00052"></a>00052 
 <a name="l00053"></a>00053 <span class="keyword">private</span>:
 <a name="l00054"></a>00054     <span class="keyword">const</span> <span class="keywordtype">bool</span> _debug;
-<a name="l00055"></a>00055     std::map&lt;unsigned long, bool&gt; _taskBuffersEnqueued;
-<a name="l00056"></a>00056     std::deque&lt;DspTask*&gt; _queue;
-<a name="l00057"></a>00057     std::vector&lt;cl::Device&gt; _clDevices;
-<a name="l00058"></a>00058     std::shared_ptr&lt;cl::CommandQueue&gt; _clCommandQueue;
-<a name="l00059"></a>00059     std::shared_ptr&lt;cl::Context&gt; _clContext;
-<a name="l00060"></a>00060     std::shared_ptr&lt;cl::Program&gt; _clProgram;
-<a name="l00061"></a>00061     std::vector&lt;cl::Kernel&gt; _clKernels;
-<a name="l00062"></a>00062 };
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064 
-<a name="l00065"></a>00065 <span class="preprocessor">#endif //LIBDSP_X15_TASKPROCESSOR_H</span>
+<a name="l00055"></a>00055     <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> _num_devices;
+<a name="l00056"></a>00056     <span class="keywordtype">int</span> _num_compute_cores;
+<a name="l00057"></a>00057     std::map&lt;unsigned long, bool&gt; _taskBuffersEnqueued;
+<a name="l00058"></a>00058     std::deque&lt;DspTask*&gt; _queue;
+<a name="l00059"></a>00059     std::vector&lt;cl::Device&gt; _clDevices;
+<a name="l00060"></a>00060     std::vector&lt;std::shared_ptr&lt;cl::CommandQueue&gt;&gt; _clCommandQueue;
+<a name="l00061"></a>00061     std::shared_ptr&lt;cl::Context&gt; _clContext;
+<a name="l00062"></a>00062     std::shared_ptr&lt;cl::Program&gt; _clProgram;
+<a name="l00063"></a>00063     std::vector&lt;cl::Kernel&gt; _clKernels;
+<a name="l00064"></a>00064 };
+<a name="l00065"></a>00065 
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 <span class="preprocessor">#endif //LIBDSP_X15_TASKPROCESSOR_H</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"

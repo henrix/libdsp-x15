@@ -7,6 +7,7 @@ var searchData=
   ['getinstance',['getInstance',['../classDspTaskFactory.html#acc92edcedc54091e60bcd97360087f81',1,'DspTaskFactory']]],
   ['getlength',['getLength',['../classFilterBiquadSP.html#a87b09236068ddba5a4ebb1bed4500998',1,'FilterBiquadSP']]],
   ['getn',['getN',['../classFFT__SP.html#a294f0e652ee3e432766e8c8f8ea02953',1,'FFT_SP::getN()'],['../classIFFT__SP.html#a0f85ef8873b487867917c003a8ea3c01',1,'IFFT_SP::getN()']]],
+  ['getoperationname',['getOperationName',['../classDspTask.html#aa9e558518ca4827781e181784a0105b6',1,'DspTask']]],
   ['getoutputbuffer',['getOutputBuffer',['../classDspTask.html#a0f5231646a852f3843833f812ef6479f',1,'DspTask::getOutputBuffer()'],['../classFFT__SP.html#a855a77678a8ccb605cd9e44e7b4d4ecc',1,'FFT_SP::getOutputBuffer()'],['../classFilterBiquadSP.html#a9a42eba7140f2923814499a403d5dffd',1,'FilterBiquadSP::getOutputBuffer()'],['../classIFFT__SP.html#a3fa21a9f45487af30e81592c5b41b8c5',1,'IFFT_SP::getOutputBuffer()']]],
   ['getoutputbuffercopy',['getOutputBufferCopy',['../classFFT__SP.html#a6c6d11f2ef2cafae189fefff906b7c4d',1,'FFT_SP::getOutputBufferCopy()'],['../classIFFT__SP.html#a8536a6a339378ae40d29e6f79dbe00ae',1,'IFFT_SP::getOutputBufferCopy()']]]
 ];
