@@ -124,7 +124,7 @@ float* FilterBiquadSP::getOutputBuffer(unsigned int index){
         return _bufferOutput;
     else {
         std::cout << "WARNING: requested non available output buffer in biquad filter" << std::endl;
-        return _bufferInput;
+        return _bufferOutput;
     }
 }
 
