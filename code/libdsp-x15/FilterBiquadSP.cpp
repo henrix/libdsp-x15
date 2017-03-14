@@ -114,8 +114,8 @@ float* FilterBiquadSP::getInputBuffer(unsigned int index){
     if (index == 0)
         return _bufferInput;
     else {
-        std::cout << "WARNING: requested non available input buffer in biquad filter. returning nullptr" << std::endl;
-        return nullptr;
+        std::cout << "WARNING: requested non available input buffer in biquad filter" << std::endl;
+        return _bufferInput;
     }
 }
 
@@ -123,8 +123,8 @@ float* FilterBiquadSP::getOutputBuffer(unsigned int index){
     if (index == 0)
         return _bufferOutput;
     else {
-        std::cout << "WARNING: requested non available output buffer in biquad filter. returning nullptr" << std::endl;
-        return nullptr;
+        std::cout << "WARNING: requested non available output buffer in biquad filter" << std::endl;
+        return _bufferInput;
     }
 }
 
@@ -144,10 +144,10 @@ void FilterBiquadSP::configFilter(std::vector<float>& b, std::vector<float>& a){
 }
 
 std::vector<float> FilterBiquadSP::calcCoefficients(TYPE type, float Fc, float Fs, float Q, float peakGain){
-    float b0, b1, b2, a1, a2, norm;
+    double b0, b1, b2, a1, a2, norm;
 
-    float V = std::pow(10.0, std::abs(peakGain) / 20.0);
-    float K = std::tan(M_PI * Fc / Fs);
+    double V = std::pow(10.0, std::abs(peakGain) / 20.0);
+    double K = std::tan(M_PI * Fc / Fs);
     switch(type){
         case LOWPASS:
             norm = 1.0 / (1.0 + K / Q + K * K);
@@ -236,7 +236,7 @@ std::vector<float> FilterBiquadSP::calcCoefficients(TYPE type, float Fc, float F
             }
             break;
     }
-    std::vector<float> coefficients {b0, b1, b2, 0.0, a1, a2};
+    std::vector<float> coefficients {(float)b0, (float)b1, (float)b2, 0.0, (float)a1, (float)a2};
 
     return coefficients;
 }
