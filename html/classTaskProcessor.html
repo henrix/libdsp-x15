@@ -94,7 +94,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTaskProcessor.html#a6a075f60f597896c9c8b7f8aa7a62aa8">TaskProcessor</a> (bool debug=0)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTaskProcessor.html#a974deebbccc9b99472161e981436090f">enqueueTask</a> (<a class="el" href="classDspTask.html">DspTask</a> &amp;task)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTaskProcessor.html#a561c8541eb94bdde362ae1a8ed5bcf8e">enqueueContinuousTask</a> (<a class="el" href="classDspTask.html">DspTask</a> &amp;task, unsigned int num_cycles)</td></tr>
 <tr><td colspan="2"><h2><a name="friends"></a>
 Friends</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05cd8106958d1d2eaf14797d163703cc"></a><!-- doxytag: member="TaskProcessor::DspTaskFactory" ref="a05cd8106958d1d2eaf14797d163703cc" args="" -->
@@ -128,41 +127,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DspTaskFactory</b></
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a561c8541eb94bdde362ae1a8ed5bcf8e"></a><!-- doxytag: member="TaskProcessor::enqueueContinuousTask" ref="a561c8541eb94bdde362ae1a8ed5bcf8e" args="(DspTask &amp;task, unsigned int num_cycles)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classTaskProcessor.html#a561c8541eb94bdde362ae1a8ed5bcf8e">TaskProcessor::enqueueContinuousTask</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classDspTask.html">DspTask</a> &amp;&#160;</td>
-          <td class="paramname"><em>task</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>num_cycles</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Enqueue a continuous DSP task to command queue </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">task</td><td></td></tr>
-    <tr><td class="paramname">num_cycles</td><td>number of task iterations (OpenCL work groups) </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a class="anchor" id="a974deebbccc9b99472161e981436090f"></a><!-- doxytag: member="TaskProcessor::enqueueTask" ref="a974deebbccc9b99472161e981436090f" args="(DspTask &amp;task)" -->
 <div class="memitem">
 <div class="memproto">

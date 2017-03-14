@@ -105,7 +105,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00025"></a>00025 
 <a name="l00030"></a><a class="code" href="classDspTask.html">00030</a> <span class="keyword">class </span><a class="code" href="classDspTask.html" title="represents abstract DSP task. all task implementations must inherit from this class.">DspTask</a> {
 <a name="l00031"></a>00031     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classTaskProcessor.html" title="manages command queue and is responsible for correct DSP task execution.">TaskProcessor</a>;
-<a name="l00032"></a>00032     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classDspTaskFactory.html" title="factory to construct DSP tasks. injects required OpenCL runtime objects.">DspTaskFactory</a>;
+<a name="l00032"></a>00032     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classDspTaskFactory.html" title="factory to construct DSP tasks. injects required OpenCL runtime dependencies.">DspTaskFactory</a>;
 <a name="l00033"></a>00033 <span class="keyword">public</span>:
 <a name="l00035"></a><a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">00035</a>     <span class="keyword">enum</span> <a class="code" href="classDspTask.html#a22e7b22b520891c83176c4c93f9d7de5">OPERATION</a> {FFT, IFFT, FILTER_BIQUAD};
 <a name="l00036"></a>00036 
