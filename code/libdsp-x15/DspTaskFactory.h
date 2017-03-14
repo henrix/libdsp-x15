@@ -28,7 +28,7 @@
 
 /**
  * @brief factory to construct DSP tasks.
- * injects required OpenCL runtime objects.
+ * injects required OpenCL runtime dependencies.
  */
 class DspTaskFactory {
 public:
