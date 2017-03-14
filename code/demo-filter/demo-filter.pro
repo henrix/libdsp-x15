@@ -11,12 +11,10 @@ TEMPLATE = app
 SOURCES += main.cpp\
     mainwindow.cpp \
     ../qcustomplot/qcustomplot.cpp \
-    jackclient.cpp \
     audioprocessor.cpp
 
 HEADERS  += mainwindow.h \
     ../qcustomplot/qcustomplot.h \
-    jackclient.h \
     audioprocessor.h
 
 FORMS    += mainwindow.ui
